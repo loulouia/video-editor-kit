@@ -1,0 +1,339 @@
+{
+ "_sobre": "Edição do TASTE WASHING 5 (o que entra e quando). Tempos em segundos do A-roll final; palavras pelo índice em transcricao/aroll.words.json. Gerar: python motor/gerar.py projetos/taste-washing-5",
+ "duracao": 35.93,
+ "titulo": {
+  "de": 0.0,
+  "ate": 5.18,
+  "linhas": [
+   "TASTE WASHING:",
+   "O SEU BOM GOSTO",
+   "É MESMO SEU?"
+  ],
+  "subtitulo": "(E O VILÃO ESCONDIDO NO SEU FEED)"
+ },
+ "legendas": [
+  [
+   "O PIERRE BOURDIEU",
+   18,
+   20
+  ],
+  [
+   "CHAMADO A DISTINÇÃO,",
+   25,
+   27
+  ],
+  [
+   "GASTEI TODA A MINHA",
+   30,
+   33
+  ],
+  [
+   "BAGAGEM LITERÁRIA",
+   34,
+   35
+  ],
+  [
+   "MOSTROU QUE AQUILO",
+   36,
+   38
+  ],
+  [
+   "QUE A GENTE CHAMA",
+   39,
+   42
+  ],
+  [
+   "DE GOSTO PESSOAL,",
+   43,
+   45
+  ],
+  [
+   "O QUE QUER DIZER?",
+   53,
+   56
+  ],
+  [
+   "OU SEJA,",
+   58,
+   59
+  ],
+  [
+   "QUEM TEM MAIS ACESSO",
+   60,
+   63
+  ],
+  [
+   "DEFINE O QUE É BOM GOSTO",
+   64,
+   69
+  ],
+  [
+   "E TODO O RESTO",
+   70,
+   73
+  ],
+  [
+   "SÓ ABSORVE",
+   74,
+   75
+  ],
+  [
+   "SEM NEM PERCEBER",
+   84,
+   86
+  ],
+  [
+   "ENTÃO, MINHA QUERIDA,",
+   87,
+   89
+  ],
+  [
+   "MEU QUERIDO,",
+   90,
+   91
+  ],
+  [
+   "QUANDO VOCÊ FALA",
+   92,
+   94
+  ],
+  [
+   "QUE TEM BOM GOSTO,",
+   95,
+   98
+  ],
+  [
+   "O QUE VOCÊ TEM",
+   99,
+   102
+  ],
+  [
+   "A UM CERTO TIPO DE",
+   107,
+   111
+  ],
+  [
+   "INFORMAÇÃO REFERÊNCIA",
+   112,
+   113
+  ],
+  [
+   "E É EXATAMENTE AÍ",
+   114,
+   117
+  ],
+  [
+   "QUE O NOSSO FEED",
+   118,
+   121
+  ],
+  [
+   "ENTRA COMO",
+   122,
+   123
+  ]
+ ],
+ "palavras_chave": [
+  {
+   "partes": [
+    [
+     "num livro de",
+     "pequeno",
+     [
+      21,
+      22,
+      23
+     ]
+    ],
+    [
+     "1979",
+     "principal",
+     [
+      24
+     ]
+    ]
+   ],
+   "segura": 0.25
+  },
+  {
+   "partes": [
+    [
+     "não é nada",
+     "pequeno",
+     [
+      46,
+      47,
+      48
+     ]
+    ],
+    [
+     "pessoal.",
+     "principal",
+     [
+      49
+     ]
+    ]
+   ],
+   "segura": 0.2,
+   "efeito": "negativo"
+  },
+  {
+   "partes": [
+    [
+     "é",
+     "pequeno",
+     [
+      50
+     ]
+    ],
+    [
+     "CAPITAL CULTURAL",
+     "principal",
+     [
+      51,
+      52
+     ]
+    ]
+   ],
+   "segura": 0.15,
+   "efeito": "negativo"
+  },
+  {
+   "partes": [
+    [
+     "essa régua",
+     "pequeno",
+     [
+      76,
+      77
+     ]
+    ],
+    [
+     "lá em cima",
+     "principal",
+     [
+      81,
+      82,
+      83
+     ]
+    ]
+   ],
+   "segura": 0.0
+  },
+  {
+   "partes": [
+    [
+     "na verdade é",
+     "pequeno",
+     [
+      103,
+      104,
+      105
+     ]
+    ],
+    [
+     "acesso.",
+     "principal",
+     [
+      106
+     ]
+    ]
+   ],
+   "segura": 0.2
+  },
+  {
+   "partes": [
+    [
+     "um",
+     "pequeno",
+     [
+      124
+     ]
+    ],
+    [
+     "vilão",
+     "principal",
+     [
+      125
+     ]
+    ],
+    [
+     "escondido na nossa rotina.",
+     "pequeno",
+     [
+      126,
+      127,
+      128,
+      129
+     ]
+    ]
+   ],
+   "segura": 0.4
+  }
+ ],
+ "texto_atras": [
+  {
+   "texto": "ACESSO.",
+   "palavra": 57,
+   "de": 16.36,
+   "ate": 16.82
+  }
+ ],
+ "cards": [
+  {
+   "arquivo": "img/noticia-techbros.png",
+   "tipo": "noticia",
+   "de": 0.0,
+   "ate": 5.18
+  },
+  {
+   "arquivo": "img/zuck-dorm.jpg",
+   "tipo": "card-pequeno",
+   "de": 25.84,
+   "ate": 27.94
+  },
+  {
+   "arquivo": "img/musk-paypal.jpg",
+   "tipo": "card-pequeno",
+   "de": 29.22,
+   "ate": 31.1
+  }
+ ],
+ "topo_mesclado": [
+  {
+   "de": 5.3,
+   "ate": 9.1,
+   "imagens": [
+    "img/bourdieu.jpg"
+   ]
+  },
+  {
+   "de": 17.48,
+   "ate": 23.95,
+   "imagens": [
+    "img/openai-bone.jpg",
+    "img/claude-airmail.jpg",
+    "img/palantir.jpg",
+    "img/post-mcallister.png"
+   ]
+  }
+ ],
+ "zoom": {
+  "escala": 1.12,
+  "origem": "50% 32%",
+  "trechos": [
+   [
+    12.12,
+    16.82
+   ],
+   [
+    24.02,
+    27.3
+   ],
+   [
+    31.26,
+    35.93
+   ]
+  ]
+ }
+}

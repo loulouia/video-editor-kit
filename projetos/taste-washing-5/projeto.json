@@ -1,0 +1,22 @@
+{
+ "titulo": "TASTE WASHING 5",
+ "padrao": "amanda",
+ "marca": "amanda",
+ "bruto": "entrada/brutos/TASTE WASHING 5 [GEMZ].mp4",
+ "aceleracao": 1.15,
+ "grading": "marca",
+ "fim": 43.0,
+ "cortes_config": {
+  "manter": [
+   [
+    19.3,
+    19.8,
+    "pausa dramática antes de 'Acesso.'"
+   ]
+  ],
+  "respiro": {
+   "gosto,": 0.14
+  }
+ },
+ "_sobre": "Decisões do plano aprovado (plano.md). Padrão = visual; marca = criador; o resto da edição está em edicao.json."
+}

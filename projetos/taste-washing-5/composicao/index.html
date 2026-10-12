@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>TASTE WASHING 5</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Padrao"; src: url("assets/fonts/HelveticaNowDisplay-ExtraBold.ttf") format("truetype"); font-weight: 800; }
+body { margin: 0; background: #000; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Padrao", sans-serif; font-weight: 800; color: #fff; }
+.clip { position: absolute; inset: 0; }
+.cam { position: absolute; inset: 0; transform-origin: 50% 32%; }
+.cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* PLAYBOOK 4.1–4.2 — cards */
+.card-slot { display: flex; justify-content: center; }
+.card { position: absolute; top: 54%; overflow: hidden; border-radius: 26px; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+.card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.card.card { width: 86%; height: 29%; }
+.card.card-pequeno { width: 60%; height: 27%; }
+.card.noticia { width: 86%; height: auto; max-height: 29%; background: #fff; border-radius: 22px; }
+.card.noticia img { height: auto; object-fit: contain; }
+/* PLAYBOOK §1 — título de abertura */
+.titulo { display: flex; justify-content: center; }
+.t-block { position: absolute; width: 90%; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,.3); }
+.t-line { font-size: 54px; line-height: 1.02; letter-spacing: -0.01em; }
+.t-sub { font-size: 27px; margin-top: 10px; opacity: .95; }
+/* PLAYBOOK §3 — legenda */
+.cap { display: flex; justify-content: center; }
+.cap-txt { position: absolute; transform: translateY(-50%); width: 88%; text-align: center; font-size: 40px;
+  line-height: 1.08; letter-spacing: -0.005em; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
+/* PLAYBOOK 3.1 — palavras-chave */
+.kw { display: flex; justify-content: center; }
+.kw-block { position: absolute; display: flex; flex-direction: column; align-items: center; text-shadow: 0 4px 24px rgba(0,0,0,.30); }
+.kw-row { white-space: nowrap; }
+.kw-small { font-size: 46px; letter-spacing: -0.03em; line-height: 1.0; }
+.kw-main { font-size: 200px; letter-spacing: -0.045em; line-height: 0.86; }
+.w { display: inline-block; }
+/* PLAYBOOK 3.1 — efeito negativo: as letras invertem as cores do vídeo atrás delas */
+.kw-neg .kw-block { mix-blend-mode: difference; text-shadow: none; }
+.logo { position: absolute; top: 5.2%; right: 7%; width: 19%; height: auto; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1080" data-height="1920" data-duration="35.93">
+<div id="cam" class="cam"><video id="aroll" src="assets/aroll_comp.mp4" playsinline data-has-audio="true" data-start="0" data-duration="35.93" data-track-index="0"></video></div>
+<div id="card0" class="clip card-slot" data-start="0.0" data-duration="5.18" data-track-index="4"><div class="card noticia" style="top:65.54%;width:73.40%"><img src="assets/img/noticia-techbros.png" alt=""></div></div>
+<div id="card1" class="clip card-slot" data-start="25.84" data-duration="2.1" data-track-index="4"><div class="card card-pequeno" style="top:54.32%;height:27.00%"><img src="assets/img/zuck-dorm.jpg" alt=""></div></div>
+<div id="card2" class="clip card-slot" data-start="29.22" data-duration="1.88" data-track-index="4"><div class="card card-pequeno" style="top:53.00%;height:27.00%"><img src="assets/img/musk-paypal.jpg" alt=""></div></div>
+<div id="titulo" class="clip titulo" data-start="0.0" data-duration="5.18" data-track-index="5"><div class="t-block" style="top:53.04%"><div class="t-line">TASTE WASHING:</div><div class="t-line">O SEU BOM GOSTO</div><div class="t-line">É MESMO SEU?</div><div class="t-sub">(E O VILÃO ESCONDIDO NO SEU FEED)</div></div></div>
+<div id="cap0" class="clip cap" data-start="5.3" data-duration="0.95" data-track-index="6"><div class="cap-txt" style="top:73.69%">O PIERRE BOURDIEU</div></div>
+<div id="cap1" class="clip cap" data-start="8.01" data-duration="1.3" data-track-index="6"><div class="cap-txt" style="top:73.89%">CHAMADO A DISTINÇÃO,</div></div>
+<div id="cap2" class="clip cap" data-start="9.5" data-duration="1.02" data-track-index="6"><div class="cap-txt" style="top:54.00%">GASTEI TODA A MINHA</div></div>
+<div id="cap3" class="clip cap" data-start="10.52" data-duration="1.6" data-track-index="6"><div class="cap-txt" style="top:54.29%">BAGAGEM LITERÁRIA</div></div>
+<div id="cap4" class="clip cap" data-start="12.12" data-duration="0.48" data-track-index="6"><div class="cap-txt" style="top:54.29%">MOSTROU QUE AQUILO</div></div>
+<div id="cap5" class="clip cap" data-start="12.6" data-duration="0.42" data-track-index="6"><div class="cap-txt" style="top:54.00%">QUE A GENTE CHAMA</div></div>
+<div id="cap6" class="clip cap" data-start="13.02" data-duration="0.53" data-track-index="6"><div class="cap-txt" style="top:55.69%">DE GOSTO PESSOAL,</div></div>
+<div id="cap7" class="clip cap" data-start="15.8" data-duration="0.56" data-track-index="6"><div class="cap-txt" style="top:54.76%">O QUE QUER DIZER?</div></div>
+<div id="cap8" class="clip cap" data-start="17.04" data-duration="0.44" data-track-index="6"><div class="cap-txt" style="top:68.06%">OU SEJA,</div></div>
+<div id="cap9" class="clip cap" data-start="17.48" data-duration="0.9" data-track-index="6"><div class="cap-txt" style="top:75.98%">QUEM TEM MAIS ACESSO</div></div>
+<div id="cap10" class="clip cap" data-start="18.38" data-duration="1.12" data-track-index="6"><div class="cap-txt" style="top:75.98%">DEFINE O QUE É BOM GOSTO</div></div>
+<div id="cap11" class="clip cap" data-start="19.5" data-duration="0.6" data-track-index="6"><div class="cap-txt" style="top:71.00%">E TODO O RESTO</div></div>
+<div id="cap12" class="clip cap" data-start="20.1" data-duration="0.75" data-track-index="6"><div class="cap-txt" style="top:71.00%">SÓ ABSORVE</div></div>
+<div id="cap13" class="clip cap" data-start="23.38" data-duration="0.64" data-track-index="6"><div class="cap-txt" style="top:71.00%">SEM NEM PERCEBER</div></div>
+<div id="cap14" class="clip cap" data-start="24.02" data-duration="1.44" data-track-index="6"><div class="cap-txt" style="top:54.00%">ENTÃO, MINHA QUERIDA,</div></div>
+<div id="cap15" class="clip cap" data-start="25.46" data-duration="0.38" data-track-index="6"><div class="cap-txt" style="top:54.00%">MEU QUERIDO,</div></div>
+<div id="cap16" class="clip cap" data-start="25.84" data-duration="0.44" data-track-index="6"><div class="cap-txt" style="top:50.32%">QUANDO VOCÊ FALA</div></div>
+<div id="cap17" class="clip cap" data-start="26.28" data-duration="1.1" data-track-index="6"><div class="cap-txt" style="top:50.32%">QUE TEM BOM GOSTO,</div></div>
+<div id="cap18" class="clip cap" data-start="27.38" data-duration="0.51" data-track-index="6"><div class="cap-txt" style="top:50.32%">O QUE VOCÊ TEM</div></div>
+<div id="cap19" class="clip cap" data-start="29.42" data-duration="0.66" data-track-index="6"><div class="cap-txt" style="top:49.00%">A UM CERTO TIPO DE</div></div>
+<div id="cap20" class="clip cap" data-start="30.08" data-duration="1.18" data-track-index="6"><div class="cap-txt" style="top:49.00%">INFORMAÇÃO REFERÊNCIA</div></div>
+<div id="cap21" class="clip cap" data-start="31.26" data-duration="0.86" data-track-index="6"><div class="cap-txt" style="top:54.00%">E É EXATAMENTE AÍ</div></div>
+<div id="cap22" class="clip cap" data-start="32.12" data-duration="0.72" data-track-index="6"><div class="cap-txt" style="top:54.00%">QUE O NOSSO FEED</div></div>
+<div id="cap23" class="clip cap" data-start="32.84" data-duration="0.51" data-track-index="6"><div class="cap-txt" style="top:55.00%">ENTRA COMO</div></div>
+<div id="kw0" class="clip kw" data-start="6.25" data-duration="1.76" data-track-index="7"><div class="kw-block" style="top:71.89%"><div class="kw-row kw-small kw-before"><span class="w" data-t="6.3">num</span> <span class="w" data-t="6.52">livro</span> <span class="w" data-t="6.92">de</span></div><div class="kw-row kw-main"><span class="w" data-t="7.08">1979</span></div></div></div>
+<div id="kw1" class="clip kw kw-neg" data-start="13.55" data-duration="1.19" data-track-index="7"><div class="kw-block" style="top:53.69%"><div class="kw-row kw-small kw-before"><span class="w" data-t="13.6">não</span> <span class="w" data-t="13.76">é</span> <span class="w" data-t="13.86">nada</span></div><div class="kw-row kw-main"><span class="w" data-t="14.08">pessoal.</span></div></div></div>
+<div id="kw2" class="clip kw kw-neg" data-start="14.71" data-duration="1.08" data-track-index="7"><div class="kw-block" style="top:52.29%"><div class="kw-row kw-small kw-before"><span class="w" data-t="14.76">é</span></div><div class="kw-row kw-main"><span class="w" data-t="14.84">CAPITAL</span></div><div class="kw-row kw-main"><span class="w" data-t="15.2">CULTURAL</span></div></div></div>
+<div id="kw3" class="clip kw" data-start="20.85" data-duration="2.53" data-track-index="7"><div class="kw-block" style="top:68.98%"><div class="kw-row kw-small kw-before"><span class="w" data-t="20.9">essa</span> <span class="w" data-t="21.48">régua</span></div><div class="kw-row kw-main"><span class="w" data-t="22.78">lá</span> <span class="w" data-t="23.06">em</span> <span class="w" data-t="23.2">cima</span></div></div></div>
+<div id="kw4" class="clip kw" data-start="27.89" data-duration="1.53" data-track-index="7"><div class="kw-block" style="top:47.00%"><div class="kw-row kw-small kw-before"><span class="w" data-t="27.94">na</span> <span class="w" data-t="28.04">verdade</span> <span class="w" data-t="28.56">é</span></div><div class="kw-row kw-main"><span class="w" data-t="28.72">acesso.</span></div></div></div>
+<div id="kw5" class="clip kw" data-start="33.35" data-duration="2.58" data-track-index="7"><div class="kw-block" style="top:53.47%"><div class="kw-row kw-small kw-before"><span class="w" data-t="33.4">um</span></div><div class="kw-row kw-main"><span class="w" data-t="33.54">vilão</span></div><div class="kw-row kw-small kw-after" data-layout-allow-overflow=""><span class="w" data-t="33.82">escondido</span> <span class="w" data-t="35.18">na</span> <span class="w" data-t="35.32">nossa</span> <span class="w" data-t="35.54">rotina.</span></div></div></div>
+<img id="logo" class="logo" src="assets/img/logo-escuro.png" alt="" style="opacity:0.7">
+<img id="logo-claro" class="logo" src="assets/img/logo-claro.png" alt="" style="opacity:0">
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+function fitMain() {
+  // palavra principal: tamanho pela largura alvo, entre o mínimo e o máximo do padrão (PLAYBOOK 3.1)
+  document.querySelectorAll(".kw-block").forEach((b) => {
+    const rows = b.querySelectorAll(".kw-main");
+    let widest = 0;
+    rows.forEach((r) => { r.style.fontSize = "100px"; widest = Math.max(widest, r.scrollWidth); });
+    const size = Math.max(110, Math.min(250, Math.floor(100 * 700 / widest)));
+    rows.forEach((r) => (r.style.fontSize = size + "px"));
+    tighten(b, size);
+    anchor(b, size);
+  });
+}
+// Ancora as palavras pequenas na palavra grande (não na largura do bloco), como nas referências:
+// antes → encaixadas no canto superior esquerdo da 1ª linha grande ("Do it / yourself");
+// depois → no canto inferior direito da última linha grande ("days / ...forget."), podendo passar dela.
+function anchor(block, size) {
+  const mains = [...block.querySelectorAll(".kw-main")];
+  const widest = Math.max(...mains.map((r) => r.offsetWidth));
+  block.style.width = widest + "px";           // a largura do bloco é a da palavra grande
+  const first = mains[0], last = mains[mains.length - 1];
+  const nudge = Math.round(size * 0.02);       // compensa o respiro lateral da letra grande
+  block.querySelectorAll(".kw-before").forEach((r) => {
+    r.style.alignSelf = "flex-start";
+    r.style.marginLeft = ((widest - first.offsetWidth) / 2 + nudge) + "px";
+  });
+  block.querySelectorAll(".kw-after").forEach((r) => {
+    if (r.offsetWidth > last.offsetWidth) {
+      // mais larga que a palavra grande: começa no "pé" esquerdo dela e cresce pra direita (ordem de leitura)
+      r.style.alignSelf = "flex-start";
+      r.style.marginLeft = ((widest - last.offsetWidth) / 2 + nudge) + "px";
+    } else {
+      r.style.alignSelf = "flex-end";
+      r.style.marginRight = ((widest - last.offsetWidth) / 2 + nudge) + "px";
+    }
+  });
+}
+// Encosta as linhas pelo contorno real das letras (sem o espaço vazio que a fonte reserva acima/abaixo).
+const ctx = document.createElement("canvas").getContext("2d");
+function inkBox(row) {
+  const fs = parseFloat(getComputedStyle(row).fontSize);
+  ctx.font = `800 ${fs}px Padrao`;
+  const m = ctx.measureText(row.textContent.trim());
+  return { fs, fontAsc: m.fontBoundingBoxAscent, fontDesc: m.fontBoundingBoxDescent,
+           inkAsc: m.actualBoundingBoxAscent, inkDesc: m.actualBoundingBoxDescent };
+}
+function tighten(block, mainSize) {
+  const gap = Math.round(mainSize * 0.04);
+  block.querySelectorAll(".kw-row").forEach((row) => {
+    const k = inkBox(row);
+    row.style.lineHeight = "normal";
+    const top = -(k.fontAsc - k.inkAsc);
+    const bottom = -(k.fontDesc - k.inkDesc);
+    let mt = row === block.firstElementChild ? top : top + gap;
+    // Encaixe no vão (PLAYBOOK 3.1): a linha pequena de antes desce até o topo das letras BAIXAS iniciais
+    // da palavra grande, quando cabe ali ("um" sobre o "v" de "vilão", colado no pingo do "i").
+    const prev = row.previousElementSibling;
+    if (row.classList.contains("kw-main") && prev && prev.classList.contains("kw-before")) {
+      const txt = row.textContent.trim();
+      ctx.font = `800 ${k.fs}px Padrao`;
+      const xAsc = ctx.measureText("x").actualBoundingBoxAscent;
+      let run = "";
+      for (const ch of txt) {
+        if (ctx.measureText(ch).actualBoundingBoxAscent > xAsc * 1.06) break;   // letra alta, acento, pingo ou maiúscula
+        run += ch;
+      }
+      const notch = run ? ctx.measureText(run).width : 0;
+      if (notch > 0 && prev.offsetWidth <= notch * 0.98) {
+        const runAsc = ctx.measureText(run).actualBoundingBoxAscent;
+        mt -= (k.inkAsc - runAsc);
+      }
+    }
+    row.style.marginTop = mt + "px";
+    row.style.marginBottom = bottom + "px";
+  });
+}
+function kwWords(sel) {
+  document.querySelectorAll(sel + " .w").forEach((w) => {
+    tl.fromTo(w, { opacity: 0, y: 14, filter: "blur(14px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.22, ease: "power2.out" }, parseFloat(w.dataset.t));
+  });
+}
+document.fonts.ready.then(() => {
+  fitMain();
+  tl.set(".cam", { scale: 1 }, 0);
+  tl.fromTo("#card0 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 0.0);
+  tl.fromTo("#card1 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 25.84);
+  tl.fromTo("#card2 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 29.22);
+  kwWords("#kw0"); tl.to("#kw0 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 7.83);
+  kwWords("#kw1"); tl.to("#kw1 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 14.56);
+  kwWords("#kw2"); tl.to("#kw2 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 15.61);
+  kwWords("#kw3"); tl.to("#kw3 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 23.2);
+  kwWords("#kw4"); tl.to("#kw4 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 29.24);
+  kwWords("#kw5"); tl.to("#kw5 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 35.75);
+  tl.set(".cam", {scale: 1.12}, 12.12); tl.set(".cam", {scale: 1}, 16.82);
+  tl.set(".cam", {scale: 1.12}, 24.02); tl.set(".cam", {scale: 1}, 27.3);
+  tl.set(".cam", {scale: 1.12}, 31.26); tl.set(".cam", {scale: 1}, 35.93);
+  tl.set("#logo", {opacity: 0}, 5.3); tl.set("#logo-claro", {opacity: 0.85}, 5.3); tl.set("#logo", {opacity: 0.7}, 9.1); tl.set("#logo-claro", {opacity: 0}, 9.1);
+  tl.set("#logo", {opacity: 0}, 17.48); tl.set("#logo-claro", {opacity: 0.85}, 17.48); tl.set("#logo", {opacity: 0.7}, 19.098); tl.set("#logo-claro", {opacity: 0}, 19.098);
+  tl.set("#logo", {opacity: 0}, 19.098); tl.set("#logo-claro", {opacity: 0.85}, 19.098); tl.set("#logo", {opacity: 0.7}, 20.715); tl.set("#logo-claro", {opacity: 0}, 20.715);
+  tl.set("#logo", {opacity: 0}, 22.332); tl.set("#logo-claro", {opacity: 0.85}, 22.332); tl.set("#logo", {opacity: 0.7}, 23.95); tl.set("#logo-claro", {opacity: 0}, 23.95);
+  window.__timelines["main"] = tl;
+});
+</script>
+</body>
+</html>

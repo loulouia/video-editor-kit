@@ -1,0 +1,22 @@
+# Vídeos, áudios e renders são pesados demais pro git
+*.mp4
+*.mov
+*.MOV
+*.MP4
+*.webm
+*.m4a
+*.wav
+*.mp3
+*.aac
+saida/
+projetos/*/cache/
+**/renders/
+**/snapshots/
+tools/
+node_modules/
+.remotion/
+__pycache__/
+.DS_Store
+.thumbnails/
+.waveform-cache/
+.hyperframes/
