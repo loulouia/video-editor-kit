@@ -1,0 +1,140 @@
+{
+ "duracao": 27.39,
+ "legendas": [
+  [
+   "então, o que você acha da gente fazer assim",
+   0,
+   8
+  ],
+  [
+   "eu libero, eu faço agora, então eu libero aqui",
+   9,
+   17
+  ],
+  [
+   "os acessos pra você poder fazer esse diagnóstico",
+   18,
+   24
+  ],
+  [
+   "aí você volta com um escopo, enfim",
+   25,
+   31
+  ],
+  [
+   "pra essa parte inicial, né, que você falou",
+   32,
+   39
+  ],
+  [
+   "da meta, e aí na sequência essa questão do CRM",
+   40,
+   49
+  ],
+  [
+   "então as telas em cima daquilo que já existe",
+   50,
+   58
+  ],
+  [
+   "que é bem nada, só um básico, uma visão kanban mesmo",
+   59,
+   70
+  ],
+  [
+   "e daí com todas essas outras, enfim",
+   71,
+   77
+  ],
+  [
+   "eu acho que é muito mais agora ouvir",
+   78,
+   85
+  ],
+  [
+   "de você do que eu entregar estruturas, coisas assim, sabe?",
+   86,
+   96
+  ]
+ ],
+ "palavras_chave": [],
+ "texto_atras": [],
+ "cards": [],
+ "topo_mesclado": [],
+ "zoom": {
+  "trechos": []
+ },
+ "titulo": {
+  "de": 0.0,
+  "ate": 2.0,
+  "linhas": [
+   "DIAGNÓSTICO 101"
+  ],
+  "subtitulo": "por que eu PRIMEIRO escuto e depois construo",
+  "colagem": [
+   "img/crm-pipeline.jpg",
+   "img/kanban.jpg",
+   "img/painel-metas.jpg"
+  ]
+ },
+ "caixa_topo": [
+  {
+   "de": 2.0,
+   "ate": 3.94,
+   "tipo": "imagem",
+   "arquivo": "img/chave-acesso.jpg"
+  },
+  {
+   "de": 3.94,
+   "ate": 6.64,
+   "tipo": "cartao",
+   "modelo": "pedra",
+   "texto": "Primeiro o acesso. Depois o diagnóstico."
+  },
+  {
+   "de": 6.64,
+   "ate": 10.44,
+   "tipo": "cartao",
+   "modelo": "papel",
+   "titulo": "Do diagnóstico ao escopo",
+   "itens": [
+    "1 · acessos",
+    "2 · diagnóstico",
+    "3 · escopo"
+   ]
+  },
+  {
+   "de": 10.44,
+   "ate": 13.1,
+   "tipo": "imagem",
+   "arquivo": "img/painel-metas.jpg"
+  },
+  {
+   "de": 13.1,
+   "ate": 15.06,
+   "tipo": "imagem",
+   "arquivo": "img/crm-pipeline.jpg"
+  },
+  {
+   "de": 15.06,
+   "ate": 17.9,
+   "tipo": "imagem",
+   "arquivo": "img/wireframes.jpg"
+  },
+  {
+   "de": 17.9,
+   "ate": 22.64,
+   "tipo": "imagem",
+   "arquivo": "img/kanban.jpg"
+  },
+  {
+   "de": 22.64,
+   "ate": 27.39,
+   "tipo": "cartao",
+   "modelo": "carvao",
+   "destaque": "Ouvir",
+   "texto": "antes de entregar estrutura."
+  }
+ ],
+ "_sobre": "Teste do padrão topo-livre. Tempos no A-roll final. Gerar: python motor/gerar.py projetos/teste-topo-livre-1"
+}

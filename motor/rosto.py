@@ -4,6 +4,8 @@ Usa o recorte (alfa) da pessoa + cor de pele: dentro da máscara, na faixa da ca
 e rosada (o cabelo é escuro). A caixa do rosto é o maior bloco de pele perto do topo da pessoa.
 
 Uso: python rosto.py <video.mp4> <recorte.webm> <saida.json> [--fps 4] [--debug pasta]
+     python rosto.py <video.mp4> --rapido <saida.json>   → sem recorte pronto: recorta só 2 quadros/s (~15 s),
+                                                           pro storyboard (motor/storyboard.py)
 Saída: {"fps": 4, "rostos": [[t, x0, y0, x1, y1], ...]} em fração da tela (0–1), no enquadramento ORIGINAL
 (sem zoom e sem o deslocamento do fundo mesclado; quem posiciona aplica as transformações).
 """
@@ -11,6 +13,14 @@ import argparse, json, os, subprocess
 import cv2
 import numpy as np
 
+import sys, tempfile
+if "--rapido" in sys.argv:                 # modo storyboard: recorte só de 2 quadros por segundo
+    video, saida = sys.argv[1], sys.argv[sys.argv.index("--rapido") + 1]
+    tmp = tempfile.mkdtemp(); clip, matte = os.path.join(tmp, "q.mp4"), os.path.join(tmp, "q.webm")
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-an", "-vf", "fps=2,scale=540:960",
+                    "-c:v", "libx264", "-crf", "18", clip], check=True)
+    subprocess.run(["npx", "-y", "hyperframes@latest", "remove-background", clip, "-o", matte], capture_output=True, check=True)
+    sys.argv = [sys.argv[0], clip, matte, saida, "--fps", "2"]
 ap = argparse.ArgumentParser()
 ap.add_argument("video"); ap.add_argument("recorte"); ap.add_argument("saida")
 ap.add_argument("--fps", type=float, default=4); ap.add_argument("--debug")

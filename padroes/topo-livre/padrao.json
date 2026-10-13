@@ -1,0 +1,182 @@
+{
+ "nome": "topo-livre",
+ "versao": "0.2",
+ "_sobre": "Padrão topo-livre (clientes). Valores lidos pelo motor; regras e porquês em PLAYBOOK.md. Fontes livres (OFL).",
+ "fonte": {
+  "arquivo": "fontes/TikTokSans-Variable.ttf",
+  "peso": 500,
+  "pesos": "300 900"
+ },
+ "fonte_cartoes": {
+  "arquivo": "fontes/InstrumentSerif-Regular.ttf",
+  "italico": "fontes/InstrumentSerif-Italic.ttf"
+ },
+ "cor_texto": "#fff",
+ "tela": {
+  "seguro_topo": 0.08,
+  "seguro_base": 0.88,
+  "folga_rosto": 0.02
+ },
+ "logo": {
+  "topo": "4%",
+  "direita": "5%",
+  "largura": "13%",
+  "opacidade_clara": 0.85,
+  "limiar_fundo_escuro": 120,
+  "padrao": false
+ },
+ "titulo": {
+  "posicao": 0.272,
+  "altura": 0.065,
+  "peso": 600,
+  "largura_alvo": 0.918,
+  "tamanho_px": 100,
+  "subtitulo_peso": 300,
+  "entrelinha": 1.0,
+  "espacamento": "-0.01em",
+  "maiusculas": true,
+  "colagem": {
+   "quantidade": 3,
+   "largura": 0.29,
+   "topo": 0.12,
+   "altura": 0.16
+  },
+  "duracao_s": 2.0,
+  "bloqueia_legenda": false,
+  "sombra": "none",
+  "topo_letras": 0.263,
+  "subtitulo_largura": 0.78,
+  "subtitulo_folga": 0.009,
+  "_medidas": "ref-topo-livre1 a 0,3 s: colagem 12–28%; título letras 26,3–31% (sobre a base da colagem), 92% da largura; subtítulo 0,9% abaixo, 78% da largura; sem sombra",
+  "altura_letras": 0.047,
+  "caracteres_por_linha": 18,
+  "entrelinha_letras": 1.42,
+  "subtitulo_max_caracteres": 45
+ },
+ "legenda": {
+  "posicao": 0.8,
+  "posicao_fundo_mesclado": 0.8,
+  "altura": 0.045,
+  "tamanho_px": 38,
+  "peso": 500,
+  "largura": "55%",
+  "entrelinha": 1.15,
+  "espacamento": "0",
+  "sombra": "0 1px 6px rgba(0,0,0,.35)",
+  "fim_extra_s": 0.35,
+  "maiusculas": false,
+  "linhas_max": 2,
+  "caracteres_por_linha": 31,
+  "equilibrar_linhas": true,
+  "prender_ligacao": true
+ },
+ "caixa_topo": {
+  "topo": 0.17,
+  "largura": 0.66,
+  "proporcao": 1.7778,
+  "raio_px": 0,
+  "troca_s": 3.0,
+  "nunca_vazia": true,
+  "cabeca_ideal": [
+   0.38,
+   0.4
+  ]
+ },
+ "cartoes": {
+  "modelos": [
+   "pedra",
+   "carvao",
+   "papel"
+  ],
+  "paleta_neutra": {
+   "pedra": "#DCD5CA",
+   "papel": "#F4F1EB",
+   "areia": "#E7E0D4",
+   "taupe": "#A89B88",
+   "carvao": "#2A2724",
+   "texto_escuro": "#2A2724",
+   "texto_claro": "#F2EDE4"
+  },
+  "tamanho_frase_px": 70,
+  "tamanho_destaque_px": 112,
+  "tamanho_titulo_px": 76,
+  "grao": true
+ },
+ "palavras_chave": {
+  "posicao": 0.56,
+  "posicao_fundo_mesclado": 0.56,
+  "pequena_px": 42,
+  "espacamento_pequena": "-0.02em",
+  "principal_min_px": 100,
+  "principal_max_px": 220,
+  "largura_alvo_px": 680,
+  "espacamento_principal": "-0.035em",
+  "folga": 0.04,
+  "empilhar_acima_de_caracteres": 12,
+  "sombra": "0 4px 24px rgba(0,0,0,.30)",
+  "altura_linha_principal": 0.1,
+  "altura_linha_pequena": 0.03,
+  "entrada": {
+   "duracao": 0.22,
+   "desfoque_px": 14,
+   "sobe_px": 14
+  },
+  "saida": {
+   "duracao": 0.18,
+   "desfoque_px": 10
+  }
+ },
+ "cards": {
+  "posicao": 0.47,
+  "raio_px": 0,
+  "raio_noticia_px": 0,
+  "largura": 0.66,
+  "largura_pequeno": 0.66,
+  "altura": 0.209,
+  "altura_pequeno": 0.209,
+  "altura_noticia_max": 0.209,
+  "altura_min": 0.16,
+  "sombra": "none",
+  "entrada": {
+   "duracao": 0.0,
+   "escala_inicial": 1.0
+  }
+ },
+ "texto_atras": {
+  "tamanho_px": 250,
+  "largura": 0.8,
+  "topo": 0.155,
+  "espacamento": -0.045,
+  "sombra": 0.35
+ },
+ "fundo_mesclado": {
+  "altura_imagem": 0.64,
+  "degrade_de": 0.56,
+  "cabeca_alvo": 0.46,
+  "deslocamento_max": 0.3,
+  "transicao": "corte seco",
+  "zoom_lento": 1.06,
+  "posicao_vertical_imagem": 0.3
+ },
+ "zoom": {
+  "escala": 1.0,
+  "origem": "50% 40%"
+ },
+ "aceleracao": {
+  "min": 1.1,
+  "max": 1.15,
+  "alvo_palavras_s": 3.7
+ },
+ "recursos": {
+  "titulo": true,
+  "legendas": true,
+  "caixa_topo": true,
+  "cartoes_frase": true,
+  "palavras_chave": "opcional",
+  "efeito_negativo": "opcional",
+  "texto_atras": false,
+  "fundo_mesclado": false,
+  "zoom_jump_cut": false,
+  "logo": "opcional"
+ }
+}

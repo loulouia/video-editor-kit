@@ -2,28 +2,119 @@
  "nome": "amanda",
  "versao": "1.0",
  "_sobre": "Padrão Amanda v1.0 (oficial em 2026-10-12). Valores lidos pelo motor; as regras e o porquê estão em PLAYBOOK.md.",
- "fonte": {"arquivo": "fontes/HelveticaNowDisplay-ExtraBold.ttf", "peso": 800},
+ "fonte": {
+  "arquivo": "fontes/HelveticaNowDisplay-ExtraBold.ttf",
+  "peso": 800
+ },
  "cor_texto": "#fff",
- "tela": {"seguro_topo": 0.08, "seguro_base": 0.86, "folga_rosto": 0.02},
- "logo": {"topo": "5.2%", "direita": "7%", "largura": "19%", "opacidade_clara": 0.85, "limiar_fundo_escuro": 120},
- "titulo": {"posicao": 0.40, "altura": 0.105, "tamanho_px": 54, "subtitulo_px": 27,
-            "entrelinha": 1.02, "espacamento": "-0.01em", "sombra": "0 2px 10px rgba(0,0,0,.3)"},
- "legenda": {"posicao": 0.54, "posicao_fundo_mesclado": 0.71, "altura": 0.04, "tamanho_px": 40, "largura": "88%",
-             "entrelinha": 1.08, "espacamento": "-0.005em", "sombra": "0 2px 10px rgba(0,0,0,.35)", "fim_extra_s": 0.35},
- "palavras_chave": {"posicao": 0.47, "posicao_fundo_mesclado": 0.64,
-                    "pequena_px": 46, "espacamento_pequena": "-0.03em",
-                    "principal_min_px": 110, "principal_max_px": 250, "largura_alvo_px": 700, "espacamento_principal": "-0.045em",
-                    "folga": 0.04, "empilhar_acima_de_caracteres": 12, "sombra": "0 4px 24px rgba(0,0,0,.30)",
-                    "altura_linha_principal": 0.11, "altura_linha_pequena": 0.03,
-                    "entrada": {"duracao": 0.22, "desfoque_px": 14, "sobe_px": 14}, "saida": {"duracao": 0.18, "desfoque_px": 10}},
- "texto_atras": {"tamanho_px": 250, "largura": 0.80, "topo": 0.155, "espacamento": -0.045, "sombra": 0.35},
- "cards": {"posicao": 0.47, "raio_px": 26, "raio_noticia_px": 22, "largura": 0.86, "largura_pequeno": 0.60,
-           "altura": 0.29, "altura_pequeno": 0.27, "altura_noticia_max": 0.29, "altura_min": 0.16,
-           "sombra": "0 18px 50px rgba(0,0,0,.28)", "entrada": {"duracao": 0.22, "escala_inicial": 0.94}},
- "fundo_mesclado": {"altura_imagem": 0.64, "degrade_de": 0.56, "cabeca_alvo": 0.46, "deslocamento_max": 0.30,
-                    "transicao": "corte seco", "zoom_lento": 1.06, "posicao_vertical_imagem": 0.3},
- "zoom": {"escala": 1.12, "origem": "50% 32%"},
- "aceleracao": {"min": 1.10, "max": 1.15, "alvo_palavras_s": 3.7},
- "recursos": {"titulo": true, "legendas": true, "palavras_chave": "opcional", "efeito_negativo": "opcional",
-              "texto_atras": "opcional", "fundo_mesclado": "opcional", "cards": true, "zoom_jump_cut": true}
+ "tela": {
+  "seguro_topo": 0.08,
+  "seguro_base": 0.86,
+  "folga_rosto": 0.02
+ },
+ "logo": {
+  "topo": "5.2%",
+  "direita": "7%",
+  "largura": "19%",
+  "opacidade_clara": 0.85,
+  "limiar_fundo_escuro": 120
+ },
+ "titulo": {
+  "posicao": 0.4,
+  "altura": 0.105,
+  "tamanho_px": 54,
+  "subtitulo_px": 27,
+  "entrelinha": 1.02,
+  "espacamento": "-0.01em",
+  "sombra": "0 2px 10px rgba(0,0,0,.3)"
+ },
+ "legenda": {
+  "posicao": 0.54,
+  "posicao_fundo_mesclado": 0.71,
+  "altura": 0.04,
+  "tamanho_px": 40,
+  "largura": "88%",
+  "entrelinha": 1.08,
+  "espacamento": "-0.005em",
+  "sombra": "0 2px 10px rgba(0,0,0,.35)",
+  "fim_extra_s": 0.35,
+  "caracteres_por_linha": 30,
+  "linhas_max": 2,
+  "equilibrar_linhas": false
+ },
+ "palavras_chave": {
+  "posicao": 0.47,
+  "posicao_fundo_mesclado": 0.64,
+  "pequena_px": 46,
+  "espacamento_pequena": "-0.03em",
+  "principal_min_px": 110,
+  "principal_max_px": 250,
+  "largura_alvo_px": 700,
+  "espacamento_principal": "-0.045em",
+  "folga": 0.04,
+  "empilhar_acima_de_caracteres": 12,
+  "sombra": "0 4px 24px rgba(0,0,0,.30)",
+  "altura_linha_principal": 0.11,
+  "altura_linha_pequena": 0.03,
+  "entrada": {
+   "duracao": 0.22,
+   "desfoque_px": 14,
+   "sobe_px": 14
+  },
+  "saida": {
+   "duracao": 0.18,
+   "desfoque_px": 10
+  }
+ },
+ "texto_atras": {
+  "tamanho_px": 250,
+  "largura": 0.8,
+  "topo": 0.155,
+  "espacamento": -0.045,
+  "sombra": 0.35
+ },
+ "cards": {
+  "posicao": 0.47,
+  "raio_px": 26,
+  "raio_noticia_px": 22,
+  "largura": 0.86,
+  "largura_pequeno": 0.6,
+  "altura": 0.29,
+  "altura_pequeno": 0.27,
+  "altura_noticia_max": 0.29,
+  "altura_min": 0.16,
+  "sombra": "0 18px 50px rgba(0,0,0,.28)",
+  "entrada": {
+   "duracao": 0.22,
+   "escala_inicial": 0.94
+  }
+ },
+ "fundo_mesclado": {
+  "altura_imagem": 0.64,
+  "degrade_de": 0.56,
+  "cabeca_alvo": 0.46,
+  "deslocamento_max": 0.3,
+  "transicao": "corte seco",
+  "zoom_lento": 1.06,
+  "posicao_vertical_imagem": 0.3
+ },
+ "zoom": {
+  "escala": 1.12,
+  "origem": "50% 32%"
+ },
+ "aceleracao": {
+  "min": 1.1,
+  "max": 1.15,
+  "alvo_palavras_s": 3.7
+ },
+ "recursos": {
+  "titulo": true,
+  "legendas": true,
+  "palavras_chave": "opcional",
+  "efeito_negativo": "opcional",
+  "texto_atras": "opcional",
+  "fundo_mesclado": "opcional",
+  "cards": true,
+  "zoom_jump_cut": true
+ }
 }

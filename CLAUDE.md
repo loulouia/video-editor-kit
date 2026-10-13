@@ -50,9 +50,10 @@ Gerar LUT: `motor/grading.py --bruto <bruto> --ref <video>:<t1,t2,...> ... --sai
 ## Fluxo obrigatório de cada edição (nunca pular etapas)
 
 1. **Plano antes de editar.** Transcrever e apresentar o plano: cortes com timecodes, aceleração, duração final, legendas, zooms, inserções (tabela PLAYBOOK 4.0), efeitos, regras do padrão aplicadas, grading. Esperar a aprovação.
-2. **Preview antes de renderizar.** `npx hyperframes preview` em `projetos/<slug>/composicao` e abrir no navegador do app. Ajustar por lá; conferir pontos com snapshots.
-3. **Render só com aprovação explícita.** `npx hyperframes render -q delivery -o ../../../saida/<data>-<slug>-padrao-<nome>.mp4`. Conferir quadros do MP4 final.
-4. **Registrar o aprendizado** no padrão (PLAYBOOK + padrao.json + CHANGELOG) ou na marca (glossário).
+2. **Storyboard antes de montar** (todo padrão, atual e futuro). Com o A-roll pronto (`motor/cortes.py`) e o `edicao.json` do plano, rodar `motor/storyboard.py projetos/<slug>` (~2 min, não precisa do recorte completo) e mandar `storyboard/storyboard.jpg` (`SendUserFile`). Um quadro por momento com a composição real, tempo, fala, tipo, origem da imagem e alertas de regra em vermelho. Só seguir pro recorte/camadas/preview depois da aprovação; correções são feitas por número do quadro.
+3. **Preview antes de renderizar.** `npx hyperframes preview` em `projetos/<slug>/composicao` e abrir no navegador do app. Ajustar por lá; conferir pontos com snapshots.
+4. **Render só com aprovação explícita.** `npx hyperframes render -q delivery -o ../../../saida/<data>-<slug>-padrao-<nome>.mp4`. Conferir quadros do MP4 final.
+5. **Registrar o aprendizado** no padrão (PLAYBOOK + padrao.json + CHANGELOG) ou na marca (glossário).
 
 ## Regras que valem em toda edição
 

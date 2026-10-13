@@ -45,9 +45,10 @@ Nada é renderizado sem você aprovar.
    - **Cor e iluminação:** o Claude mostra um antes/depois e pergunta qual coloração usar: a da marca (padrão), a de outra referência ou a original.
    - **Pesquisa de imagens e notícias (opcional):** peça *"busca imagens e notícias"*. O Claude propõe as buscas, você aprova, escolhe nas opções e só o escolhido é baixado.
 2. **Plano (você aprova).** Cortes com o tempo de cada um, aceleração, duração final, legendas, palavras-chave, tabela de inserções (fala exata, entrada/saída, duração, tipo) e a pergunta do gancho.
-3. **Preview (você ajusta).** Timeline no navegador do app; cada ajuste aparece em segundos. Ex.: *"aos 0:07 a legenda cobre a boca"*.
-4. **Render.** Só com a sua aprovação: MP4 1080×1920 em `saida/`.
-5. **Aprendizado.** Toda correção vira regra no padrão (ou no glossário da marca), registrada no `CHANGELOG.md`.
+3. **Storyboard (você aprova).** Antes de montar, uma folha com um quadro por momento do vídeo, já com a composição real: gancho, imagens, cartões, legendas e palavras-chave nas posições do padrão, com tempo, fala, origem de cada imagem e **alertas em vermelho** quando algo fere uma regra. Você corrige pelo número do quadro (ex.: *"quadro 4: troca a imagem"*). Vale pra todos os padrões.
+4. **Preview (você ajusta).** Timeline no navegador do app; cada ajuste aparece em segundos. Ex.: *"aos 0:07 a legenda cobre a boca"*.
+5. **Render.** Só com a sua aprovação: MP4 1080×1920 em `saida/`.
+6. **Aprendizado.** Toda correção vira regra no padrão (ou no glossário da marca), registrada no `CHANGELOG.md`.
 
 ## Ferramentas instaladas
 

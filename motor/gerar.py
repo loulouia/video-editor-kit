@@ -26,6 +26,11 @@ shutil.copy2(P.padrao(S["fonte"]["arquivo"]), os.path.join(P.assets, "fonts", FO
 for k in ("escuro", "claro"):
     shutil.copy2(P.marca(M["logo"][k]), os.path.join(P.assets, "img", f"logo-{k}.png"))
 FW = S["fonte"]["peso"]
+FW_RANGE = S["fonte"].get("pesos", FW)        # fonte variável: faixa de pesos ("300 900")
+FC = S.get("fonte_cartoes")
+if FC:
+    for k in ("arquivo", "italico"):
+        shutil.copy2(P.padrao(FC[k]), os.path.join(P.assets, "fonts", os.path.basename(FC[k])))
 
 # ---------- janelas ----------
 KW, CAP, TIT, CARD, TELA = S["palavras_chave"], S["legenda"], S["titulo"], S["cards"], S["tela"]
@@ -35,14 +40,16 @@ for k in E["palavras_chave"]:
     kws.append((W[min(idx)]["s"] - 0.05, min(D, W[max(idx)]["e"] + k["segura"]), k))
 atras = [(a["de"], a["ate"], a) for a in E["texto_atras"]]
 T = E.get("titulo")
-blocked = [(a, b) for a, b, _ in kws] + [(a, b) for a, b, _ in atras] + ([(T["de"], T["ate"])] if T else [])
+blocked = [(a, b) for a, b, _ in kws] + [(a, b) for a, b, _ in atras] + \
+          ([(T["de"], T["ate"])] if T and S["titulo"].get("bloqueia_legenda", True) else [])
 cards = [(c["de"], c["ate"], c) for c in E["cards"]]
 
 def overlaps(a, b, spans):
     return any(a < y and b > x for x, y in spans)
 
 # ---------- rosto: nada pode cobrir o rosto (PLAYBOOK §0) ----------
-FACE = json.load(open(P.path("cache/rosto.json")))["rostos"]
+_rf = P.path("cache/rosto.json") if os.path.exists(P.path("cache/rosto.json")) else P.path("cache/rosto_rapido.json")
+FACE = json.load(open(_rf))["rostos"]     # rosto_rapido.json = modo storyboard (antes do recorte completo)
 SHIFT = json.load(open(P.path("cache/camadas.json"))) if os.path.exists(P.path("cache/camadas.json")) else {"janelas": [], "deslocamentos_px": []}
 ZS, ZO = ZOOM["escala"], float(ZOOM["origem"].split()[1].rstrip("%")) / 100
 SAFE_TOP, SAFE_BOTTOM, GAP = TELA["seguro_topo"], TELA["seguro_base"], TELA["folga_rosto"]
@@ -84,6 +91,11 @@ for n, (txt, i, j) in enumerate(E["legendas"]):
     if e - s < 0.2:
         continue
     caps.append((r3(s), r3(e), txt, overlaps(s, e, [(a, b) for a, b, _ in cards])))
+
+MAXC = CAP.get("caracteres_por_linha", 30) * CAP.get("linhas_max", 2)
+for _, _, txt, _ in caps:
+    if len(txt) > MAXC:
+        print(f"⚠️  legenda com {len(txt)} caracteres (máx. {MAXC}): {txt!r} — divida com motor/legendas.py")
 
 # Trechos de fundo mesclado: a pessoa está mais baixa na tela → legendas e palavras-chave descem (PLAYBOOK 4.5)
 topo_win = [(t["de"], t["ate"]) for t in E["topo_mesclado"]]
@@ -138,7 +150,32 @@ for n, ((a, b, c), (_, _, _, ct, ch)) in enumerate(zip(cards, card_pos)):
     if abs(prev_end - a) > 0.05:  # entrada só quando não é troca direta de card
         tl.append(f'tl.fromTo("#{cid} .card", {{opacity: 0, scale: {CE["escala_inicial"]}}}, {{opacity: 1, scale: 1, duration: {CE["duracao"]}, ease: "power2.out"}}, {r3(a)});')
 
-if T:
+COL = TIT.get("colagem")
+if T and COL and T.get("colagem"):
+    # Gancho com colagem (PLAYBOOK topo-livre §5): 3 imagens no alto, título encostado na base, subtítulo fino
+    cw = COL["largura"]; gap = (1 - COL["quantidade"] * cw) / (COL["quantidade"] + 1)
+    imgs = "".join(f'<img src="assets/{im}" alt="" style="position:absolute;left:{(gap + i*(cw+gap))*100:.2f}%;top:{COL["topo"]*100:.2f}%;'
+                   f'width:{cw*100:.2f}%;height:{COL["altura"]*100:.2f}%;object-fit:cover;">' for i, im in enumerate(T["colagem"]))
+    # quebra por caracteres por linha (padrão), sem diminuir a letra
+    texto, MAXL, linhas_t = " ".join(T["linhas"]), TIT.get("caracteres_por_linha", 99), []
+    for w in texto.split():
+        if linhas_t and len(linhas_t[-1] + " " + w) <= MAXL:
+            linhas_t[-1] += " " + w
+        else:
+            linhas_t.append(w)
+    if T.get("subtitulo") and len(T["subtitulo"]) > TIT.get("subtitulo_max_caracteres", 999):
+        print(f"⚠️  subtítulo com {len(T['subtitulo'])} caracteres (máx. {TIT['subtitulo_max_caracteres']})")
+    sh = "" if TIT.get("sombra", "none") == "none" else f'text-shadow:{TIT["sombra"]};'
+    # posições finais calculadas no navegador pelo contorno real das letras (fitTitle)
+    sub = (f'<div class="t-fit-sub" data-alvo="{TIT["subtitulo_largura"]}" data-folga="{TIT["subtitulo_folga"]}" '
+           f'style="position:absolute;left:0;right:0;text-align:center;white-space:nowrap;font-weight:{TIT["subtitulo_peso"]};{sh}">'
+           f'{esc(T["subtitulo"])}</div>') if T.get("subtitulo") else ""
+    add(f'<div id="titulo" class="clip titulo" data-start="{T["de"]}" data-duration="{r3(T["ate"]-T["de"])}" data-track-index="5">{imgs}'
+        + "".join(f'<div class="t-fit" data-linha="{i}" data-alvo="{TIT["largura_alvo"]}" data-topo="{TIT["topo_letras"]}" '
+                  f'data-letras="{TIT.get("altura_letras", 0.047)}" data-entre="{TIT.get("entrelinha_letras", 1.28)}" style="position:absolute;left:0;right:0;text-align:center;'
+                  f'white-space:nowrap;font-weight:{TIT["peso"]};letter-spacing:{TIT["espacamento"]};{sh}">{esc(l)}</div>' for i, l in enumerate(linhas_t))
+        + f'{sub}</div>')
+elif T:
     lines = "".join(f'<div class="t-line">{esc(l)}</div>' for l in T["linhas"])
     tt = header_top(T["de"], T["ate"])
     tt = tt if tt is not None else place(T["de"], T["ate"], TITLE_H, TIT["posicao"])
@@ -146,11 +183,67 @@ if T:
     add(f'<div id="titulo" class="clip titulo" data-start="{T["de"]}" data-duration="{r3(T["ate"]-T["de"])}" data-track-index="5">'
         f'<div class="t-block" style="top:{tt*100:.2f}%">{lines}{sub}</div></div>')
 
+# ---------- caixa do topo (PLAYBOOK topo-livre §2) ----------
+CX = S.get("caixa_topo")
+CARD_FACES = ""
+if FC:
+    CARD_FACES = (f'@font-face {{ font-family: "Cartao"; src: url("assets/fonts/{os.path.basename(FC["arquivo"])}"); font-style: normal; }}\n'
+                  f'@font-face {{ font-family: "Cartao"; src: url("assets/fonts/{os.path.basename(FC["italico"])}"); font-style: italic; }}')
+if CX and E.get("caixa_topo"):
+    PAL = dict(S["cartoes"]["paleta_neutra"]); PAL.update(M.get("paleta", {}))      # paleta da marca; sem ela, neutros
+    CT = S["cartoes"]
+    GRAIN = ("background-image: repeating-radial-gradient(circle at 17% 32%, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),"
+             " repeating-radial-gradient(circle at 73% 61%, rgba(0,0,0,.035) 0 1px, transparent 1px 4px);") if CT.get("grao") else ""
+    bw = CX["largura"] * 1080; bh = bw / CX["proporcao"]; k = bw / 713.0
+    box_bottom = CX["topo"] + bh / 1920
+    def cartao(it):
+        m = it["modelo"]
+        if m == "pedra":
+            return (f'<div class="cx-in" style="background:{PAL["pedra"]};align-items:center;justify-content:center;"><div class="cx-grao" style="{GRAIN}"></div>'
+                    f'<div style="position:relative;width:74%;text-align:center;color:{PAL["texto_escuro"]};font-size:{CT["tamanho_frase_px"]*k:.0f}px;line-height:1.04;">{esc(it["texto"])}</div></div>')
+        if m == "carvao":
+            dest = f'<span style="font-style:italic;">{esc(it["destaque"])}</span><br>' if it.get("destaque") else ""
+            return (f'<div class="cx-in" style="background:radial-gradient(130% 150% at 30% 20%, #4A4540 0%, #2E2B27 55%, #1E1C1A 100%);'
+                    f'align-items:center;justify-content:center;"><div class="cx-grao" style="{GRAIN}"></div>'
+                    f'<div style="position:relative;width:84%;text-align:center;color:{PAL["texto_claro"]};font-size:{CT["tamanho_destaque_px"]*k*0.72:.0f}px;line-height:0.98;">'
+                    f'<span style="font-size:1.4em;">{dest}</span>{esc(it["texto"])}</div></div>')
+        # papel: título no alto + traço + itens
+        itens = "".join(f'<div>{esc(x)}</div>' for x in it.get("itens", []))
+        return (f'<div class="cx-in" style="background:{PAL["papel"]};flex-direction:column;justify-content:space-between;padding:{36*k:.0f}px {44*k:.0f}px;">'
+                f'<div class="cx-grao" style="{GRAIN}"></div><div style="position:relative;">'
+                f'<div style="color:{PAL["texto_escuro"]};font-size:{CT["tamanho_titulo_px"]*k:.0f}px;line-height:0.98;">{esc(it["titulo"])}</div>'
+                f'<div style="margin-top:{14*k:.0f}px;width:{90*k:.0f}px;height:{3*k:.1f}px;background:{PAL["taupe"]};"></div></div>'
+                f'<div style="position:relative;display:flex;justify-content:space-between;color:#4A443D;font-style:italic;font-size:{32*k:.0f}px;">{itens}</div></div>')
+    for n, it in enumerate(E["caixa_topo"]):
+        a, b = it["de"], it["ate"]
+        inner = (f'<div class="cx-in"><img src="assets/{it["arquivo"]}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div>'
+                 if it["tipo"] == "imagem" else cartao(it))
+        add(f'<div id="cx{n}" class="clip" data-start="{r3(a)}" data-duration="{r3(b-a)}" data-track-index="3">'
+            f'<div class="cx" style="left:{(1-CX["largura"])/2*100:.2f}%;top:{CX["topo"]*100:.2f}%;width:{CX["largura"]*100:.2f}%;height:{bh/1920*100:.2f}%;'
+            f'border-radius:{CX["raio_px"]}px;">{inner}</div></div>')
+        ftop, _ = face_span(a, b)
+        if ftop < box_bottom + GAP:     # opção B: o motor não desloca o vídeo, só avisa
+            print(f"⚠️  caixa do topo {a:.2f}–{b:.2f}: topo da cabeça a {ftop*100:.0f}% (caixa termina a {box_bottom*100:.0f}%). Regravar com mais espaço acima da cabeça.")
+    # topo nunca vazio depois do título
+    t0 = (T["ate"] if T else 0); itens = sorted((it["de"], it["ate"]) for it in E["caixa_topo"])
+    furos = [(x1, y0) for (_, x1), (y0, _) in zip(itens, itens[1:]) if y0 - x1 > 0.05]
+    if itens and itens[0][0] - t0 > 0.05: furos.insert(0, (t0, itens[0][0]))
+    if itens and D - itens[-1][1] > 0.05: furos.append((itens[-1][1], D))
+    for x, y in furos:
+        print(f"⚠️  caixa do topo vazia de {x:.2f} a {y:.2f} (o padrão pede o topo sempre ocupado)")
+
+import re
+LIG = r"(?i)\b(pra|para|de|do|da|dos|das|que|e|o|a|os|as|um|uma|no|na|nos|nas|com|em|por|se|eu|the|to|of|and|in)\s+"
+def cap_html(txt):
+    h = esc(txt)
+    # palavra de ligação presa à seguinte (espaço inseparável): nunca fica sozinha no fim de uma linha
+    return re.sub(LIG, lambda m: m.group(1) + "&nbsp;", h) if CAP.get("prender_ligacao") else h
+
 for n, (a, b, txt, up, low) in enumerate(caps):
     ht = header_top(a, b)
     top = ht if ht is not None else place(a, b, CAP_H, (CAP["posicao_fundo_mesclado"] if low else CAP["posicao"]) - CAP_H / 2)
     add(f'<div id="cap{n}" class="clip cap" data-start="{a}" data-duration="{r3(b-a)}" data-track-index="6">'
-        f'<div class="cap-txt" style="top:{(top + CAP_H / 2)*100:.2f}%">{esc(txt)}</div></div>')
+        f'<div class="cap-txt" style="top:{(top + CAP_H / 2)*100:.2f}%">{cap_html(txt)}</div></div>')
 
 KS = KW["saida"]
 for n, (a, b, k) in enumerate(kws):
@@ -182,11 +275,13 @@ for a, b in ZOOM["trechos"]:
     tl.append(f'tl.set(".cam", {{scale: {ZOOM["escala"]}}}, {a}); tl.set(".cam", {{scale: 1}}, {b});')
 
 L, LG = M["logo"], S["logo"]
-add(f'<img id="logo" class="logo" src="assets/img/logo-escuro.png" alt="" style="opacity:{L["opacidade"]}">')
-add('<img id="logo-claro" class="logo" src="assets/img/logo-claro.png" alt="" style="opacity:0">')
+USA_LOGO = P.p.get("logo", LG.get("padrao", True))
+if USA_LOGO:
+    add(f'<img id="logo" class="logo" src="assets/img/logo-escuro.png" alt="" style="opacity:{L["opacidade"]}">')
+    add('<img id="logo-claro" class="logo" src="assets/img/logo-claro.png" alt="" style="opacity:0">')
 
 # Logo legível: sobre imagem de topo escura no canto do logo, troca pra versão clara
-for t in E["topo_mesclado"]:
+for t in (E["topo_mesclado"] if USA_LOGO else []):
     k = len(t["imagens"]); step = (t["ate"] - t["de"]) / k
     for m, img in enumerate(t["imagens"]):
         im = cv2.imread(os.path.join(P.assets, img), cv2.IMREAD_GRAYSCALE)
@@ -205,7 +300,8 @@ page = f"""<!doctype html>
 <title>{esc(P.p.get("titulo", os.path.basename(P.dir)))}</title>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
 <style>
-@font-face {{ font-family: "Padrao"; src: url("assets/fonts/{FONT_FILE}") format("truetype"); font-weight: {FW}; }}
+@font-face {{ font-family: "Padrao"; src: url("assets/fonts/{FONT_FILE}") format("truetype"); font-weight: {FW_RANGE}; }}
+{CARD_FACES}
 body {{ margin: 0; background: #000; }}
 #root {{ position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Padrao", sans-serif; font-weight: {FW}; color: {S["cor_texto"]}; }}
 .clip {{ position: absolute; inset: 0; }}
@@ -223,11 +319,12 @@ body {{ margin: 0; background: #000; }}
 .titulo {{ display: flex; justify-content: center; }}
 .t-block {{ position: absolute; width: 90%; text-align: center; text-shadow: {TIT["sombra"]}; }}
 .t-line {{ font-size: {TIT["tamanho_px"]}px; line-height: {TIT["entrelinha"]}; letter-spacing: {TIT["espacamento"]}; }}
-.t-sub {{ font-size: {TIT["subtitulo_px"]}px; margin-top: 10px; opacity: .95; }}
+.t-sub {{ font-size: {TIT.get("subtitulo_px", 34)}px; margin-top: 10px; opacity: .95; }}
 /* PLAYBOOK §3 — legenda */
 .cap {{ display: flex; justify-content: center; }}
 .cap-txt {{ position: absolute; transform: translateY(-50%); width: {CAP["largura"]}; text-align: center; font-size: {CAP["tamanho_px"]}px;
-  line-height: {CAP["entrelinha"]}; letter-spacing: {CAP["espacamento"]}; text-shadow: {CAP["sombra"]}; }}
+  font-weight: {CAP.get("peso", FW)}; line-height: {CAP["entrelinha"]}; letter-spacing: {CAP["espacamento"]}; text-shadow: {CAP["sombra"]};
+  {"text-wrap: balance;" if CAP.get("equilibrar_linhas") else ""} }}
 /* PLAYBOOK 3.1 — palavras-chave */
 .kw {{ display: flex; justify-content: center; }}
 .kw-block {{ position: absolute; display: flex; flex-direction: column; align-items: center; text-shadow: {KW["sombra"]}; }}
@@ -237,6 +334,9 @@ body {{ margin: 0; background: #000; }}
 .w {{ display: inline-block; }}
 /* PLAYBOOK 3.1 — efeito negativo: as letras invertem as cores do vídeo atrás delas */
 .kw-neg .kw-block {{ mix-blend-mode: difference; text-shadow: none; }}
+.cx {{ position: absolute; overflow: hidden; }}
+.cx-in {{ position: absolute; inset: 0; display: flex; font-family: "Cartao", serif; overflow: hidden; }}
+.cx-grao {{ position: absolute; inset: 0; }}
 .logo {{ position: absolute; top: {LG["topo"]}; right: {LG["direita"]}; width: {LG["largura"]}; height: auto; }}
 </style>
 </head>
@@ -246,6 +346,44 @@ body {{ margin: 0; background: #000; }}
 </div>
 <script>
 const tl = gsap.timeline({{ paused: true }});
+function fitTitle() {{
+  // Gancho (topo-livre): tamanho FIXO pela altura das letras; cada linha a uma distância fixa da anterior;
+  // subtítulo colado embaixo da última linha. Só encolhe se uma linha passar da largura da tela.
+  const H = 1920;
+  const ink = (el) => {{
+    const cs = getComputedStyle(el);
+    ctx.font = `${{cs.fontWeight}} ${{parseFloat(cs.fontSize)}}px Padrao`;
+    const m = ctx.measureText(el.textContent.trim());
+    return {{ fa: m.fontBoundingBoxAscent, ia: m.actualBoundingBoxAscent }};
+  }};
+  document.querySelectorAll(".titulo").forEach((box) => {{
+    const lines = [...box.querySelectorAll(".t-fit")];
+    if (!lines.length) return;
+    const t0 = lines[0];
+    ctx.font = `${{getComputedStyle(t0).fontWeight}} 100px Padrao`;
+    const capH = ctx.measureText("H").actualBoundingBoxAscent;
+    let fs = 100 * parseFloat(t0.dataset.letras) * H / capH;
+    const maxW = parseFloat(t0.dataset.alvo) * 1080;
+    lines.forEach((l) => {{ l.style.lineHeight = "normal"; l.style.fontSize = fs + "px"; }});
+    const widest = Math.max(...lines.map((l) => l.scrollWidth));
+    if (widest > maxW) {{ fs = fs * maxW / widest; lines.forEach((l) => (l.style.fontSize = fs + "px")); }}
+    const cap = parseFloat(t0.dataset.letras) * H * (fs / (100 * parseFloat(t0.dataset.letras) * H / capH));
+    const passo = cap * parseFloat(t0.dataset.entre);
+    let inkTop = parseFloat(t0.dataset.topo) * H, lastBottom = 0;
+    lines.forEach((l, i) => {{
+      const k = ink(l), top = inkTop + i * passo;
+      l.style.top = (top - (k.fa - k.ia)) + "px";
+      lastBottom = top + k.ia;
+    }});
+    const s = box.querySelector(".t-fit-sub");
+    if (s) {{
+      s.style.lineHeight = "normal"; s.style.fontSize = "100px";
+      s.style.fontSize = (100 * parseFloat(s.dataset.alvo) * 1080 / s.scrollWidth) + "px";
+      const ks = ink(s);
+      s.style.top = (lastBottom + parseFloat(s.dataset.folga) * H - (ks.fa - ks.ia)) + "px";
+    }}
+  }});
+}}
 function fitMain() {{
   // palavra principal: tamanho pela largura alvo, entre o mínimo e o máximo do padrão (PLAYBOOK 3.1)
   document.querySelectorAll(".kw-block").forEach((b) => {{
@@ -329,6 +467,7 @@ function kwWords(sel) {{
 }}
 document.fonts.ready.then(() => {{
   fitMain();
+  fitTitle();
   tl.set(".cam", {{ scale: 1 }}, 0);
   {(chr(10) + "  ").join(tl)}
   window.__timelines["main"] = tl;

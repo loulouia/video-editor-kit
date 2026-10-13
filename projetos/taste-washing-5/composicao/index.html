@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
 <style>
 @font-face { font-family: "Padrao"; src: url("assets/fonts/HelveticaNowDisplay-ExtraBold.ttf") format("truetype"); font-weight: 800; }
+
 body { margin: 0; background: #000; }
 #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Padrao", sans-serif; font-weight: 800; color: #fff; }
 .clip { position: absolute; inset: 0; }
@@ -28,7 +29,8 @@ body { margin: 0; background: #000; }
 /* PLAYBOOK §3 — legenda */
 .cap { display: flex; justify-content: center; }
 .cap-txt { position: absolute; transform: translateY(-50%); width: 88%; text-align: center; font-size: 40px;
-  line-height: 1.08; letter-spacing: -0.005em; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
+  font-weight: 800; line-height: 1.08; letter-spacing: -0.005em; text-shadow: 0 2px 10px rgba(0,0,0,.35);
+   }
 /* PLAYBOOK 3.1 — palavras-chave */
 .kw { display: flex; justify-content: center; }
 .kw-block { position: absolute; display: flex; flex-direction: column; align-items: center; text-shadow: 0 4px 24px rgba(0,0,0,.30); }
@@ -38,6 +40,9 @@ body { margin: 0; background: #000; }
 .w { display: inline-block; }
 /* PLAYBOOK 3.1 — efeito negativo: as letras invertem as cores do vídeo atrás delas */
 .kw-neg .kw-block { mix-blend-mode: difference; text-shadow: none; }
+.cx { position: absolute; overflow: hidden; }
+.cx-in { position: absolute; inset: 0; display: flex; font-family: "Cartao", serif; overflow: hidden; }
+.cx-grao { position: absolute; inset: 0; }
 .logo { position: absolute; top: 5.2%; right: 7%; width: 19%; height: auto; }
 </style>
 </head>
@@ -83,6 +88,44 @@ body { margin: 0; background: #000; }
 </div>
 <script>
 const tl = gsap.timeline({ paused: true });
+function fitTitle() {
+  // Gancho (topo-livre): tamanho FIXO pela altura das letras; cada linha a uma distância fixa da anterior;
+  // subtítulo colado embaixo da última linha. Só encolhe se uma linha passar da largura da tela.
+  const H = 1920;
+  const ink = (el) => {
+    const cs = getComputedStyle(el);
+    ctx.font = `${cs.fontWeight} ${parseFloat(cs.fontSize)}px Padrao`;
+    const m = ctx.measureText(el.textContent.trim());
+    return { fa: m.fontBoundingBoxAscent, ia: m.actualBoundingBoxAscent };
+  };
+  document.querySelectorAll(".titulo").forEach((box) => {
+    const lines = [...box.querySelectorAll(".t-fit")];
+    if (!lines.length) return;
+    const t0 = lines[0];
+    ctx.font = `${getComputedStyle(t0).fontWeight} 100px Padrao`;
+    const capH = ctx.measureText("H").actualBoundingBoxAscent;
+    let fs = 100 * parseFloat(t0.dataset.letras) * H / capH;
+    const maxW = parseFloat(t0.dataset.alvo) * 1080;
+    lines.forEach((l) => { l.style.lineHeight = "normal"; l.style.fontSize = fs + "px"; });
+    const widest = Math.max(...lines.map((l) => l.scrollWidth));
+    if (widest > maxW) { fs = fs * maxW / widest; lines.forEach((l) => (l.style.fontSize = fs + "px")); }
+    const cap = parseFloat(t0.dataset.letras) * H * (fs / (100 * parseFloat(t0.dataset.letras) * H / capH));
+    const passo = cap * parseFloat(t0.dataset.entre);
+    let inkTop = parseFloat(t0.dataset.topo) * H, lastBottom = 0;
+    lines.forEach((l, i) => {
+      const k = ink(l), top = inkTop + i * passo;
+      l.style.top = (top - (k.fa - k.ia)) + "px";
+      lastBottom = top + k.ia;
+    });
+    const s = box.querySelector(".t-fit-sub");
+    if (s) {
+      s.style.lineHeight = "normal"; s.style.fontSize = "100px";
+      s.style.fontSize = (100 * parseFloat(s.dataset.alvo) * 1080 / s.scrollWidth) + "px";
+      const ks = ink(s);
+      s.style.top = (lastBottom + parseFloat(s.dataset.folga) * H - (ks.fa - ks.ia)) + "px";
+    }
+  });
+}
 function fitMain() {
   // palavra principal: tamanho pela largura alvo, entre o mínimo e o máximo do padrão (PLAYBOOK 3.1)
   document.querySelectorAll(".kw-block").forEach((b) => {
@@ -166,6 +209,7 @@ function kwWords(sel) {
 }
 document.fonts.ready.then(() => {
   fitMain();
+  fitTitle();
   tl.set(".cam", { scale: 1 }, 0);
   tl.fromTo("#card0 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 0.0);
   tl.fromTo("#card1 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 25.84);
