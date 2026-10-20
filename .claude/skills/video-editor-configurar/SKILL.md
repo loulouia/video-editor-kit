@@ -7,6 +7,13 @@ description: Primeiro uso do editor de vídeo (video-editor) — instala e confe
 
 Siga em ordem. Fale em linguagem simples (a pessoa pode não ser técnica). Cada etapa já feita é só conferida e pulada. Regras gerais: `CLAUDE.md`.
 
+## 0. Nome da pasta (iCloud)
+
+A pasta deve se chamar `video-editor.nosync` (já é distribuída assim). Conferir:
+- nome atual da raiz do projeto termina em `.nosync`? → seguir;
+- não termina **e** está num lugar sincronizado pelo iCloud (caminho dentro de `~/Desktop` ou `~/Documents` quando existir `~/Library/Mobile Documents/com~apple~CloudDocs/Desktop`, ou dentro de `~/Library/Mobile Documents`) → explicar em uma frase ("o iCloud pode tirar arquivos do seu Mac quando o disco enche; com `.nosync` no nome a pasta fica sempre no Mac") e **pedir OK** pra renomear no mesmo lugar. Antes: checar espaço e baixar os arquivos que estejam só na nuvem (`find . -flags +dataless`); depois: conferir que nenhum ficou na nuvem. Avisar que a pessoa passa a abrir a pasta com o nome novo.
+- não está num lugar sincronizado → não mexer.
+
 ## 1. Ferramentas no Mac
 
 Conferir e, se faltar, instalar (avisar o tamanho antes de downloads grandes; checar espaço livre com `df -h ~` — se houver menos de ~5 GB, avisar antes de seguir):

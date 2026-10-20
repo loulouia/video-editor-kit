@@ -42,8 +42,20 @@ def checar():
     return " ".join(linhas)
 
 
+def aviso_icloud():
+    """Pasta sem .nosync dentro de um lugar sincronizado pelo iCloud → avisar (o setup corrige com OK)."""
+    home = os.path.expanduser("~")
+    sinc = os.path.exists(os.path.join(home, "Library/Mobile Documents/com~apple~CloudDocs/Desktop"))
+    dentro = RAIZ.startswith(os.path.join(home, "Library/Mobile Documents")) or \
+        (sinc and (RAIZ.startswith(os.path.join(home, "Desktop")) or RAIZ.startswith(os.path.join(home, "Documents"))))
+    if dentro and not os.path.basename(RAIZ).endswith(".nosync"):
+        return (" ATENÇÃO: a pasta do projeto está num lugar sincronizado pelo iCloud e sem '.nosync' no nome — o macOS pode "
+                "tirar arquivos do disco. Sugerir /video-editor-configurar (etapa 0) pra renomear com OK.")
+    return ""
+
+
 try:
-    ctx = checar()
+    ctx = checar() + aviso_icloud()
 except Exception as e:
     ctx = f"[video-editor] Checagem de início falhou ({str(e)[:150]}). Seguir normalmente."
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}, ensure_ascii=False))

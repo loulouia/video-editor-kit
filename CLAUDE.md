@@ -8,6 +8,10 @@ Comandos (skills em `.claude/skills/`): `/video-editor-configurar` (primeiro uso
 
 Ao abrir o projeto, o hook `SessionStart` (`.claude/settings.json` → `motor/inicio.py`) informa se o setup está completo e quais vídeos estão novos/em andamento no Drive. Na primeira resposta: setup incompleto → indicar `/video-editor-configurar` e não editar; completo → citar em uma frase os vídeos novos/em andamento.
 
+## Nome da pasta: `video-editor.nosync`
+
+O projeto é distribuído com a pasta já chamada **`video-editor.nosync`**: pastas terminadas em `.nosync` não são sincronizadas pelo iCloud, então os arquivos ficam sempre no Mac (com "Mesa e Documentos" no iCloud e pouco espaço, o macOS tira arquivos do disco — aconteceu com 471 arquivos deste projeto em 2026-10-20, e git dentro do iCloud pode corromper). A pessoa coloca a pasta onde quiser; o motor funciona em qualquer lugar. O `/video-editor-configurar` confere: se a pasta estiver sem `.nosync` **e** num lugar sincronizado pelo iCloud, explica em uma frase e pede OK pra renomear (baixando antes os arquivos que estiverem só no iCloud).
+
 ## Drive e Mac (cada pessoa usa o próprio Drive)
 
 ```
@@ -104,4 +108,4 @@ Só quando a usuária pedir: 1) propor 4–8 queries curtas e **esperar aprovaç
 - Bruto novo no Drive → `motor/registro.py iniciar` cria `projetos/<slug>/` (slug: minúsculas, sem acentos/espaços) e registra em `registro.json`.
 - `projetos/taste-washing-5` e `projetos/teste-topo-livre-1` são anteriores ao Drive (bruto e inserções locais); `taste-washing-5` é a regressão do padrão Amanda.
 - Pouco espaço em disco: checar `df -h ~` antes de baixar; avisar abaixo de ~3 GB. Apagar intermediários quando não forem mais necessários.
-- Git: usar `/opt/homebrew/bin/git` (o `/usr/bin/git` exige Xcode CLT). Este projeto é **privado**: tem repositório próprio e é ignorado pelo repositório público do portfólio (`../.gitignore`). Nunca publicar sem pedido. Backup dos clientes = zip no Drive; GitHub privado é só pra autora do motor.
+- Git: usar `/opt/homebrew/bin/git` (o `/usr/bin/git` exige Xcode CLT). Este projeto é **privado**: tem repositório próprio e é ignorado pelo repositório público do portfólio (`../.gitignore`, com e sem `.nosync`). Nunca publicar sem pedido. Backup dos clientes = zip no Drive; GitHub privado é só pra autora do motor.

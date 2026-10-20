@@ -4,7 +4,7 @@ Edição de vídeos curtos (1080×1920) feita pelo Claude: cortes de pausas, ace
 
 ## Comece aqui
 
-1. Abra a pasta `video-editor` no Claude Code.
+1. Coloque a pasta **`video-editor.nosync`** onde preferir (Área de Trabalho, Documentos...) e abra no Claude Code. Não tire o `.nosync` do nome: é ele que impede o iCloud de tirar os arquivos do seu Mac quando o disco fica cheio.
 2. Digite **`/video-editor-configurar`**. O Claude confere e instala as ferramentas, conecta o seu Google Drive (você autoriza no navegador) e, **com o seu OK**, cria as pastas no Drive.
 3. Suba um vídeo gravado em `Edição de vídeos/brutos/` no seu Drive (pelo navegador, celular ou computador).
 4. Digite **`/video-editor-videos`** pra ver o que é novo, e **`/video-editor-editar`** pra começar.
