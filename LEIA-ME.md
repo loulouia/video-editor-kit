@@ -1,64 +1,98 @@
 # Editor de vídeo (Reels / TikTok)
 
-Edição de vídeos curtos (1080×1920) feita pelo Claude em código: cortes de pausas, aceleração, cor, legendas, palavras-chave, inserções, fundo mesclado e render, sempre com plano e preview aprovados por você.
+Edição de vídeos curtos (1080×1920) feita pelo Claude: cortes de pausas, aceleração, cor, legendas, palavras-chave, inserções e render, sempre com plano, storyboard e preview aprovados por você. Os vídeos ficam no seu Google Drive; o Mac guarda só o que é pequeno.
 
-## Como está organizado
+## Comece aqui
+
+1. Abra a pasta `video-editor` no Claude Code.
+2. Digite **`/video-editor-configurar`**. O Claude confere e instala as ferramentas, conecta o seu Google Drive (você autoriza no navegador) e, **com o seu OK**, cria as pastas no Drive.
+3. Suba um vídeo gravado em `Edição de vídeos/brutos/` no seu Drive (pelo navegador, celular ou computador).
+4. Digite **`/video-editor-videos`** pra ver o que é novo, e **`/video-editor-editar`** pra começar.
+
+Toda vez que você abrir o projeto, o Claude já confere se há vídeos novos no Drive e te avisa na primeira resposta.
+
+### Comandos
+
+Digite `/video-editor` pra ver todos.
+
+| Comando | O que faz |
+|---|---|
+| `/video-editor-configurar` | primeiro uso: ferramentas, Drive, pastas, marca |
+| `/video-editor-videos` | mostra 🆕 novos, ⏳ em andamento e ✅ entregues |
+| `/video-editor-editar` | edita um bruto (ou reabre um já entregue pra ajustar) até o preview |
+| `/video-editor-entregar` | renderiza o aprovado, envia pro Drive, confere, limpa o Mac e faz backup |
+| `/video-editor-novo-padrao` | cria um estilo de edição a partir de vídeos de referência |
+
+Também dá pra pedir em linguagem normal (ex.: *"edita o vídeo novo"*).
+
+## Seu Google Drive
+
+```
+Meu Drive/Edição de vídeos/
+  brutos/                       ← você sobe aqui os vídeos pra editar
+  insercoes/<nome-do-bruto>/    ← prints, fotos e b-rolls de cada vídeo
+  editados/                     ← os vídeos prontos aparecem aqui
+  _padroes/  _marca/            ← vídeos de referência e seus vídeos já editados
+  _backup/                      ← cópias de segurança do projeto (automáticas)
+```
+
+- **Bruto** é só o que está **direto** em `brutos/`. Uma pasta por vídeo em `insercoes/`, com o **mesmo nome do bruto** (ex.: `brutos/aula-03.mov` → `insercoes/aula-03/`). Os nomes dos arquivos dentro dela são livres; se quiser, coloque o momento no começo (ex.: `0m12-print.png`).
+- O vídeo pronto vai pra `editados/<nome-do-bruto>-<padrão>.mp4`. Se você pedir ajuste depois, a versão nova vira `-v2` e a anterior continua lá.
+- O Claude **nunca renomeia, move ou apaga** arquivos seus no Drive.
+- Suba os vídeos **originais**, direto do celular ou do computador. Passar pelo WhatsApp ou baixar de rede social comprime o vídeo antes.
+- **Não apague o bruto** de um vídeo que talvez precise de ajuste: sem ele, não dá pra reabrir a edição.
+
+## Como funciona cada edição
+
+Nada é renderizado sem você aprovar.
+
+1. **Você pede.** Diga qual bruto e qual padrão (o Claude sempre pergunta o padrão). Pra cada inserção você pode escolher o tipo; recursos opcionais só entram quando você pede (ex.: *"com palavras-chave"*).
+   - **Cor e iluminação:** antes/depois pra escolher: a cor da sua marca, a de outra referência ou a original.
+   - **Pesquisa de imagens (opcional):** *"busca imagens"*. O Claude propõe as buscas, você aprova, escolhe e só o escolhido é baixado (e guardado na pasta do vídeo no Drive).
+2. **Plano (você aprova).** Cortes, aceleração, duração, legendas, inserções (fala exata, entrada/saída, duração, tipo) e o gancho.
+3. **Storyboard (você aprova).** Um quadro por momento, já com a composição real, tempo, fala, origem de cada imagem e **alertas em vermelho** quando algo fere uma regra. Correção pelo número do quadro.
+4. **Preview (você ajusta).** Timeline no navegador do app; cada ajuste aparece em segundos.
+5. **Entrega.** Com a sua aprovação: o vídeo vai pra `editados/` no Drive, é conferido, e o Mac é limpo sozinho. Você recebe um aviso como:
+   > ✅ **Entregue:** aula-03-topo-livre.mp4 está em `editados/` no seu Drive.
+   > Liberei 240 MB no seu Mac (só arquivos temporários de edição). O vídeo e tudo o que é preciso pra reeditar estão guardados.
+6. **Ajustes depois da entrega.** `/video-editor-editar` com o nome do vídeo: ele reabre igual à versão entregue (ou com o padrão atualizado, se você quiser).
+
+## Como está organizado (no Mac)
 
 | Pasta | O que é |
 |---|---|
-| `motor/` | **Como editar.** Os scripts que fazem o trabalho. São os mesmos pra qualquer estilo (não mexer) |
-| `padroes/<nome>/` | **Um estilo de edição.** Regras (`PLAYBOOK.md`), valores (`padrao.json`), histórico (`CHANGELOG.md`), fontes e vídeos de referência |
-| `marcas/<nome>/` | **Um criador ou cliente.** Logo (claro e escuro), glossário de termos, cor do cenário (LUT) e vídeos já editados |
-| `projetos/<nome-do-video>/` | **Um vídeo.** Plano, decisões, inserções e a composição. Criada pelo Claude quando você coloca o bruto |
-| `entrada/brutos/` | Onde você coloca os vídeos gravados, sem edição |
-| `saida/` | Vídeos prontos |
-| `tools/` | Ferramentas instaladas (não mexer) |
+| `motor/` | **Como editar.** Os scripts que fazem o trabalho. Iguais pra qualquer estilo (não mexer) |
+| `padroes/<nome>/` | **Um estilo de edição.** Regras (`PLAYBOOK.md`), valores (`padrao.json`), histórico (`CHANGELOG.md`), fontes |
+| `marcas/<nome>/` | **Um criador ou cliente.** Logo (claro e escuro), glossário de termos, cor do cenário, paleta |
+| `projetos/<nome-do-video>/` | **As decisões de cada vídeo** (< 1 MB): cortes, legendas, inserções, storyboard, versão entregue |
+| `config/` | configuração desta instalação (conexão com o Drive) |
+| `registro.json` | lista de vídeos e status |
 
-Cada vídeo combina **um padrão + uma marca**. Ex.: o TASTE WASHING 5 é *padrão amanda + marca amanda*. O mesmo vídeo pode ser editado em outro padrão sem mudar nada da marca.
+Cada vídeo combina **um padrão + uma marca**. O mesmo vídeo pode ser editado em outro padrão sem mudar nada da marca.
 
 ### Padrões existentes
 
 | Padrão | Status | Para |
 |---|---|---|
 | `amanda` | v1.0, oficial | uso próprio (Helvetica Now Display, LOULOU Studios) |
-| `topo-livre` | em criação | clientes (fonte TikTok Sans, livre) |
+| `topo-livre` | em criação | clientes (TikTok Sans + Instrument Serif, livres) |
 
 ## Criar um padrão novo
 
-1. **Escolha o caminho.**
-   - **A. Partir de vídeos editados** de uma marca: eles ficam em `marcas/<nome>/meus-editados/`. Referências em `padroes/<novo>/referencias/` entram só como elementos pontuais.
-   - **B. Copiar o estilo de referências:** coloque **2 a 3 vídeos do mesmo criador** em `padroes/<novo>/referencias/`. O que se repete entre eles é o estilo; a identidade do criador (logo, paleta exata, bordões) não é copiada.
-2. **Coloque os arquivos.** MP4 ou MOV, nomes sem espaços e sem acentos. Salve as referências pelo próprio app ou grave a tela, evitando a interface do app por cima.
-3. **Avise o Claude:** o caminho, a referência principal (no B) e o que você gosta em cada referência (ritmo, legendas, transições...).
-4. O Claude analisa e devolve uma **tabela comparativa** com uma coluna "Proposta". Você decide cada linha, e o padrão nasce (`PLAYBOOK.md` + `padrao.json`).
-5. **Teste com um bruto.** Ver o mesmo vídeo em dois padrões, lado a lado, é a melhor forma de comparar.
+Use **`/video-editor-novo-padrao`**.
+- **Caminho A:** partir dos seus vídeos editados (em `_marca/meus-editados/` no Drive).
+- **Caminho B:** copiar o estilo de **2 a 3 vídeos do mesmo criador** (em `_padroes/<novo>/referencias/` no Drive). O que se repete é o estilo; a identidade do criador (logo, paleta exata, bordões) não é copiada.
 
-Recursos que o motor já sabe fazer e que cada padrão liga, desliga ou ajusta: legendas, título do gancho, palavras-chave (com efeito negativo opcional), texto atrás da pessoa, fundo mesclado, cards e notícias, zoom de jump cut, grading de cor, "nada cobre o rosto". Se uma referência tiver algo novo, o recurso é construído no motor e fica disponível pra todos os padrões.
+O Claude devolve uma **tabela comparativa**; você decide cada linha, e o padrão nasce. Recursos que o motor já faz e cada padrão liga/desliga: legendas, título do gancho, palavras-chave (com efeito negativo), texto atrás da pessoa, fundo mesclado, caixa no topo, cartões de frase, cards e notícias, zoom de jump cut, cor, "nada cobre o rosto". Padrões pra clientes usam só fontes livres.
 
-**Fontes:** padrão pra clientes usa só fontes livres (ex.: Google Fonts). Fontes pagas exigem licença pra uso em serviço.
+## Ferramentas
 
-## Como funciona cada edição
+| Ferramenta | Para quê |
+|---|---|
+| ffmpeg | cortar, juntar, converter, cor, camadas |
+| mlx-whisper | transcrição com tempo por palavra (`~/.video-skill`) |
+| HyperFrames | composição, recorte da pessoa, preview, render (telemetria desativada) |
+| rclone | leva os vídeos do Drive pro Mac e devolve o editado (sem app, sem cache) |
+| git | histórico do projeto (repositório privado) |
 
-Nada é renderizado sem você aprovar.
-
-1. **Você pede.** Coloque o bruto em `entrada/brutos/` e diga o padrão e a marca. O Claude cria `projetos/<nome-do-video>/insercoes/`: coloque lá as imagens e vídeos desse vídeo (opcional: o momento no nome, ex.: `0m12-noticia-openai.png`). Pra cada inserção você pode escolher o tipo: card (na base ou no topo), notícia, tela cheia, horizontal com faixas pretas ou fundo mesclado. Recursos opcionais só entram quando você pede (ex.: *"com palavras-chave; no gancho, texto atrás de mim"*).
-   - **Cor e iluminação:** o Claude mostra um antes/depois e pergunta qual coloração usar: a da marca (padrão), a de outra referência ou a original.
-   - **Pesquisa de imagens e notícias (opcional):** peça *"busca imagens e notícias"*. O Claude propõe as buscas, você aprova, escolhe nas opções e só o escolhido é baixado.
-2. **Plano (você aprova).** Cortes com o tempo de cada um, aceleração, duração final, legendas, palavras-chave, tabela de inserções (fala exata, entrada/saída, duração, tipo) e a pergunta do gancho.
-3. **Storyboard (você aprova).** Antes de montar, uma folha com um quadro por momento do vídeo, já com a composição real: gancho, imagens, cartões, legendas e palavras-chave nas posições do padrão, com tempo, fala, origem de cada imagem e **alertas em vermelho** quando algo fere uma regra. Você corrige pelo número do quadro (ex.: *"quadro 4: troca a imagem"*). Vale pra todos os padrões.
-4. **Preview (você ajusta).** Timeline no navegador do app; cada ajuste aparece em segundos. Ex.: *"aos 0:07 a legenda cobre a boca"*.
-5. **Render.** Só com a sua aprovação: MP4 1080×1920 em `saida/`.
-6. **Aprendizado.** Toda correção vira regra no padrão (ou no glossário da marca), registrada no `CHANGELOG.md`.
-
-## Ferramentas instaladas
-
-| Ferramenta | Para quê | Onde |
-|---|---|---|
-| ffmpeg 9 | cortar, juntar, converter, cor (LUT), camadas | Homebrew |
-| mlx-whisper (large-v3-turbo) | transcrição com tempo por palavra (rápido no M4) | `~/.video-skill` |
-| opencv, matplotlib | medidas, mapa do rosto, texto atrás | `~/.video-skill` |
-| HyperFrames + skills | composição, recorte da pessoa (remove-background), preview, render | `npx hyperframes`, `~/.claude/skills` |
-| Remotion skills, claude-shorts | instalados, não usados neste fluxo | `~/.claude/skills` |
-| git | controle de versão (repositório privado) | Homebrew |
-
-Telemetria do HyperFrames desativada.
+**Backup:** depois de cada entrega, um zip do projeto (sem vídeos) vai pra `_backup/` no seu Drive, com as 5 cópias mais recentes. Em um Mac novo, o `/video-editor-configurar` restaura a partir dele.

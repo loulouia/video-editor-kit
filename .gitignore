@@ -20,3 +20,7 @@ __pycache__/
 .thumbnails/
 .waveform-cache/
 .hyperframes/
+# Por instalação (vão no backup zip, não no git)
+config/
+registro.json
+projetos/*/versao/

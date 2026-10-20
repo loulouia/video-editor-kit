@@ -4,7 +4,8 @@ Motor = como editar (igual pra todos). Padrão = o visual. Marca = o criador (lo
 """
 import json, os
 
-RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# VE_RAIZ: usado ao reabrir com a versão entregue (motor copiado em projetos/<slug>/versao/<data>/motor)
+RAIZ = os.environ.get("VE_RAIZ") or os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 class Projeto:
@@ -13,7 +14,9 @@ class Projeto:
         self.p = json.load(open(self.path("projeto.json"), encoding="utf-8"))
         self.padrao_dir = os.path.join(RAIZ, "padroes", self.p["padrao"])
         self.marca_dir = os.path.join(RAIZ, "marcas", self.p["marca"])
-        self.S = json.load(open(os.path.join(self.padrao_dir, "padrao.json"), encoding="utf-8"))
+        # VE_PADRAO_FIXO: padrao.json guardado na entrega (reabrir "igual à versão entregue")
+        fixo = os.environ.get("VE_PADRAO_FIXO")
+        self.S = json.load(open(fixo or os.path.join(self.padrao_dir, "padrao.json"), encoding="utf-8"))
         self.M = json.load(open(os.path.join(self.marca_dir, "marca.json"), encoding="utf-8"))
 
     def path(self, *p):

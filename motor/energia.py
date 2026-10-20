@@ -34,7 +34,8 @@ print(f"piso de ruído: {floor:.1f} dB (borda ok se < {floor + 12:.1f} dB)")
 
 if "--sugerir" in sys.argv:
     # pausas reais: trechos de 20 ms abaixo de piso+10 dB por mais de 0,25 s → corte deixando 0,06 s de cada lado
-    i = sys.argv.index("--sugerir"); fim = float(sys.argv[i + 1]) if len(sys.argv) > i + 1 else len(a) / 16000
+    i = sys.argv.index("--sugerir"); prox = sys.argv[i + 1] if len(sys.argv) > i + 1 else ""
+    fim = float(prox) if prox and not prox.startswith("--") else len(a) / 16000
     quiet = [db(t, t + 0.02) < floor + 10 for t in np.arange(0, fim, 0.02)]
     novos, start = [], None
     for k, q in enumerate(quiet + [False]):

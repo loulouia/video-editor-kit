@@ -2,8 +2,15 @@
  "nome": "Amanda Lourenço",
  "marca": "LOULOU Studios",
  "_sobre": "Marca/criador: o que é da pessoa, não do estilo. Logo, glossário de termos e a cor do cenário dela (LUT).",
- "logo": {"escuro": "logos/logo-escuro.png", "claro": "logos/logo-claro.png", "opacidade": 0.7},
+ "logo": {
+  "escuro": "logos/logo-escuro.png",
+  "claro": "logos/logo-claro.png",
+  "opacidade": 0.7
+ },
  "lut": "cor/meus-editados.cube",
  "glossario": "glossario.md",
- "videos_editados": "meus-editados/"
+ "videos_editados": "meus-editados/",
+ "padrao_padrao": null,
+ "paleta": {},
+ "_padrao_padrao": "Padrão usado quando a pessoa não diz qual. null = sempre perguntar."
 }
