@@ -1,4 +1,5 @@
 """Divide a fala em legendas respeitando o padrão: no máximo `linhas_max` linhas de `caracteres_por_linha`
+e no máximo `palavras_max` palavras por tela (se o padrão definir)
 (PLAYBOOK §4 de cada padrão). Prefere quebrar em pontuação; nunca deixa uma palavra sozinha no fim.
 
 Uso: python motor/legendas.py projetos/<video> [--de <indice> --ate <indice>] [--gravar]
@@ -14,6 +15,7 @@ from config import Projeto
 P = Projeto(sys.argv[1])
 L = P.S["legenda"]
 MAXC = L.get("caracteres_por_linha", 30) * L.get("linhas_max", 2)
+PMAX = L.get("palavras_max", 99)  # palavras por tela (padrão amanda: 5)
 ALVO = int(MAXC * 0.88)          # mira abaixo do máximo (na referência, a maioria fica entre 25 e 55 caracteres)
 # palavras de ligação: uma legenda nunca termina nelas (vão pra legenda seguinte)
 LIGACAO = {"pra", "para", "de", "do", "da", "dos", "das", "que", "e", "o", "a", "os", "as", "um", "uma",
@@ -31,7 +33,7 @@ def fmt(ws):
 caps, cur = [], []
 for i in range(a, b + 1):
     w = W[i]
-    if cur and len(fmt(cur + [w])) > ALVO:          # não cabe: fecha a legenda atual
+    if cur and (len(fmt(cur + [w])) > ALVO or len(cur) + 1 > PMAX):   # não cabe: fecha a legenda atual
         cut = len(cur)
         # recua palavras de ligação do fim e a palavra solta depois de uma vírgula
         while cut > 2 and cur[cut - 1]["w"].lower().strip(",.") in LIGACAO:
@@ -50,7 +52,7 @@ if cur:
 # sobra curta (menos de 12 caracteres) junta na legenda anterior, se couber no máximo
 k = 1
 while k < len(caps):
-    if len(fmt(caps[k])) < 12 and len(fmt(caps[k - 1] + caps[k])) <= MAXC:
+    if len(fmt(caps[k])) < 12 and len(fmt(caps[k - 1] + caps[k])) <= MAXC and len(caps[k - 1] + caps[k]) <= PMAX:
         caps[k - 1] = caps[k - 1] + caps.pop(k)
     else:
         k += 1
@@ -62,4 +64,4 @@ for t, i, j in out:
 if "--gravar" in sys.argv:
     e = P.edicao(); e["legendas"] = out
     json.dump(e, open(P.path("edicao.json"), "w"), ensure_ascii=False, indent=1)
-    print(f"{len(out)} legendas gravadas (máx. {MAXC} caracteres, {L.get('linhas_max', 2)} linhas)")
+    print(f"{len(out)} legendas gravadas (máx. {MAXC} caracteres, {L.get('linhas_max', 2)} linha(s), {PMAX} palavras)")

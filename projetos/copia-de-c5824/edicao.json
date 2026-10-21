@@ -13,73 +13,163 @@
  },
  "legendas": [
   [
-   "vamos falar das mamas da kim kardashian.",
+   "vamos falar das mamas",
    0,
+   3
+  ],
+  [
+   "da kim kardashian.",
+   4,
    6
   ],
   [
-   "ela tinha aqui nessa foto um colo cheio,",
+   "ela tinha aqui nessa foto",
    7,
+   11
+  ],
+  [
+   "um colo cheio,",
+   12,
    14
   ],
   [
-   "uma mama vistosa, uma clivagem bem próxima,",
+   "uma mama vistosa,",
    15,
+   17
+  ],
+  [
+   "uma clivagem bem próxima,",
+   18,
    21
   ],
   [
-   "mas ao mesmo tempo uma mama muito grande, muito pesada,",
+   "mas ao mesmo tempo",
    22,
+   25
+  ],
+  [
+   "uma mama muito grande,",
+   26,
+   29
+  ],
+  [
+   "muito pesada,",
+   30,
    31
   ],
   [
-   "que talvez tenha feito sentido na vida dela por um tempo.",
+   "que talvez tenha feito",
    32,
+   35
+  ],
+  [
+   "sentido na vida dela",
+   36,
+   39
+  ],
+  [
+   "por um tempo.",
+   40,
    42
   ],
   [
-   "e ela mudou para isso daqui.",
+   "e ela mudou",
    43,
+   45
+  ],
+  [
+   "para isso daqui.",
+   46,
    48
   ],
   [
-   "uma perda de colo, uma perda de volume,",
+   "uma perda de colo,",
    49,
+   52
+  ],
+  [
+   "uma perda de volume,",
+   53,
    56
   ],
   [
-   "mas uma mama muito mais funcional.",
+   "mas uma mama",
    57,
+   59
+  ],
+  [
+   "muito mais funcional.",
+   60,
    62
   ],
   [
-   "será que ela retirou o implante?",
+   "será que ela retirou",
    63,
+   66
+  ],
+  [
+   "o implante?",
+   67,
    68
   ],
   [
-   "será que ela está usando um implante menor?",
+   "será que ela está usando",
    69,
+   73
+  ],
+  [
+   "um implante menor?",
+   74,
    76
   ],
   [
-   "isso a gente não vai saber.",
+   "isso a gente",
    77,
+   79
+  ],
+  [
+   "não vai saber.",
+   80,
    82
   ],
   [
-   "mas o que a gente sabe é que ela poderia sim ter",
+   "mas o que",
    83,
+   85
+  ],
+  [
+   "a gente sabe",
+   86,
+   88
+  ],
+  [
+   "é que ela",
+   89,
+   91
+  ],
+  [
+   "poderia sim ter",
+   92,
    94
   ],
   [
-   "a mama mais leve, a mama mais funcional,",
+   "a mama mais leve,",
    95,
+   98
+  ],
+  [
+   "a mama mais funcional,",
+   99,
    102
   ],
   [
-   "a mama mais anatômica dentro do tórax",
+   "a mama mais anatômica",
    103,
+   106
+  ],
+  [
+   "dentro do tórax",
+   107,
    109
   ],
   [
@@ -88,8 +178,13 @@
    114
   ],
   [
-   "graças à ascensão multiplanos do footprint mamário.",
+   "graças à ascensão multiplanos",
    115,
+   118
+  ],
+  [
+   "do footprint mamário.",
+   119,
    121
   ],
   [
@@ -98,73 +193,158 @@
    126
   ],
   [
-   "que permite que a mama que começa muito embaixo,",
+   "que permite que a mama",
    127,
+   131
+  ],
+  [
+   "que começa muito embaixo,",
+   132,
    135
   ],
   [
-   "que precisa de um implante muito grande para ter colo,",
+   "que precisa de um implante",
    136,
+   140
+  ],
+  [
+   "muito grande para ter colo,",
+   141,
    145
   ],
   [
-   "ela comece em um ponto mais alto.",
+   "ela comece",
    146,
+   147
+  ],
+  [
+   "em um ponto mais alto.",
+   148,
    152
   ],
   [
-   "isso vai alongar o teu abdômen,",
+   "isso vai alongar",
    153,
+   155
+  ],
+  [
+   "o teu abdômen,",
+   156,
    158
   ],
   [
-   "fazer com que a silhueta fique mais magra e mais alta",
+   "fazer com que a silhueta",
    159,
+   163
+  ],
+  [
+   "fique mais magra",
+   164,
+   166
+  ],
+  [
+   "e mais alta",
+   167,
    169
   ],
   [
-   "e ao mesmo tempo, sim, a paciente tenha o colo cheio,",
+   "e ao mesmo tempo, sim,",
    170,
+   174
+  ],
+  [
+   "a paciente tenha",
+   175,
+   177
+  ],
+  [
+   "o colo cheio,",
+   178,
    180
   ],
   [
-   "com o implante pequeno, com o implante mais funcional.",
+   "com o implante pequeno,",
    181,
+   184
+  ],
+  [
+   "com o implante",
+   185,
+   187
+  ],
+  [
+   "mais funcional.",
+   188,
    189
   ],
   [
-   "um implante que obviamente é muito mais estável,",
+   "um implante que obviamente",
    190,
+   193
+  ],
+  [
+   "é muito mais estável,",
+   194,
    197
   ],
   [
-   "porque ele danifica muito menos anatomia.",
+   "porque ele danifica",
    198,
+   200
+  ],
+  [
+   "muito menos anatomia.",
+   201,
    203
   ],
   [
-   "então, se você quer saber sobre",
+   "então, se você quer saber",
    204,
-   209
+   208
   ],
   [
-   "a ascensão multiplanos do footprint mamário,",
-   210,
+   "sobre a ascensão multiplanos",
+   209,
+   212
+  ],
+  [
+   "do footprint mamário,",
+   213,
    215
   ],
   [
-   "aqui é o lugar onde ela nasceu,",
+   "aqui é o lugar onde",
    216,
+   220
+  ],
+  [
+   "ela nasceu,",
+   221,
    222
   ],
   [
-   "aqui é o lugar para você perguntar.",
+   "aqui é o lugar",
    223,
+   226
+  ],
+  [
+   "para você perguntar.",
+   227,
    229
   ],
   [
-   "escreve aqui, a gente vai estar te respondendo.",
+   "escreve aqui,",
    230,
+   231
+  ],
+  [
+   "a gente vai estar",
+   232,
+   235
+  ],
+  [
+   "te respondendo.",
+   236,
    237
   ]
  ],
@@ -275,5 +455,6 @@
    ]
   ]
  },
- "_minusculas": "Teste só deste vídeo: legendas e palavras-chave em minúsculas (o padrão amanda continua em MAIÚSCULAS)."
+ "_minusculas": "Teste só deste vídeo: legendas e palavras-chave em minúsculas (o padrão amanda continua em MAIÚSCULAS).",
+ "_legendas": "Padrão amanda (PLAYBOOK §3): 2 a 5 palavras por tela, uma linha."
 }

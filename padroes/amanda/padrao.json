@@ -39,8 +39,9 @@
   "sombra": "0 2px 10px rgba(0,0,0,.35)",
   "fim_extra_s": 0.35,
   "caracteres_por_linha": 30,
-  "linhas_max": 2,
-  "equilibrar_linhas": false
+  "linhas_max": 1,
+  "equilibrar_linhas": false,
+  "palavras_max": 5
  },
  "palavras_chave": {
   "posicao": 0.47,

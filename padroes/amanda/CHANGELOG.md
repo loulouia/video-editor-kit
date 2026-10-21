@@ -1,5 +1,9 @@
 # Histórico do playbook
 
+## 2026-10-21 — correção de valores (regra inalterada)
+
+- `padrao.json` → `legenda`: `linhas_max` 2 → **1** e novo `palavras_max: 5`, pra bater com a regra já aprovada (§3: **2 a 5 palavras por tela**). Antes o arquivo permitia até 60 caracteres em 2 linhas e o gerador de legendas seguia o arquivo. `motor/legendas.py` agora também conta palavras. Motivo: no vídeo do Adel Bark saíram legendas longas demais; correção aprovada pela Amanda. TASTE WASHING 5 já seguia a regra (sem mudança).
+
 ## 2026-10-12 — v1.5
 
 - Palavras-chave (3.1): **encaixe no vão**. A linha pequena de antes desce até o topo das letras baixas iniciais da palavra grande quando cabe ali ("um" colado no pingo do "i" de "vilão"). Motivo: correção da Amanda; o "um" estava acima da letra mais alta, longe da palavra.

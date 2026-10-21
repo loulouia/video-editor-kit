@@ -96,6 +96,8 @@ MAXC = CAP.get("caracteres_por_linha", 30) * CAP.get("linhas_max", 2)
 for _, _, txt, _ in caps:
     if len(txt) > MAXC:
         print(f"⚠️  legenda com {len(txt)} caracteres (máx. {MAXC}): {txt!r} — divida com motor/legendas.py")
+    if len(txt.split()) > CAP.get("palavras_max", 99):
+        print(f"⚠️  legenda com {len(txt.split())} palavras (máx. {CAP['palavras_max']}): {txt!r} — divida com motor/legendas.py")
 
 # Trechos de fundo mesclado: a pessoa está mais baixa na tela → legendas e palavras-chave descem (PLAYBOOK 4.5)
 topo_win = [(t["de"], t["ate"]) for t in E["topo_mesclado"]]
