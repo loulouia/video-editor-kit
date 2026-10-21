@@ -16,12 +16,12 @@ audio, nome = sys.argv[2], sys.argv[3]
 
 # Termos certos: primeira coluna das tabelas do glossário da marca (antes da seção de erros conhecidos)
 terms = []
-gl = open(P.marca(P.M["glossario"]), encoding="utf-8").read().split("## Erros conhecidos")[0]
+gl = open(P.marca(P.M["glossario"]), encoding="utf-8").read().split("## Erros conhecidos")[0] if P.M.get("glossario") else ""
 for line in gl.splitlines():
     m = re.match(r"\|\s*([^|]+?)\s*\|", line)
     if m and not set(m.group(1)) <= set("-: ") and m.group(1).lower() not in ("termo", "termos"):
         terms += [t.strip() for t in m.group(1).split(",")]
-prompt = f"Vídeo de {P.M['nome']}. Termos: " + ", ".join(terms) + "."
+prompt = f"Vídeo de {P.M['nome']}." + (" Termos: " + ", ".join(terms) + "." if terms else "")
 
 r = mlx_whisper.transcribe(audio, path_or_hf_repo="mlx-community/whisper-large-v3-turbo",
                            language="pt", word_timestamps=True, initial_prompt=prompt)

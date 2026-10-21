@@ -47,7 +47,7 @@ Regras:
 
 ## Distribuição para clientes
 
-Pacote `video-editor.nosync` com: `motor/`, `.claude/` (comandos e hook), `CLAUDE.md`, `LEIA-ME.md`, `padroes/` (amanda + topo-livre, com fontes e licenças). **Não vai:** `marcas/amanda/` (logo, glossário, editados), `projetos/`, `config/`, `registro.json`, `.git/`. Marca do cliente: logo e glossário definidos por ele no `/video-editor-configurar`; a cor do cenário sugerida é a mesma da Amanda (`meus-editados.cube` copiado pra `marcas/<cliente>/cor/`), a menos que ele queira outra. Por isso o pacote leva essa LUT separada da marca Amanda (ex.: `padroes/amanda/cor/`). O vídeo de teste (`taste-washing-5`) é só da autora do motor.
+Pacote `video-editor.nosync` com: `motor/`, `.claude/` (comandos e hook), `CLAUDE.md`, `LEIA-ME.md`, `padroes/` (amanda + topo-livre, com fontes e licenças). **Não vai:** `marcas/amanda/` (logo, glossário, editados), `projetos/`, `config/`, `registro.json`, `.git/`. Marca do cliente: logo e glossário definidos por ele no `/video-editor-configurar`; a cor sugerida depende de **como a câmera grava**: imagem normal (com contraste) → a mesma da Amanda (`padroes/amanda/cor/meus-editados.cube`); **imagem lavada** (cinza, sem contraste: perfis log/flat, comum em câmeras Sony/cinema) → `padroes/amanda/cor/lavado.cube` (contraste, pele quente, cor rica; aprovada no vídeo do Adel Bark, 2026-10-21). A LUT da Amanda num vídeo lavado deixa ainda mais apagado. Sempre mostrar a comparação e deixar a pessoa escolher; a escolhida é copiada pra `marcas/<cliente>/cor/`. O vídeo de teste (`taste-washing-5`) é só da autora do motor.
 
 ## Primeiro uso / padrão novo
 

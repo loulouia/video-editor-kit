@@ -59,7 +59,7 @@ Meu Drive/Edição de vídeos/
 
 Se não houver marca em `marcas/`, cadastrar com a pessoa: nome, logo (versão clara e escura, PNG transparente), fontes próprias (se houver e se tiver licença), cores/paleta (opcional), termos e nomes próprios pro glossário. Criar `marcas/<slug>/marca.json` seguindo o modelo de `marca.json` (`"padrao_padrao": null` — o padrão de cada vídeo é sempre perguntado enquanto isso estiver vazio).
 
-Cor do cenário: **sugerir a mesma cor da Amanda** (copiar a LUT do padrão Amanda pra `marcas/<slug>/cor/`). Se a pessoa quiser outra, gerar depois com vídeos editados dela (`motor/grading.py`).
+Cor do cenário: decidida no primeiro vídeo, com comparação lado a lado. Imagem normal → sugerir a cor da Amanda (`padroes/amanda/cor/meus-editados.cube`); imagem lavada (cinza, sem contraste) → sugerir `padroes/amanda/cor/lavado.cube`. A escolhida é copiada pra `marcas/<slug>/cor/`. Outra cor: gerar com vídeos editados da pessoa (`motor/grading.py`). Logo e glossário são opcionais (sem logo, o vídeo sai sem logo).
 
 ## 6. Vídeos de referência e editados que estejam no Mac
 

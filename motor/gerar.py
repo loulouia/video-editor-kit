@@ -23,7 +23,7 @@ os.makedirs(os.path.join(P.assets, "fonts"), exist_ok=True)
 os.makedirs(os.path.join(P.assets, "img"), exist_ok=True)
 FONT_FILE = os.path.basename(S["fonte"]["arquivo"])
 shutil.copy2(P.padrao(S["fonte"]["arquivo"]), os.path.join(P.assets, "fonts", FONT_FILE))
-for k in ("escuro", "claro"):
+for k in (("escuro", "claro") if M.get("logo") else ()):     # marca sem logo: vídeo sem logo
     shutil.copy2(P.marca(M["logo"][k]), os.path.join(P.assets, "img", f"logo-{k}.png"))
 FW = S["fonte"]["peso"]
 FW_RANGE = S["fonte"].get("pesos", FW)        # fonte variável: faixa de pesos ("300 900")
@@ -275,7 +275,7 @@ for a, b in ZOOM["trechos"]:
     tl.append(f'tl.set(".cam", {{scale: {ZOOM["escala"]}}}, {a}); tl.set(".cam", {{scale: 1}}, {b});')
 
 L, LG = M["logo"], S["logo"]
-USA_LOGO = P.p.get("logo", LG.get("padrao", True))
+USA_LOGO = bool(L) and P.p.get("logo", LG.get("padrao", True))
 if USA_LOGO:
     add(f'<img id="logo" class="logo" src="assets/img/logo-escuro.png" alt="" style="opacity:{L["opacidade"]}">')
     add('<img id="logo-claro" class="logo" src="assets/img/logo-claro.png" alt="" style="opacity:0">')
