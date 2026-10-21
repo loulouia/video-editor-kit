@@ -97,7 +97,7 @@ Nunca posicionar título, cards, legendas ou palavras-chave em posições fixas.
 
 ## Cor e iluminação (PLAYBOOK 1.1)
 
-Em todo vídeo, **antes de montar o plano**, perguntar qual grading usar: (1) o da marca (`marcas/<nome>/cor/*.cube`, padrão), (2) o de outra referência indicada, ou (3) manter o original. Mostrar comparação lado a lado (bruto | com grading | referência). Grava a escolha em `projeto.json` → `"grading"`. Aplicado no A-roll (`motor/cortes.py`) antes do recorte; inserções mantêm as cores originais.
+No **direto ao resultado**: `motor/medir_cor.py <bruto>` decide sozinho (lavado → `padroes/amanda/cor/lavado.cube`; normal → cor da marca; sem cor na marca → original). No **passo a passo**, em todo vídeo, **antes de montar o plano**, perguntar qual grading usar: (1) o da marca (`marcas/<nome>/cor/*.cube`, padrão), (2) o de outra referência indicada, ou (3) manter o original. Mostrar comparação lado a lado (bruto | com grading | referência). Grava a escolha em `projeto.json` → `"grading"`. Aplicado no A-roll (`motor/cortes.py`) antes do recorte; inserções mantêm as cores originais.
 
 Gerar LUT: `motor/grading.py --bruto <bruto> --ref <video>:<t1,t2,...> ... --saida marcas/<nome>/cor/<nome>.cube --comparar <jpg>`.
 - Tempos de referência **só da pessoa falando**: montar uma grade dos quadros e conferir antes (b-roll e cards contaminam).
@@ -132,7 +132,7 @@ As etapas abaixo são executadas em ambos os modos. No passo a passo, cada etapa
 ## Regras que valem em toda edição
 
 - **Glossário da marca:** `motor/transcrever.py` passa os termos como contexto do Whisper. Aplicar a tabela de erros conhecidos pelo contexto ("cloud" só vira "Claude" quando o assunto é a IA). Termo novo ou duvidoso → perguntar e acrescentar.
-- **Confirmação das inserções (PLAYBOOK 4.0):** tabela fala exata → entra/sai → duração → arquivo → tipo e posição, de todas as inserções. Gancho (~5 s) é pergunta separada: quantas inserções, tipo, posição, duração.
+- **Confirmação das inserções (PLAYBOOK 4.0)** — no passo a passo; no direto ao resultado, gancho = só o título e as inserções entram como card na base no trecho da fala, sem perguntar: tabela fala exata → entra/sai → duração → arquivo → tipo e posição, de todas as inserções. Gancho (~5 s) é pergunta separada: quantas inserções, tipo, posição, duração.
 - **Recursos opcionais** (fundo mesclado, palavras-chave, efeito negativo, texto atrás): nunca aplicar sem pedido ou aprovação explícita, e só se o padrão os tiver em `"recursos"`.
 
 ## Lições técnicas

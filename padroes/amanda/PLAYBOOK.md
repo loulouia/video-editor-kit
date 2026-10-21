@@ -142,7 +142,7 @@ Cada imagem ou vídeo inserido usa **um** destes tipos. O tipo é escolhido por 
 
 ### 4.0 Confirmação obrigatória das inserções (no plano)
 
-Nenhuma inserção é montada sem a Amanda aprovar, no plano, uma tabela com **cada** inserção:
+No modo **passo a passo**, nenhuma inserção é montada sem a Amanda aprovar, no plano, uma tabela com **cada** inserção (no modo **direto ao resultado**, as inserções entram como card na base no trecho da fala e o gancho é só o título; a aprovação é no preview):
 
 | Coluna | O que informar |
 |---|---|

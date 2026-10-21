@@ -6,7 +6,7 @@ argument-hint: "[nome do bruto]"
 
 # Editar um vídeo
 
-Bruto pedido: $ARGUMENTS (se vazio, rodar `motor/registro.py` e perguntar qual). Seguir o fluxo do `CLAUDE.md` (plano → storyboard → montagem → preview); comandos do motor em `motor/LEIA-ME.md`. Nunca pular uma aprovação.
+Bruto pedido: $ARGUMENTS (se vazio, rodar `motor/registro.py` e perguntar qual). Seguir o fluxo do `CLAUDE.md` (plano → storyboard → montagem → preview); comandos do motor em `motor/LEIA-ME.md`. No **passo a passo**, nunca pular uma aprovação; no **direto ao resultado**, as aprovações viram decisões automáticas (abaixo) e a pessoa só aprova no preview.
 
 ## Escolha do modo de edição
 
@@ -40,9 +40,9 @@ Executa todas as etapas do fluxo normal **sem pedir confirmação**, usando as m
 
 1. Padrão e marca: já definidos antes do bypass.
 2. `registro.py iniciar` + `preparar.py` → baixa tudo.
-3. Cor: usar a cor da marca (padrão). Se não tiver, manter original.
+3. Cor: rodar `motor/medir_cor.py <bruto>`. **Lavado** → `padroes/amanda/cor/lavado.cube` (`grading` = esse caminho); **normal** → cor da marca; marca sem cor → original. Nunca aplicar a cor da marca num bruto lavado (deixa ainda mais apagado).
 4. Transcrever, cortar, validar energia, aceleração → `cortes.py` → A-roll.
-5. Plano: montar automaticamente seguindo as regras do PLAYBOOK do padrão. Inserções do gancho: usar o padrão do PLAYBOOK. Recursos opcionais: só os que o padrão liga por padrão.
+5. Plano: montar automaticamente seguindo as regras do PLAYBOOK do padrão. Gancho: só o título de abertura (sem inserção). Inserções: as imagens de `insercoes/<nome-do-bruto>/` entram como card na base, no trecho da fala a que se referem (ou no tempo do prefixo do nome, ex. `0m12-`). Recursos opcionais: só os que o padrão liga por padrão.
 6. Storyboard: gerar mas **não mostrar** (fica salvo pra consulta posterior).
 7. Recorte, `rosto.py`, `compor_camadas.py`, `gerar.py`, snapshots → abrir o **preview**.
 8. `registro.py etapa <slug> preview`.

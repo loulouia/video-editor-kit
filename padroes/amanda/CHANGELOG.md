@@ -1,5 +1,9 @@
 # Histórico do playbook
 
+## 2026-10-21 — modo direto ao resultado
+
+- §4.0: a aprovação da tabela de inserções vale no modo **passo a passo**; no **direto ao resultado**, as inserções entram como card na base no trecho da fala, o gancho é só o título, e a aprovação é no preview. Motivo: modo criado pela Amanda.
+
 ## 2026-10-21 — biblioteca de áudio e transições
 
 - Nova seção/linha: música, efeitos sonoros e transições vêm da biblioteca do Drive (`_audio/musicas/`, `_audio/efeitos/`, `_transicoes/`) e só entram com aprovação no plano. Regras de volume e uso a definir no primeiro vídeo com áudio. Motivo: pedido da Amanda.
