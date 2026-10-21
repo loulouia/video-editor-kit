@@ -37,6 +37,7 @@ Conferir e, se faltar, instalar (avisar o tamanho antes de downloads grandes; ch
 1. Explicar: vai abrir uma página do Google no navegador; a pessoa entra na conta e clica em **Permitir**. Eu nunca vejo a senha. O acesso é ao Drive inteiro porque os vídeos que ela sobe pelo navegador/celular precisam ser lidos.
 2. Rodar em segundo plano (espera a autorização): `rclone config create gdrive drive scope=drive`
 3. Conferir: `rclone lsd gdrive:` lista as pastas do Meu Drive.
+3b. **Chave própria do Google** (a chave compartilhada do rclone está sendo desativada em 2026; o rclone avisa com um NOTICE de `client_id`). Guiar a pessoa no console.cloud.google.com, olhando a tela dela, um passo por vez: criar projeto `Editor de video` (se a conta tiver organização, escolher a organização — "Recurso pai" preenche sozinho); ativar a **Google Drive API**; Google Auth Platform → Começar (nome do app, e-mails; **Interno** se a conta do Drive for da mesma organização — confira com a API `about`; senão **Externo** + **Publicar app**, senão o acesso expira em 7 dias); Clientes → **App para computador**. A pessoa cola ID e chave secreta num script com `read -s` no terminal (nunca no chat), que roda `rclone config update gdrive client_id=… client_secret=…` e `rclone config reconnect gdrive: --auto-confirm`. Conferir com `rclone lsd gdrive:` (sem o NOTICE).
 4. Gravar `config/ambiente.json`: `{"remote": "gdrive:", "raiz": "Edição de vídeos", "configurado": false}`
 
 ## 4. Pastas no Drive (só com OK)
