@@ -24,6 +24,8 @@ b = int(sys.argv[sys.argv.index("--ate") + 1]) if "--ate" in sys.argv else len(W
 
 def fmt(ws):
     t = " ".join(w["w"] for w in ws).strip()
+    if L.get("minusculas"):          # tudo em minúsculas (padrão amanda v1.1)
+        return t.lower()
     return t.upper() if L.get("maiusculas", True) else t[:1].lower() + t[1:] if t[:2] != t[:2].upper() else t
 
 caps, cur = [], []

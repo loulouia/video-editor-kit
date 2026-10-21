@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Cópia de C5824</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Padrao"; src: url("assets/fonts/HelveticaNowDisplay-ExtraBold.ttf") format("truetype"); font-weight: 800; }
+
+body { margin: 0; background: #000; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Padrao", sans-serif; font-weight: 800; color: #fff; }
+.clip { position: absolute; inset: 0; }
+.cam { position: absolute; inset: 0; transform-origin: 50% 32%; }
+.cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* PLAYBOOK 4.1–4.2 — cards */
+.card-slot { display: flex; justify-content: center; }
+.card { position: absolute; top: 54%; overflow: hidden; border-radius: 26px; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+.card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.card.card { width: 86%; height: 29%; }
+.card.card-pequeno { width: 60%; height: 27%; }
+.card.noticia { width: 86%; height: auto; max-height: 29%; background: #fff; border-radius: 22px; }
+.card.noticia img { height: auto; object-fit: contain; }
+/* PLAYBOOK §1 — título de abertura */
+.titulo { display: flex; justify-content: center; }
+.t-block { position: absolute; width: 90%; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,.3); }
+.t-line { font-size: 54px; line-height: 1.02; letter-spacing: -0.01em; }
+.t-sub { font-size: 27px; margin-top: 10px; opacity: .95; }
+/* PLAYBOOK §3 — legenda */
+.cap { display: flex; justify-content: center; }
+.cap-txt { position: absolute; transform: translateY(-50%); width: 88%; text-align: center; font-size: 40px;
+  font-weight: 800; line-height: 1.08; letter-spacing: -0.005em; text-shadow: 0 2px 10px rgba(0,0,0,.35);
+   }
+/* PLAYBOOK 3.1 — palavras-chave */
+.kw { display: flex; justify-content: center; }
+.kw-block { position: absolute; display: flex; flex-direction: column; align-items: center; text-shadow: 0 4px 24px rgba(0,0,0,.30); }
+.kw-row { white-space: nowrap; }
+.kw-small { font-size: 46px; letter-spacing: -0.03em; line-height: 1.0; }
+.kw-main { font-size: 200px; letter-spacing: -0.045em; line-height: 0.86; }
+.w { display: inline-block; }
+/* PLAYBOOK 3.1 — efeito negativo: as letras invertem as cores do vídeo atrás delas */
+.kw-neg .kw-block { mix-blend-mode: difference; text-shadow: none; }
+.cx { position: absolute; overflow: hidden; }
+.cx-in { position: absolute; inset: 0; display: flex; font-family: "Cartao", serif; overflow: hidden; }
+.cx-grao { position: absolute; inset: 0; }
+.logo { position: absolute; top: 5.2%; right: 7%; width: 19%; height: auto; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1080" data-height="1920" data-duration="65.93">
+<div id="cam" class="cam"><video id="aroll" src="assets/aroll.mp4" playsinline data-has-audio="true" data-start="0" data-duration="65.93" data-track-index="0"></video></div>
+<div id="card0" class="clip card-slot" data-start="2.78" data-duration="7.46" data-track-index="4"><div class="card card" style="top:53.00%;height:29.00%"><img src="assets/img/kim-2017-antes.jpg" alt=""></div></div>
+<div id="card1" class="clip card-slot" data-start="13.08" data-duration="5.12" data-track-index="4"><div class="card card" style="top:53.00%;height:29.00%"><img src="assets/img/kim-2022-depois.jpg" alt=""></div></div>
+<div id="card2" class="clip card-slot" data-start="18.34" data-duration="4.2" data-track-index="4"><div class="card card" style="top:53.00%;height:29.00%"><img src="assets/img/kim-2017x2022.jpg" alt=""></div></div>
+<div id="titulo" class="clip titulo" data-start="0.0" data-duration="2.7" data-track-index="5"><div class="t-block" style="top:40.00%"><div class="t-line">AS MAMAS DA</div><div class="t-line">KIM</div><div class="t-line">KARDASHIAN</div><div class="t-sub">(O QUE MUDOU?)</div></div></div>
+<div id="cap0" class="clip cap" data-start="2.78" data-duration="2.08" data-track-index="6"><div class="cap-txt" style="top:49.00%">ela tinha aqui nessa foto um colo cheio,</div></div>
+<div id="cap1" class="clip cap" data-start="4.86" data-duration="2.68" data-track-index="6"><div class="cap-txt" style="top:49.00%">uma mama vistosa, uma clivagem bem próxima,</div></div>
+<div id="cap2" class="clip cap" data-start="7.54" data-duration="2.78" data-track-index="6"><div class="cap-txt" style="top:49.00%">mas ao mesmo tempo uma mama muito grande, muito pesada,</div></div>
+<div id="cap3" class="clip cap" data-start="10.32" data-duration="2.76" data-track-index="6"><div class="cap-txt" style="top:54.00%">que talvez tenha feito sentido na vida dela por um tempo.</div></div>
+<div id="cap4" class="clip cap" data-start="13.08" data-duration="1.52" data-track-index="6"><div class="cap-txt" style="top:49.00%">e ela mudou para isso daqui.</div></div>
+<div id="cap5" class="clip cap" data-start="14.6" data-duration="2.0" data-track-index="6"><div class="cap-txt" style="top:49.00%">uma perda de colo, uma perda de volume,</div></div>
+<div id="cap6" class="clip cap" data-start="16.6" data-duration="1.74" data-track-index="6"><div class="cap-txt" style="top:49.00%">mas uma mama muito mais funcional.</div></div>
+<div id="cap7" class="clip cap" data-start="18.34" data-duration="1.12" data-track-index="6"><div class="cap-txt" style="top:49.00%">será que ela retirou o implante?</div></div>
+<div id="cap8" class="clip cap" data-start="19.46" data-duration="1.52" data-track-index="6"><div class="cap-txt" style="top:49.00%">será que ela está usando um implante menor?</div></div>
+<div id="cap9" class="clip cap" data-start="20.98" data-duration="1.7" data-track-index="6"><div class="cap-txt" style="top:49.00%">isso a gente não vai saber.</div></div>
+<div id="cap10" class="clip cap" data-start="22.68" data-duration="2.24" data-track-index="6"><div class="cap-txt" style="top:54.00%">mas o que a gente sabe é que ela poderia sim ter</div></div>
+<div id="cap11" class="clip cap" data-start="24.92" data-duration="2.2" data-track-index="6"><div class="cap-txt" style="top:54.00%">a mama mais leve, a mama mais funcional,</div></div>
+<div id="cap12" class="clip cap" data-start="27.12" data-duration="1.98" data-track-index="6"><div class="cap-txt" style="top:54.00%">a mama mais anatômica dentro do tórax</div></div>
+<div id="cap13" class="clip cap" data-start="29.1" data-duration="1.72" data-track-index="6"><div class="cap-txt" style="top:54.00%">e ter o colo cheio,</div></div>
+<div id="cap14" class="clip cap" data-start="30.82" data-duration="0.71" data-track-index="6"><div class="cap-txt" style="top:54.00%">graças à ascensão multiplanos do footprint mamário.</div></div>
+<div id="cap15" class="clip cap" data-start="34.56" data-duration="0.9" data-track-index="6"><div class="cap-txt" style="top:54.00%">técnica que a gente criou,</div></div>
+<div id="cap16" class="clip cap" data-start="35.46" data-duration="2.48" data-track-index="6"><div class="cap-txt" style="top:54.00%">que permite que a mama que começa muito embaixo,</div></div>
+<div id="cap17" class="clip cap" data-start="37.94" data-duration="2.38" data-track-index="6"><div class="cap-txt" style="top:54.00%">que precisa de um implante muito grande para ter colo,</div></div>
+<div id="cap18" class="clip cap" data-start="40.32" data-duration="2.18" data-track-index="6"><div class="cap-txt" style="top:54.00%">ela comece em um ponto mais alto.</div></div>
+<div id="cap19" class="clip cap" data-start="42.5" data-duration="1.56" data-track-index="6"><div class="cap-txt" style="top:54.00%">isso vai alongar o teu abdômen,</div></div>
+<div id="cap20" class="clip cap" data-start="44.06" data-duration="3.74" data-track-index="6"><div class="cap-txt" style="top:54.00%">fazer com que a silhueta fique mais magra e mais alta</div></div>
+<div id="cap21" class="clip cap" data-start="47.8" data-duration="2.19" data-track-index="6"><div class="cap-txt" style="top:54.00%">e ao mesmo tempo, sim, a paciente tenha o colo cheio,</div></div>
+<div id="cap22" class="clip cap" data-start="52.16" data-duration="1.3" data-track-index="6"><div class="cap-txt" style="top:54.00%">com o implante pequeno, com o implante mais funcional.</div></div>
+<div id="cap23" class="clip cap" data-start="53.46" data-duration="2.22" data-track-index="6"><div class="cap-txt" style="top:54.00%">um implante que obviamente é muito mais estável,</div></div>
+<div id="cap24" class="clip cap" data-start="55.68" data-duration="2.18" data-track-index="6"><div class="cap-txt" style="top:54.00%">porque ele danifica muito menos anatomia.</div></div>
+<div id="cap25" class="clip cap" data-start="57.86" data-duration="1.02" data-track-index="6"><div class="cap-txt" style="top:54.00%">então, se você quer saber sobre</div></div>
+<div id="cap26" class="clip cap" data-start="58.88" data-duration="2.02" data-track-index="6"><div class="cap-txt" style="top:54.00%">a ascensão multiplanos do footprint mamário,</div></div>
+<div id="cap27" class="clip cap" data-start="60.9" data-duration="1.48" data-track-index="6"><div class="cap-txt" style="top:54.00%">aqui é o lugar onde ela nasceu,</div></div>
+<div id="cap28" class="clip cap" data-start="62.38" data-duration="1.54" data-track-index="6"><div class="cap-txt" style="top:54.00%">aqui é o lugar para você perguntar.</div></div>
+<div id="cap29" class="clip cap" data-start="63.92" data-duration="2.17" data-track-index="6"><div class="cap-txt" style="top:54.00%">escreve aqui, a gente vai estar te respondendo.</div></div>
+<div id="kw0" class="clip kw" data-start="31.53" data-duration="3.03" data-track-index="7"><div class="kw-block" style="top:47.00%"><div class="kw-row kw-small kw-before"><span class="w" data-t="31.58">ascensão</span> <span class="w" data-t="32.28">multiplanos</span> <span class="w" data-t="33.16">do</span></div><div class="kw-row kw-main"><span class="w" data-t="33.46">footprint</span></div><div class="kw-row kw-main"><span class="w" data-t="33.84">mamário</span></div></div></div>
+<div id="kw1" class="clip kw" data-start="49.99" data-duration="0.99" data-track-index="7"><div class="kw-block" style="top:47.00%"><div class="kw-row kw-small kw-before"><span class="w" data-t="50.04">o</span></div><div class="kw-row kw-main"><span class="w" data-t="50.2">colo</span> <span class="w" data-t="50.48">cheio</span></div></div></div>
+<div id="kw2" class="clip kw" data-start="50.95" data-duration="1.21" data-track-index="7"><div class="kw-block" style="top:47.00%"><div class="kw-row kw-small kw-before"><span class="w" data-t="51.0">com</span> <span class="w" data-t="51.08">o</span></div><div class="kw-row kw-main"><span class="w" data-t="51.2">implante</span></div><div class="kw-row kw-main"><span class="w" data-t="51.38">pequeno</span></div></div></div>
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+function fitTitle() {
+  // Gancho (topo-livre): tamanho FIXO pela altura das letras; cada linha a uma distância fixa da anterior;
+  // subtítulo colado embaixo da última linha. Só encolhe se uma linha passar da largura da tela.
+  const H = 1920;
+  const ink = (el) => {
+    const cs = getComputedStyle(el);
+    ctx.font = `${cs.fontWeight} ${parseFloat(cs.fontSize)}px Padrao`;
+    const m = ctx.measureText(el.textContent.trim());
+    return { fa: m.fontBoundingBoxAscent, ia: m.actualBoundingBoxAscent };
+  };
+  document.querySelectorAll(".titulo").forEach((box) => {
+    const lines = [...box.querySelectorAll(".t-fit")];
+    if (!lines.length) return;
+    const t0 = lines[0];
+    ctx.font = `${getComputedStyle(t0).fontWeight} 100px Padrao`;
+    const capH = ctx.measureText("H").actualBoundingBoxAscent;
+    let fs = 100 * parseFloat(t0.dataset.letras) * H / capH;
+    const maxW = parseFloat(t0.dataset.alvo) * 1080;
+    lines.forEach((l) => { l.style.lineHeight = "normal"; l.style.fontSize = fs + "px"; });
+    const widest = Math.max(...lines.map((l) => l.scrollWidth));
+    if (widest > maxW) { fs = fs * maxW / widest; lines.forEach((l) => (l.style.fontSize = fs + "px")); }
+    const cap = parseFloat(t0.dataset.letras) * H * (fs / (100 * parseFloat(t0.dataset.letras) * H / capH));
+    const passo = cap * parseFloat(t0.dataset.entre);
+    let inkTop = parseFloat(t0.dataset.topo) * H, lastBottom = 0;
+    lines.forEach((l, i) => {
+      const k = ink(l), top = inkTop + i * passo;
+      l.style.top = (top - (k.fa - k.ia)) + "px";
+      lastBottom = top + k.ia;
+    });
+    const s = box.querySelector(".t-fit-sub");
+    if (s) {
+      s.style.lineHeight = "normal"; s.style.fontSize = "100px";
+      s.style.fontSize = (100 * parseFloat(s.dataset.alvo) * 1080 / s.scrollWidth) + "px";
+      const ks = ink(s);
+      s.style.top = (lastBottom + parseFloat(s.dataset.folga) * H - (ks.fa - ks.ia)) + "px";
+    }
+  });
+}
+function fitMain() {
+  // palavra principal: tamanho pela largura alvo, entre o mínimo e o máximo do padrão (PLAYBOOK 3.1)
+  document.querySelectorAll(".kw-block").forEach((b) => {
+    const rows = b.querySelectorAll(".kw-main");
+    let widest = 0;
+    rows.forEach((r) => { r.style.fontSize = "100px"; widest = Math.max(widest, r.scrollWidth); });
+    const size = Math.max(110, Math.min(250, Math.floor(100 * 700 / widest)));
+    rows.forEach((r) => (r.style.fontSize = size + "px"));
+    tighten(b, size);
+    anchor(b, size);
+  });
+}
+// Ancora as palavras pequenas na palavra grande (não na largura do bloco), como nas referências:
+// antes → encaixadas no canto superior esquerdo da 1ª linha grande ("Do it / yourself");
+// depois → no canto inferior direito da última linha grande ("days / ...forget."), podendo passar dela.
+function anchor(block, size) {
+  const mains = [...block.querySelectorAll(".kw-main")];
+  const widest = Math.max(...mains.map((r) => r.offsetWidth));
+  block.style.width = widest + "px";           // a largura do bloco é a da palavra grande
+  const first = mains[0], last = mains[mains.length - 1];
+  const nudge = Math.round(size * 0.02);       // compensa o respiro lateral da letra grande
+  block.querySelectorAll(".kw-before").forEach((r) => {
+    r.style.alignSelf = "flex-start";
+    r.style.marginLeft = ((widest - first.offsetWidth) / 2 + nudge) + "px";
+  });
+  block.querySelectorAll(".kw-after").forEach((r) => {
+    if (r.offsetWidth > last.offsetWidth) {
+      // mais larga que a palavra grande: começa no "pé" esquerdo dela e cresce pra direita (ordem de leitura)
+      r.style.alignSelf = "flex-start";
+      r.style.marginLeft = ((widest - last.offsetWidth) / 2 + nudge) + "px";
+    } else {
+      r.style.alignSelf = "flex-end";
+      r.style.marginRight = ((widest - last.offsetWidth) / 2 + nudge) + "px";
+    }
+  });
+}
+// Encosta as linhas pelo contorno real das letras (sem o espaço vazio que a fonte reserva acima/abaixo).
+const ctx = document.createElement("canvas").getContext("2d");
+function inkBox(row) {
+  const fs = parseFloat(getComputedStyle(row).fontSize);
+  ctx.font = `800 ${fs}px Padrao`;
+  const m = ctx.measureText(row.textContent.trim());
+  return { fs, fontAsc: m.fontBoundingBoxAscent, fontDesc: m.fontBoundingBoxDescent,
+           inkAsc: m.actualBoundingBoxAscent, inkDesc: m.actualBoundingBoxDescent };
+}
+function tighten(block, mainSize) {
+  const gap = Math.round(mainSize * 0.04);
+  block.querySelectorAll(".kw-row").forEach((row) => {
+    const k = inkBox(row);
+    row.style.lineHeight = "normal";
+    const top = -(k.fontAsc - k.inkAsc);
+    const bottom = -(k.fontDesc - k.inkDesc);
+    let mt = row === block.firstElementChild ? top : top + gap;
+    // Encaixe no vão (PLAYBOOK 3.1): a linha pequena de antes desce até o topo das letras BAIXAS iniciais
+    // da palavra grande, quando cabe ali ("um" sobre o "v" de "vilão", colado no pingo do "i").
+    const prev = row.previousElementSibling;
+    if (row.classList.contains("kw-main") && prev && prev.classList.contains("kw-before")) {
+      const txt = row.textContent.trim();
+      ctx.font = `800 ${k.fs}px Padrao`;
+      const xAsc = ctx.measureText("x").actualBoundingBoxAscent;
+      let run = "";
+      for (const ch of txt) {
+        if (ctx.measureText(ch).actualBoundingBoxAscent > xAsc * 1.06) break;   // letra alta, acento, pingo ou maiúscula
+        run += ch;
+      }
+      const notch = run ? ctx.measureText(run).width : 0;
+      if (notch > 0 && prev.offsetWidth <= notch * 0.98) {
+        const runAsc = ctx.measureText(run).actualBoundingBoxAscent;
+        mt -= (k.inkAsc - runAsc);
+      }
+    }
+    row.style.marginTop = mt + "px";
+    row.style.marginBottom = bottom + "px";
+  });
+}
+function kwWords(sel) {
+  document.querySelectorAll(sel + " .w").forEach((w) => {
+    tl.fromTo(w, { opacity: 0, y: 14, filter: "blur(14px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.22, ease: "power2.out" }, parseFloat(w.dataset.t));
+  });
+}
+document.fonts.ready.then(() => {
+  fitMain();
+  fitTitle();
+  tl.set(".cam", { scale: 1 }, 0);
+  tl.fromTo("#card0 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 2.78);
+  tl.fromTo("#card1 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 13.08);
+  tl.fromTo("#card2 .card", {opacity: 0, scale: 0.94}, {opacity: 1, scale: 1, duration: 0.22, ease: "power2.out"}, 18.34);
+  kwWords("#kw0"); tl.to("#kw0 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 34.38);
+  kwWords("#kw1"); tl.to("#kw1 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 50.8);
+  kwWords("#kw2"); tl.to("#kw2 .kw-block", {opacity: 0, filter: "blur(10px)", duration: 0.18}, 51.98);
+  tl.set(".cam", {scale: 1.12}, 22.68); tl.set(".cam", {scale: 1}, 29.1);
+  tl.set(".cam", {scale: 1.12}, 34.32); tl.set(".cam", {scale: 1}, 42.22);
+  tl.set(".cam", {scale: 1.12}, 47.8); tl.set(".cam", {scale: 1}, 53.24);
+  tl.set(".cam", {scale: 1.12}, 57.86); tl.set(".cam", {scale: 1}, 65.93);
+  window.__timelines["main"] = tl;
+});
+</script>
+</body>
+</html>

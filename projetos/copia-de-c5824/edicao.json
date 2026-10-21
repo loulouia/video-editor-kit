@@ -1,0 +1,279 @@
+{
+ "_sobre": "Edição do vídeo do Adel Bark (Cópia de C5824). Tempos em segundos do A-roll final; palavras pelo índice em transcricao/aroll.words.json.",
+ "duracao": 65.93,
+ "titulo": {
+  "de": 0.0,
+  "ate": 2.7,
+  "linhas": [
+   "AS MAMAS DA",
+   "KIM",
+   "KARDASHIAN"
+  ],
+  "subtitulo": "(O QUE MUDOU?)"
+ },
+ "legendas": [
+  [
+   "vamos falar das mamas da kim kardashian.",
+   0,
+   6
+  ],
+  [
+   "ela tinha aqui nessa foto um colo cheio,",
+   7,
+   14
+  ],
+  [
+   "uma mama vistosa, uma clivagem bem próxima,",
+   15,
+   21
+  ],
+  [
+   "mas ao mesmo tempo uma mama muito grande, muito pesada,",
+   22,
+   31
+  ],
+  [
+   "que talvez tenha feito sentido na vida dela por um tempo.",
+   32,
+   42
+  ],
+  [
+   "e ela mudou para isso daqui.",
+   43,
+   48
+  ],
+  [
+   "uma perda de colo, uma perda de volume,",
+   49,
+   56
+  ],
+  [
+   "mas uma mama muito mais funcional.",
+   57,
+   62
+  ],
+  [
+   "será que ela retirou o implante?",
+   63,
+   68
+  ],
+  [
+   "será que ela está usando um implante menor?",
+   69,
+   76
+  ],
+  [
+   "isso a gente não vai saber.",
+   77,
+   82
+  ],
+  [
+   "mas o que a gente sabe é que ela poderia sim ter",
+   83,
+   94
+  ],
+  [
+   "a mama mais leve, a mama mais funcional,",
+   95,
+   102
+  ],
+  [
+   "a mama mais anatômica dentro do tórax",
+   103,
+   109
+  ],
+  [
+   "e ter o colo cheio,",
+   110,
+   114
+  ],
+  [
+   "graças à ascensão multiplanos do footprint mamário.",
+   115,
+   121
+  ],
+  [
+   "técnica que a gente criou,",
+   122,
+   126
+  ],
+  [
+   "que permite que a mama que começa muito embaixo,",
+   127,
+   135
+  ],
+  [
+   "que precisa de um implante muito grande para ter colo,",
+   136,
+   145
+  ],
+  [
+   "ela comece em um ponto mais alto.",
+   146,
+   152
+  ],
+  [
+   "isso vai alongar o teu abdômen,",
+   153,
+   158
+  ],
+  [
+   "fazer com que a silhueta fique mais magra e mais alta",
+   159,
+   169
+  ],
+  [
+   "e ao mesmo tempo, sim, a paciente tenha o colo cheio,",
+   170,
+   180
+  ],
+  [
+   "com o implante pequeno, com o implante mais funcional.",
+   181,
+   189
+  ],
+  [
+   "um implante que obviamente é muito mais estável,",
+   190,
+   197
+  ],
+  [
+   "porque ele danifica muito menos anatomia.",
+   198,
+   203
+  ],
+  [
+   "então, se você quer saber sobre",
+   204,
+   209
+  ],
+  [
+   "a ascensão multiplanos do footprint mamário,",
+   210,
+   215
+  ],
+  [
+   "aqui é o lugar onde ela nasceu,",
+   216,
+   222
+  ],
+  [
+   "aqui é o lugar para você perguntar.",
+   223,
+   229
+  ],
+  [
+   "escreve aqui, a gente vai estar te respondendo.",
+   230,
+   237
+  ]
+ ],
+ "palavras_chave": [
+  {
+   "partes": [
+    [
+     "ascensão multiplanos do",
+     "pequeno",
+     [
+      117,
+      118,
+      119
+     ]
+    ],
+    [
+     "footprint mamário",
+     "principal",
+     [
+      120,
+      121
+     ]
+    ]
+   ],
+   "segura": 0.3
+  },
+  {
+   "partes": [
+    [
+     "o",
+     "pequeno",
+     [
+      178
+     ]
+    ],
+    [
+     "colo cheio",
+     "principal",
+     [
+      179,
+      180
+     ]
+    ]
+   ],
+   "segura": 0.2
+  },
+  {
+   "partes": [
+    [
+     "com o",
+     "pequeno",
+     [
+      181,
+      182
+     ]
+    ],
+    [
+     "implante pequeno",
+     "principal",
+     [
+      183,
+      184
+     ]
+    ]
+   ],
+   "segura": 0.3
+  }
+ ],
+ "texto_atras": [],
+ "cards": [
+  {
+   "arquivo": "img/kim-2017-antes.jpg",
+   "tipo": "card",
+   "de": 2.78,
+   "ate": 10.24
+  },
+  {
+   "arquivo": "img/kim-2022-depois.jpg",
+   "tipo": "card",
+   "de": 13.08,
+   "ate": 18.2
+  },
+  {
+   "arquivo": "img/kim-2017x2022.jpg",
+   "tipo": "card",
+   "de": 18.34,
+   "ate": 22.54
+  }
+ ],
+ "topo_mesclado": [],
+ "zoom": {
+  "trechos": [
+   [
+    22.68,
+    29.1
+   ],
+   [
+    34.32,
+    42.22
+   ],
+   [
+    47.8,
+    53.24
+   ],
+   [
+    57.86,
+    65.93
+   ]
+  ]
+ },
+ "_minusculas": "Teste só deste vídeo: legendas e palavras-chave em minúsculas (o padrão amanda continua em MAIÚSCULAS)."
+}

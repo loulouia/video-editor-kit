@@ -41,7 +41,7 @@ Meu Drive/Edição de vídeos/
 
 Regras:
 - **Nunca** escrever valor visual fixo no motor: ele lê `padrao.json`. Recurso novo pedido por um padrão → implementar no motor de forma configurável, com o valor do padrão em `padrao.json`, e ligar/desligar em `"recursos"`.
-- Correção da usuária sobre o visual → `padroes/<nome>/PLAYBOOK.md` + `padrao.json` + entrada no `CHANGELOG.md` do padrão. Sobre grafia de termos → `marcas/<nome>/glossario.md`.
+- Ajuste visual pedido durante a edição de um vídeo vale **só pra esse vídeo** (`edicao.json`/`projeto.json`), mesmo com "vale pra tudo". O padrão só muda quando a pessoa disser explicitamente que é pro padrão / pra todos os vídeos; na dúvida, aplicar no vídeo e perguntar uma vez se leva pro padrão. Mudança aprovada pro padrão → `padroes/<nome>/PLAYBOOK.md` + `padrao.json` + entrada no `CHANGELOG.md` do padrão. Sobre grafia de termos → `marcas/<nome>/glossario.md`.
 - Ao mexer no motor, regenerar um projeto já aprovado (ex.: `taste-washing-5`) e comparar com snapshots anteriores: o resultado de um padrão aprovado não pode mudar sem pedido.
 - Padrões existentes: `amanda` (v1.0, oficial, com ajustes pendentes que a autora vai revisar; vai também pros clientes, que recebem a licença da Helvetica Now e a fonte em `padroes/amanda/fontes/`). `topo-livre` (em criação, para clientes: fonte TikTok Sans, sem fonte paga nem logo fixo).
 

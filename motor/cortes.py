@@ -54,8 +54,11 @@ for k, (a, b) in enumerate(keep):
                  f"[0:a]atrim={a}:{b},asetpts=PTS-STARTPTS,afade=t=in:d=0.012,afade=t=out:st={d-0.012:.3f}:d=0.012[a{k}];")
     labels.append(f"[v{k}][a{k}]")
 lut = f",lut3d='{os.path.abspath(LUT)}'" if LUT else ""
+# Saída sempre 1080×1920 (formato do Reels/TikTok): brutos 4K são reduzidos antes da cor, o que deixa
+# esta etapa e todas as seguintes (recorte, camadas, preview) muito mais rápidas. Bruto já 1080×1920: inalterado.
+ESCALA = "scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,setsar=1"
 fc = "".join(parts) + "".join(labels) + f"concat=n={len(keep)}:v=1:a=1[vc][ac];" \
-     f"[vc]setpts=PTS/{SPEED},fps=30{lut}[v];[ac]atempo={SPEED}[a]"
+     f"[vc]setpts=PTS/{SPEED},fps=30,{ESCALA}{lut}[v];[ac]atempo={SPEED}[a]"
 os.makedirs(P.assets, exist_ok=True)
 out = os.path.join(P.assets, "aroll.mp4")
 subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", bruto, "-filter_complex", fc,
