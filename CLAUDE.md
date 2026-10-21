@@ -4,7 +4,7 @@ Pipeline de edição de vídeos curtos (Reels/TikTok, 1080×1920) feito em códi
 
 ## Comandos do projeto e início de sessão
 
-Comandos (skills em `.claude/skills/`): `/video-editor-configurar` (primeiro uso), `/video-editor-videos` (status no Drive), `/video-editor-editar` (editar ou reabrir), `/video-editor-entregar` (render + entrega), `/video-editor-novo-padrao`. Pedidos em linguagem normal seguem o mesmo fluxo do comando correspondente.
+Comandos (skills em `.claude/skills/`): `/video-editor-configurar` (primeiro uso), `/video-editor-verificar` (verificar material novo no Drive — também responde a "veja se tem vídeo novo", "subi vídeo novo", "carreguei video", "tem material novo?"), `/video-editor-videos` (status no Drive), `/video-editor-editar` (editar ou reabrir), `/video-editor-entregar` (render + entrega), `/video-editor-novo-padrao`. Pedidos em linguagem normal seguem o mesmo fluxo do comando correspondente.
 
 Ao abrir o projeto, o hook `SessionStart` (`.claude/settings.json` → `motor/inicio.py`) informa se o setup está completo e quais vídeos estão novos/em andamento no Drive. Na primeira resposta, **sempre mostrar o painel visual** (`.claude/painel.html`) via `show_widget`:
 
@@ -25,7 +25,7 @@ Formato do JSON que substitui `{{DATA}}`:
   ]
 }
 ```
-Etapas possíveis: `novo`, `plano`, `storyboard`, `montagem`, `preview`, `entregue`. `marca` é o nome da primeira marca em `marcas/` (ou `null`). `setup` vem do `configurado` em `config/ambiente.json`. `padroes` são as pastas em `padroes/`. `videos` vem do contexto do hook (registro + Drive); se o hook não retornar vídeos, usar `[]`.
+Etapas possíveis: `novo`, `plano`, `storyboard`, `montagem`, `preview`, `entregue`. `marca`: se houver **uma só** marca em `marcas/`, o nome dela; se **não houver**, `null`; se houver **mais de uma**, **perguntar ao usuário qual é a dele** (listar as marcas) antes de mostrar o painel — nunca escolher a primeira da lista. `setup` vem do `configurado` em `config/ambiente.json`. `padroes` são as pastas em `padroes/`. `videos` vem do contexto do hook (registro + Drive); se o hook não retornar vídeos, usar `[]`.
 
 Depois do painel, acrescentar **uma frase curta** (não um parágrafo) dizendo o que há de novo, como antes. Setup incompleto → indicar `/video-editor-configurar` e não editar.
 
@@ -104,13 +104,30 @@ Gerar LUT: `motor/grading.py --bruto <bruto> --ref <video>:<t1,t2,...> ... --sai
 - A medição usa só **pele do rosto + fundo da sala** (máscara do recorte); a roupa não entra.
 - A LUT da marca `amanda` já existe (`marcas/amanda/cor/meus-editados.cube`, 2026-10-12): reaproveitar.
 
-## Fluxo obrigatório de cada edição (nunca pular etapas)
+## Modo de edição: bypass ou passo a passo
 
-1. **Plano antes de editar.** Transcrever e apresentar o plano: cortes com timecodes, aceleração, duração final, legendas, zooms, inserções (tabela PLAYBOOK 4.0), efeitos, regras do padrão aplicadas, grading. Esperar a aprovação.
-2. **Storyboard antes de montar** (todo padrão, atual e futuro). Com o A-roll pronto (`motor/cortes.py`) e o `edicao.json` do plano, rodar `motor/storyboard.py projetos/<slug>` (~2 min, não precisa do recorte completo) e mandar `storyboard/storyboard.jpg` (`SendUserFile`). Um quadro por momento com a composição real, tempo, fala, tipo, origem da imagem e alertas de regra em vermelho. Só seguir pro recorte/camadas/preview depois da aprovação; correções são feitas por número do quadro.
-3. **Preview antes de renderizar.** `npx hyperframes preview` em `projetos/<slug>/composicao` e abrir no navegador do app. Ajustar por lá; conferir pontos com snapshots.
-4. **Entrega só com aprovação explícita:** `/video-editor-entregar` (`motor/entregar.py`). Conferir quadros do MP4 final.
-5. **Registrar o aprendizado** no padrão (PLAYBOOK + padrao.json + CHANGELOG) ou na marca (glossário).
+Antes de começar a edição (depois de definir padrão e marca), **sempre oferecer a escolha** ao usuário:
+
+> **Como você quer editar?**
+> 1. **Direto ao resultado** — executo tudo sozinho e te mostro o vídeo pronto pra você assistir e pedir ajustes.
+> 2. **Passo a passo** — te mostro cada decisão antes de aplicar. Você aprova cada etapa.
+
+- **Direto ao resultado (bypass):** todas as etapas abaixo são executadas corretamente no backend, mas sem pedir confirmação. Decisões automáticas: cor da marca (padrão), regras do PLAYBOOK do padrão, recursos opcionais só os ligados por padrão. Storyboard é gerado e salvo mas não mostrado. O usuário só vê o resultado final no preview.
+- **Passo a passo:** fluxo normal com aprovação em cada etapa.
+- Na dúvida ou sem resposta clara → usar **Direto ao resultado**.
+
+Essa escolha também vale para **reedição de vídeos já entregues** (da pasta `editados/`). No bypass de reedição, usar "igual à versão entregue" como padrão.
+
+## Fluxo de cada edição (etapas técnicas)
+
+As etapas abaixo são executadas em ambos os modos. No passo a passo, cada etapa pede aprovação. No bypass, todas rodam sem parar.
+
+1. **Plano.** Transcrever e montar o plano: cortes com timecodes, aceleração, duração final, legendas, zooms, inserções (tabela PLAYBOOK 4.0), efeitos, regras do padrão aplicadas, grading.
+2. **Storyboard.** Com o A-roll pronto (`motor/cortes.py`) e o `edicao.json` do plano, rodar `motor/storyboard.py projetos/<slug>` (~2 min). Um quadro por momento com a composição real.
+3. **Preview.** Recorte, `rosto.py`, `compor_camadas.py`, `gerar.py`, `hyperframes check` + snapshots → abrir o preview (HyperFrames, navegador do app).
+4. **Ajustes.** O usuário assiste e pede ajustes pelo painel ou chat. Isso vale nos dois modos — o bypass acaba aqui, e a partir do preview o controle é do usuário.
+5. **Entrega só com aprovação explícita:** `/video-editor-entregar` (`motor/entregar.py`). Conferir quadros do MP4 final.
+6. **Registrar o aprendizado** no padrão (PLAYBOOK + padrao.json + CHANGELOG) ou na marca (glossário).
 
 ## Regras que valem em toda edição
 
