@@ -1,5 +1,9 @@
 # Histórico do playbook
 
+## 2026-10-21 — biblioteca de áudio e transições
+
+- Nova seção/linha: música, efeitos sonoros e transições vêm da biblioteca do Drive (`_audio/musicas/`, `_audio/efeitos/`, `_transicoes/`) e só entram com aprovação no plano. Regras de volume e uso a definir no primeiro vídeo com áudio. Motivo: pedido da Amanda.
+
 ## 2026-10-21 — correção de valores (regra inalterada)
 
 - `padrao.json` → `legenda`: `linhas_max` 2 → **1** e novo `palavras_max: 5`, pra bater com a regra já aprovada (§3: **2 a 5 palavras por tela**). Antes o arquivo permitia até 60 caracteres em 2 linhas e o gerador de legendas seguia o arquivo. `motor/legendas.py` agora também conta palavras. Motivo: no vídeo do Adel Bark saíram legendas longas demais; correção aprovada pela Amanda. TASTE WASHING 5 já seguia a regra (sem mudança).

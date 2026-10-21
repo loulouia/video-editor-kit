@@ -21,7 +21,11 @@ Meu Drive/Edição de vídeos/
   editados/                     ← <nome-do-bruto>-<padrão>.mp4 (reedição: -v2, -v3; nunca sobrescreve)
   _padroes/<padrão>/referencias/  _marca/meus-editados/   ← vídeos de referência e editados da marca
   _backup/                      ← zip do projeto após cada entrega (5 mais recentes)
+  _audio/musicas/               ← biblioteca: trilhas (mp3/wav), pra qualquer projeto/padrão
+  _audio/efeitos/               ← biblioteca: efeitos sonoros (whoosh, pop, clique...)
+  _transicoes/                  ← biblioteca: transições em vídeo pra overlay (com alfa ou fundo preto/verde)
 ```
+- **Biblioteca (`_audio/`, `_transicoes/`):** compartilhada por todos os projetos e padrões; a pessoa abastece, com nomes que dizem o uso (`calma-piano.mp3`, `whoosh-card.wav`, `flash-branco.mov`). Só arquivos que ela tem direito de usar (livres de royalties ou comprados). Baixar só o que o vídeo usa pra `projetos/<slug>/cache/` (apagado na entrega). Cada padrão diz no PLAYBOOK se usa música/efeitos/transições e como; em cada vídeo, sugerir no plano (arquivo, momento, volume) e **só aplicar com aprovação**. **O motor ainda não mixa áudio nem aplica transições** (pendente): implementar de forma configurável no primeiro vídeo que pedir (música com volume baixo e abaixando sob a voz, entrada/saída suaves; efeitos em eventos como entrada de card/palavra-chave; transição como overlay nos cortes).
 - Transporte: **rclone** (`motor/drive.py`; config em `config/ambiente.json`, remote `gdrive:`). O conector do Google Drive só serve pra consultar/listar — não transfere vídeo.
 - **Nunca** renomear, mover ou apagar arquivos da pessoa no Drive. Única exceção: backups antigos que o próprio motor criou em `_backup/`.
 - Vídeo ambíguo em `brutos/` (sem fala, muito curto, nome tipo "broll") → perguntar se é bruto ou inserção; nunca decidir sozinho.

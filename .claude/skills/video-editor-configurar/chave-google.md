@@ -54,6 +54,8 @@ Abrir um terminal pra pessoa rodando `zsh .claude/skills/video-editor-configurar
 - escolher a conta do Drive → **Permitir**;
 - só se for **Externo**: aparece "O Google não verificou este app" → **Avançado** → **Acessar Editor de video** (normal: o app é da própria pessoa).
 
-O terminal termina com **PRONTO**. Conferir: `rclone lsd gdrive:` lista as pastas **sem** o NOTICE de `client_id`.
+O terminal termina com **PRONTO** só depois de pedir ao Google um acesso novo com a chave gravada (é o que acontece a cada hora). **Não** basta `rclone lsd gdrive:` logo depois: o acesso antigo continua valendo por até 1 h e esconde uma chave errada (aconteceu em 2026-10-21: a chave secreta foi colada repetida — 140 caracteres em vez de ~35 — e a conexão caiu na hora seguinte). O script recusa chave secreta com tamanho estranho.
+
+Chave secreta perdida ou errada: o Google não mostra de novo a chave depois de criada. Em **Clientes** → `rclone` → **Adicionar chave secreta** (ou "Add secret"), copiar a nova e rodar o script de novo.
 
 Se falhar logo depois de criar a chave: o Google pode levar de 5 minutos a algumas horas pra ativar. Esperar e rodar o script de novo (ele não estraga nada).

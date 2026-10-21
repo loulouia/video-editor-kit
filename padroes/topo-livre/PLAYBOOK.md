@@ -89,3 +89,4 @@ Medido em `referencias/ref-topo-livre1.mp4` (0,0–1,9 s). A pergunta do gancho 
 | Zoom de jump cut | desligado (a referência é um take só, enquadramento fixo) |
 | Logo | da marca do cliente, pequeno, **só se o cliente pedir** |
 | Ritmo | regra do motor: cortar pausas + acelerar 1,10–1,15× (a referência fala a 3,54 palavras/s, sem pausas > 0,5 s) |
+| Música, efeitos sonoros, transições | da biblioteca do Drive (`_audio/musicas/`, `_audio/efeitos/`, `_transicoes/`), **só com aprovação no plano**; regras a definir (o motor ainda não usa) |

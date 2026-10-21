@@ -1,5 +1,9 @@
 # Histórico do padrão topo-livre
 
+## 2026-10-21 — biblioteca de áudio e transições
+
+- Nova seção/linha: música, efeitos sonoros e transições vêm da biblioteca do Drive (`_audio/musicas/`, `_audio/efeitos/`, `_transicoes/`) e só entram com aprovação no plano. Regras de volume e uso a definir no primeiro vídeo com áudio. Motivo: pedido da Amanda.
+
 ## 2026-10-12 — v0.1
 
 - Padrão criado pelo caminho B a partir de `referencias/ref-topo-livre1.mp4`. Para clientes: TikTok Sans, sem identidade da Amanda.

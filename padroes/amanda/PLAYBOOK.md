@@ -232,9 +232,19 @@ Se a busca, o download ou o print falhar por qualquer motivo (nenhum resultado b
 2. Pede pra Amanda colocar o arquivo em **`projetos/<slug>/insercoes/`**, sugerindo o nome do arquivo e o que procurar (a query e, se tiver, o link encontrado).
 3. Segue com o resto do plano e marca o item como "aguardando arquivo".
 
-## 6. Decisões pendentes
+## 6. Música, efeitos sonoros e transições
+
+| Regra | Valor |
+|---|---|
+| De onde vêm | biblioteca da Amanda no Drive: `_audio/musicas/`, `_audio/efeitos/`, `_transicoes/` (transições em vídeo, como overlay). Compartilhada com todos os padrões |
+| Quando entram | **só com aprovação no plano**: o Claude sugere arquivo, momento e volume; nada é aplicado sem o OK |
+| Como (a definir no primeiro vídeo com áudio) | música baixa e abaixando sob a voz, entrada/saída suaves; efeitos em eventos (entrada de card, palavra-chave); transição sobreposta nos cortes. Valores (volume, duração) entram aqui e no `padrao.json` depois de aprovados |
+| Status | motor ainda não mixa áudio nem aplica transições (pendente) |
+
+## 7. Decisões pendentes
 
 - [ ] Texto atrás da pessoa (3.2): contraste na parede clara, espaço acima da cabeça e convivência com o logo — testar no primeiro vídeo
 - [ ] Tipo de degradê do topo mesclado (ver 4.5)
 - [ ] Regras de J-cut
 - [ ] Motor do preview: HyperFrames ou Remotion (tendência: HyperFrames)
+- [ ] Música, efeitos e transições (§6): volumes, onde entram e quais tipos de transição

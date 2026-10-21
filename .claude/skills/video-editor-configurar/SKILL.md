@@ -51,7 +51,11 @@ Meu Drive/Edição de vídeos/
   _padroes/<padrão>/referencias/
   _marca/meus-editados/
   _backup/                      ← cópias de segurança do projeto
+  _audio/musicas/               ← biblioteca de músicas
+  _audio/efeitos/               ← biblioteca de efeitos sonoros
+  _transicoes/                  ← biblioteca de transições em vídeo (overlay)
 ```
+Explicar em uma frase que `_audio/` e `_transicoes/` são uma biblioteca da pessoa, pra qualquer vídeo, e que só entra o que ela tem direito de usar.
 
 `python motor/drive.py status` mostra o que já existe; `python motor/drive.py criar-estrutura` cria só o que falta (nunca apaga nem renomeia nada). Se a pasta já existir, usar a existente.
 

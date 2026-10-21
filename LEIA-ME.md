@@ -34,7 +34,12 @@ Meu Drive/Edição de vídeos/
   editados/                     ← os vídeos prontos aparecem aqui
   _padroes/  _marca/            ← vídeos de referência e seus vídeos já editados
   _backup/                      ← cópias de segurança do projeto (automáticas)
+  _audio/musicas/               ← suas músicas (pra qualquer vídeo)
+  _audio/efeitos/               ← seus efeitos sonoros (whoosh, pop, clique...)
+  _transicoes/                  ← transições em vídeo, pra sobrepor nos cortes
 ```
+
+**Músicas, efeitos e transições:** coloque em `_audio/` e `_transicoes/` os arquivos que quiser usar nos vídeos, com nomes que digam pra que servem (ex.: `calma-piano.mp3`, `whoosh-card.wav`, `flash-branco.mov`). Use só o que você tem direito de usar (bibliotecas livres de royalties ou compradas): música de streaming pode derrubar o vídeo nas redes. O Claude sugere no plano qual usar e onde, e só aplica com a sua aprovação. *(Em implementação: o motor ainda não usa esses arquivos.)*
 
 - **Bruto** é só o que está **direto** em `brutos/`. Uma pasta por vídeo em `insercoes/`, com o **mesmo nome do bruto** (ex.: `brutos/aula-03.mov` → `insercoes/aula-03/`). Os nomes dos arquivos dentro dela são livres; se quiser, coloque o momento no começo (ex.: `0m12-print.png`).
 - O vídeo pronto vai pra `editados/<nome-do-bruto>-<padrão>.mp4`. Se você pedir ajuste depois, a versão nova vira `-v2` e a anterior continua lá.

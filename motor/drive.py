@@ -14,7 +14,8 @@ import hashlib, json, os, shutil, subprocess, sys
 
 RAIZ_PROJETO = os.environ.get("VE_RAIZ") or os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 AMBIENTE = os.path.join(RAIZ_PROJETO, "config", "ambiente.json")
-PASTAS = ["brutos", "insercoes", "editados", "_padroes", "_marca", "_backup"]
+PASTAS = ["brutos", "insercoes", "editados", "_padroes", "_marca", "_backup",
+          "_audio/musicas", "_audio/efeitos", "_transicoes"]   # biblioteca compartilhada por todos os projetos e padrões
 
 
 def rclone_bin():
@@ -49,10 +50,10 @@ def status():
         remote = ambiente().get("remote", "gdrive:")
         if remote.endswith(":") and remote.rstrip(":") not in [x.rstrip(":") for x in rc("listremotes", check=False).stdout.split()]:
             return st
-        r = rc("lsjson", "--dirs-only", caminho(), check=False, timeout=60)
+        r = rc("lsjson", "--dirs-only", "-R", "--max-depth", "2", caminho(), check=False, timeout=60)
         st["autorizado"] = r.returncode == 0 or "directory not found" in r.stderr
         if r.returncode == 0:
-            existentes = {d["Name"] for d in json.loads(r.stdout or "[]")}
+            existentes = {d["Path"] for d in json.loads(r.stdout or "[]")}
             st["pastas_faltando"] = [p for p in PASTAS if p not in existentes]
     return st
 
