@@ -74,7 +74,7 @@ Cada vídeo combina **um padrão + uma marca**. O mesmo vídeo pode ser editado 
 
 | Padrão | Status | Para |
 |---|---|---|
-| `amanda` | v1.0, oficial | uso próprio (Helvetica Now Display, LOULOU Studios) |
+| `amanda` | v1.0, oficial | Helvetica Now Display (licença e fonte incluídas) |
 | `topo-livre` | em criação | clientes (TikTok Sans + Instrument Serif, livres) |
 
 ## Criar um padrão novo

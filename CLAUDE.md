@@ -43,7 +43,11 @@ Regras:
 - **Nunca** escrever valor visual fixo no motor: ele lê `padrao.json`. Recurso novo pedido por um padrão → implementar no motor de forma configurável, com o valor do padrão em `padrao.json`, e ligar/desligar em `"recursos"`.
 - Correção da usuária sobre o visual → `padroes/<nome>/PLAYBOOK.md` + `padrao.json` + entrada no `CHANGELOG.md` do padrão. Sobre grafia de termos → `marcas/<nome>/glossario.md`.
 - Ao mexer no motor, regenerar um projeto já aprovado (ex.: `taste-washing-5`) e comparar com snapshots anteriores: o resultado de um padrão aprovado não pode mudar sem pedido.
-- Padrões existentes: `amanda` (v1.0, oficial, uso próprio). `topo-livre` (em criação, para clientes: fonte TikTok Sans, sem fonte paga nem logo fixo).
+- Padrões existentes: `amanda` (v1.0, oficial, com ajustes pendentes que a autora vai revisar; vai também pros clientes, que recebem a licença da Helvetica Now e a fonte em `padroes/amanda/fontes/`). `topo-livre` (em criação, para clientes: fonte TikTok Sans, sem fonte paga nem logo fixo).
+
+## Distribuição para clientes
+
+Pacote `video-editor.nosync` com: `motor/`, `.claude/` (comandos e hook), `CLAUDE.md`, `LEIA-ME.md`, `padroes/` (amanda + topo-livre, com fontes e licenças). **Não vai:** `marcas/amanda/` (logo, glossário, editados), `projetos/`, `config/`, `registro.json`, `.git/`. Marca do cliente: logo e glossário definidos por ele no `/video-editor-configurar`; a cor do cenário sugerida é a mesma da Amanda (`meus-editados.cube` copiado pra `marcas/<cliente>/cor/`), a menos que ele queira outra. Por isso o pacote leva essa LUT separada da marca Amanda (ex.: `padroes/amanda/cor/`). O vídeo de teste (`taste-washing-5`) é só da autora do motor.
 
 ## Primeiro uso / padrão novo
 
@@ -106,6 +110,6 @@ Só quando a usuária pedir: 1) propor 4–8 queries curtas e **esperar aprovaç
 ## Organização e restrições
 
 - Bruto novo no Drive → `motor/registro.py iniciar` cria `projetos/<slug>/` (slug: minúsculas, sem acentos/espaços) e registra em `registro.json`.
-- `projetos/taste-washing-5` e `projetos/teste-topo-livre-1` são anteriores ao Drive (bruto e inserções locais); `taste-washing-5` é a regressão do padrão Amanda.
+- `projetos/taste-washing-5` e `projetos/teste-topo-livre-1` são anteriores ao Drive; os brutos estão em `_padroes/<padrão>/teste/` no Drive (`bruto_drive` no `projeto.json`; `motor/preparar.py` baixa quando precisar). `taste-washing-5` é a regressão do padrão Amanda: a versão aprovada vigente, que evolui quando a autora aprova melhorias no padrão (o editado v1.0 está em `editados/` no Drive).
 - Pouco espaço em disco: checar `df -h ~` antes de baixar; avisar abaixo de ~3 GB. Apagar intermediários quando não forem mais necessários.
 - Git: usar `/opt/homebrew/bin/git` (o `/usr/bin/git` exige Xcode CLT). Este projeto é **privado**: tem repositório próprio e é ignorado pelo repositório público do portfólio (`../.gitignore`, com e sem `.nosync`). Nunca publicar sem pedido. Backup dos clientes = zip no Drive; GitHub privado é só pra autora do motor.
