@@ -1,0 +1,206 @@
+<!--
+  Painel do editor de video — template que o Claude preenche com dados do inicio.py.
+  O Claude substitui {{DATA}} por um JSON com: marca, setup, videos[], padroes[], contagem.
+  Mostrado via show_widget na abertura de sessao.
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .painel { padding: 4px 0 16px; font-family: var(--font-sans); color: var(--text-primary); }
+
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .header h1 { font-size: 20px; font-weight: 500; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 400; }
+  .pill-ok { background: var(--bg-success); color: var(--text-success); }
+  .pill-warn { background: var(--bg-warning); color: var(--text-warning); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 500; line-height: 1.2; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .stat-new .stat-num { color: var(--text-accent); }
+  .stat-wip .stat-num { color: var(--text-warning); }
+  .stat-done .stat-num { color: var(--text-success); }
+
+  .section-title { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .video-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .video-card { display: flex; align-items: center; gap: 12px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; cursor: pointer; transition: border-color 0.15s; }
+  .video-card:hover { border-color: var(--border-strong); }
+  .video-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .video-icon-novo { background: var(--bg-accent); color: var(--text-accent); }
+  .video-icon-andamento { background: var(--bg-warning); color: var(--text-warning); }
+  .video-icon-entregue { background: var(--bg-success); color: var(--text-success); }
+  .video-info { flex: 1; min-width: 0; }
+  .video-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .video-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .video-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 400; white-space: nowrap; }
+  .badge-novo { background: var(--bg-accent); color: var(--text-accent); }
+  .badge-plano, .badge-storyboard, .badge-montagem, .badge-preview { background: var(--bg-warning); color: var(--text-warning); }
+  .badge-entregue { background: var(--bg-success); color: var(--text-success); }
+
+  .empty-state { text-align: center; padding: 24px 16px; color: var(--text-muted); font-size: 13px; background: var(--surface-1); border: 1px dashed var(--border); border-radius: 10px; margin-bottom: 20px; }
+
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); font-size: 14px; font-weight: 500; cursor: pointer; transition: border-color 0.15s, background 0.15s; font-family: var(--font-sans); }
+  .btn:hover { border-color: var(--border-strong); background: var(--surface-0); }
+  .btn-primary { background: var(--text-primary); color: var(--surface-2); border-color: transparent; }
+  .btn-primary:hover { opacity: 0.9; background: var(--text-primary); }
+  .btn i { font-size: 16px; }
+
+  .adjust-section { margin-bottom: 8px; }
+  .adjust-row { display: flex; gap: 8px; }
+  .adjust-input { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); font-size: 14px; font-family: var(--font-sans); outline: none; transition: border-color 0.15s; }
+  .adjust-input::placeholder { color: var(--text-muted); }
+  .adjust-input:focus { border-color: var(--border-strong); }
+  .adjust-btn { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); font-size: 16px; cursor: pointer; transition: border-color 0.15s; display: flex; align-items: center; }
+  .adjust-btn:hover { border-color: var(--border-strong); }
+
+  .footer { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 16px; }
+</style>
+
+<div class="painel">
+  <div class="header">
+    <h1 id="titulo"></h1>
+    <span class="pill" id="status-pill"></span>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div id="videos-section">
+    <div class="section-title">Videos</div>
+    <div class="video-list" id="video-list"></div>
+  </div>
+
+  <div class="section-title">Acoes</div>
+  <div class="actions" id="actions"></div>
+
+  <div class="adjust-section" id="adjust-section" style="display:none">
+    <div class="section-title">Pedir ajuste</div>
+    <div class="adjust-row">
+      <input class="adjust-input" id="adjust-input" placeholder="Ex.: legenda maior, tira o zoom no segundo 12...">
+      <button class="adjust-btn" onclick="enviarAjuste()" aria-label="Enviar ajuste"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+    </div>
+  </div>
+
+  <div class="footer" id="footer"></div>
+</div>
+
+<script>
+const DATA = {{DATA}};
+
+const ETAPA_LABEL = {
+  novo: 'novo', plano: 'plano', storyboard: 'storyboard',
+  montagem: 'montagem', preview: 'preview', entregue: 'entregue'
+};
+const ETAPA_ICON_CLASS = {
+  novo: 'video-icon-novo', plano: 'video-icon-andamento', storyboard: 'video-icon-andamento',
+  montagem: 'video-icon-andamento', preview: 'video-icon-andamento', entregue: 'video-icon-entregue'
+};
+const ETAPA_ICON = {
+  novo: 'ti-sparkles', plano: 'ti-list-check', storyboard: 'ti-layout-board',
+  montagem: 'ti-cut', preview: 'ti-player-play', entregue: 'ti-circle-check'
+};
+
+function render() {
+  const { marca, setup, videos = [], padroes = [] } = DATA;
+
+  document.getElementById('titulo').textContent = marca || 'Editor de video';
+
+  const pill = document.getElementById('status-pill');
+  if (setup) {
+    pill.className = 'pill pill-ok';
+    pill.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Configurado';
+  } else {
+    pill.className = 'pill pill-warn';
+    pill.innerHTML = '<i class="ti ti-alert-triangle" aria-hidden="true"></i> Setup pendente';
+  }
+
+  const novos = videos.filter(v => v.etapa === 'novo').length;
+  const andamento = videos.filter(v => !['novo','entregue'].includes(v.etapa)).length;
+  const entregues = videos.filter(v => v.etapa === 'entregue').length;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card stat-new"><div class="stat-num">${novos}</div><div class="stat-label">Novos</div></div>
+    <div class="stat-card stat-wip"><div class="stat-num">${andamento}</div><div class="stat-label">Em andamento</div></div>
+    <div class="stat-card stat-done"><div class="stat-num">${entregues}</div><div class="stat-label">Entregues</div></div>
+  `;
+
+  const list = document.getElementById('video-list');
+  if (videos.length === 0) {
+    list.innerHTML = '';
+    document.getElementById('videos-section').innerHTML =
+      '<div class="section-title">Videos</div>' +
+      '<div class="empty-state"><i class="ti ti-upload" aria-hidden="true" style="font-size:24px;display:block;margin-bottom:8px"></i>' +
+      'Nenhum video ainda. Suba um video em brutos/ no seu Drive.</div>';
+  } else {
+    list.innerHTML = videos.map(v => {
+      const iconClass = ETAPA_ICON_CLASS[v.etapa] || 'video-icon-novo';
+      const icon = ETAPA_ICON[v.etapa] || 'ti-file';
+      const badge = `badge-${v.etapa}`;
+      const label = ETAPA_LABEL[v.etapa] || v.etapa;
+      const mb = v.tamanho_mb ? `${v.tamanho_mb} MB` : '';
+      const pad = v.padrao ? ` · ${v.padrao}` : '';
+      const cmd = v.etapa === 'novo'
+        ? `/video-editor-editar ${v.bruto}`
+        : v.etapa === 'entregue'
+        ? `/video-editor-editar ${v.bruto}`
+        : `Continue editando ${v.bruto}`;
+      return `<div class="video-card" onclick="sendPrompt('${cmd.replace(/'/g, "\\'")}')">
+        <div class="video-icon ${iconClass}"><i class="ti ${icon}" aria-hidden="true"></i></div>
+        <div class="video-info">
+          <div class="video-name">${v.bruto}</div>
+          <div class="video-meta">${mb}${pad}</div>
+        </div>
+        <span class="video-badge ${badge}">${label}</span>
+      </div>`;
+    }).join('');
+  }
+
+  const hasPreview = videos.some(v => v.etapa === 'preview');
+  if (hasPreview) {
+    document.getElementById('adjust-section').style.display = 'block';
+  }
+
+  const actionsEl = document.getElementById('actions');
+  const btns = [];
+  if (!setup) {
+    btns.push({ label: 'Configurar', icon: 'ti-settings', cmd: '/video-editor-configurar', primary: true });
+  } else {
+    btns.push({ label: 'Ver videos', icon: 'ti-list', cmd: '/video-editor-videos' });
+    if (novos > 0) {
+      btns.push({ label: 'Editar video', icon: 'ti-edit', cmd: '/video-editor-editar', primary: true });
+    }
+    if (hasPreview) {
+      btns.push({ label: 'Ver preview', icon: 'ti-player-play', cmd: 'Mostrar o preview do video em andamento' });
+      btns.push({ label: 'Entregar', icon: 'ti-send', cmd: '/video-editor-entregar' });
+    }
+    if (!novos && !hasPreview) {
+      btns.push({ label: 'Editar video', icon: 'ti-edit', cmd: '/video-editor-editar' });
+    }
+    btns.push({ label: 'Novo padrao', icon: 'ti-palette', cmd: '/video-editor-novo-padrao' });
+  }
+  actionsEl.innerHTML = btns.map(b =>
+    `<button class="btn ${b.primary ? 'btn-primary' : ''}" onclick="sendPrompt('${b.cmd.replace(/'/g, "\\'")}')">
+      <i class="ti ${b.icon}" aria-hidden="true"></i> ${b.label}
+    </button>`
+  ).join('');
+
+  document.getElementById('footer').textContent = padroes.length
+    ? `Padroes disponiveis: ${padroes.join(', ')}`
+    : '';
+}
+
+function enviarAjuste() {
+  const input = document.getElementById('adjust-input');
+  const texto = input.value.trim();
+  if (!texto) return;
+  sendPrompt('Ajustar: ' + texto);
+  input.value = '';
+}
+
+document.getElementById('adjust-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') enviarAjuste();
+});
+
+render();
+</script>

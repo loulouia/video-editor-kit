@@ -6,7 +6,28 @@ Pipeline de edição de vídeos curtos (Reels/TikTok, 1080×1920) feito em códi
 
 Comandos (skills em `.claude/skills/`): `/video-editor-configurar` (primeiro uso), `/video-editor-videos` (status no Drive), `/video-editor-editar` (editar ou reabrir), `/video-editor-entregar` (render + entrega), `/video-editor-novo-padrao`. Pedidos em linguagem normal seguem o mesmo fluxo do comando correspondente.
 
-Ao abrir o projeto, o hook `SessionStart` (`.claude/settings.json` → `motor/inicio.py`) informa se o setup está completo e quais vídeos estão novos/em andamento no Drive. Na primeira resposta: setup incompleto → indicar `/video-editor-configurar` e não editar; completo → citar em uma frase os vídeos novos/em andamento.
+Ao abrir o projeto, o hook `SessionStart` (`.claude/settings.json` → `motor/inicio.py`) informa se o setup está completo e quais vídeos estão novos/em andamento no Drive. Na primeira resposta, **sempre mostrar o painel visual** (`.claude/painel.html`) via `show_widget`:
+
+1. Ler `.claude/painel.html`.
+2. Montar o JSON com os dados da sessão (marca, setup, vídeos, padrões) a partir do contexto do hook.
+3. Substituir `{{DATA}}` no HTML pelo JSON.
+4. Mostrar o resultado com `show_widget` (title: `painel_editor_video`).
+
+Formato do JSON que substitui `{{DATA}}`:
+```json
+{
+  "marca": "nome-da-marca",
+  "setup": true,
+  "padroes": ["amanda", "topo-livre"],
+  "videos": [
+    {"bruto": "nome.mp4", "etapa": "novo", "tamanho_mb": 150, "padrao": null},
+    {"bruto": "outro.mov", "etapa": "preview", "tamanho_mb": 200, "padrao": "amanda"}
+  ]
+}
+```
+Etapas possíveis: `novo`, `plano`, `storyboard`, `montagem`, `preview`, `entregue`. `marca` é o nome da primeira marca em `marcas/` (ou `null`). `setup` vem do `configurado` em `config/ambiente.json`. `padroes` são as pastas em `padroes/`. `videos` vem do contexto do hook (registro + Drive); se o hook não retornar vídeos, usar `[]`.
+
+Depois do painel, acrescentar **uma frase curta** (não um parágrafo) dizendo o que há de novo, como antes. Setup incompleto → indicar `/video-editor-configurar` e não editar.
 
 ## Nome da pasta: `video-editor.nosync`
 
@@ -106,6 +127,7 @@ Gerar LUT: `motor/grading.py --bruto <bruto> --ref <video>:<t1,t2,...> ... --sai
 - **Uma cópia só da pessoa:** recorte nunca como segunda `<video>` no HyperFrames (dessincroniza no preview → "fantasma"). `motor/compor_camadas.py` embute fundo mesclado + texto atrás + recorte num vídeo único.
 - **Ordem de dependência:** mudou corte, aceleração ou grading → `cortes.py`, recorte, `rosto.py`, `compor_camadas.py`, `gerar.py`. Mudou fundo mesclado/texto atrás → `compor_camadas.py` + `gerar.py`. Mudou legenda, palavra-chave, card, título ou valor do padrão (exceto fundo mesclado/texto atrás) → só `gerar.py`.
 - **MediaPipe 1.1** não tem `mp.solutions`: a detecção de rosto do `/shorts` (claude-shorts) está quebrada. O motor usa `rosto.py` (pele dentro da máscara do recorte).
+- **Tratamento de áudio (decisão pendente da autora, não aplicar):** avaliado em 2026-10-21 no vídeo do Adel Bark. Opções: cadeia ffmpeg (highpass 80 Hz, afftdn leve, deesser, EQ +2 dB em 3,5 kHz, compressão 2,5:1, loudnorm −14 LUFS), DeepFilterNet (`pip install deepfilternet` falha no Python 3.12; só o binário `deep-filter` do GitHub, sem checksum nem assinatura — download não autorizado), Adobe Podcast Enhance (envia áudio de terceiro pra Adobe). Até ela decidir, o áudio sai original.
 
 ## Pesquisa de imagens e notícias (opcional, PLAYBOOK §5)
 
