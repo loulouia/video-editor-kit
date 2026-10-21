@@ -20,7 +20,13 @@ __pycache__/
 .thumbnails/
 .waveform-cache/
 .hyperframes/
-# Por instalação (vão no backup zip, não no git)
+# Por instalação (pessoais, não vão pro repo de distribuição)
 config/
 registro.json
-projetos/*/versao/
+projetos/
+
+# Marca pessoal (a distribuição vai sem ela)
+marcas/amanda/
+
+# Tipos gerados pelo engine do mod
+.claude/mods/*/.claude-plugin/types/

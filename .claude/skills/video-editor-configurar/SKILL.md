@@ -59,11 +59,36 @@ Explicar em uma frase que `_audio/` e `_transicoes/` são uma biblioteca da pess
 
 `python motor/drive.py status` mostra o que já existe; `python motor/drive.py criar-estrutura` cria só o que falta (nunca apaga nem renomeia nada). Se a pasta já existir, usar a existente.
 
-## 5. Marca
+## 5. Marcas
 
-Se não houver marca em `marcas/`, cadastrar com a pessoa: nome, logo (versão clara e escura, PNG transparente), fontes próprias (se houver e se tiver licença), cores/paleta (opcional), termos e nomes próprios pro glossário. Criar `marcas/<slug>/marca.json` seguindo o modelo de `marca.json` (`"padrao_padrao": null` — o padrão de cada vídeo é sempre perguntado enquanto isso estiver vazio).
+Listar as pastas em `marcas/` e ler cada `marca.json`.
 
-Cor do cenário: decidida no primeiro vídeo, com comparação lado a lado. Imagem normal → sugerir a cor da Amanda (`padroes/amanda/cor/meus-editados.cube`); imagem lavada (cinza, sem contraste) → sugerir `padroes/amanda/cor/lavado.cube`. A escolhida é copiada pra `marcas/<slug>/cor/`. Outra cor: gerar com vídeos editados da pessoa (`motor/grading.py`). Logo e glossário são opcionais (sem logo, o vídeo sai sem logo).
+### Nenhuma marca existe
+Cadastrar do zero: nome, logo (versão clara e escura, PNG transparente; opcional), fontes próprias (se houver e tiver licença), cores/paleta (opcional), termos pro glossário (opcional). Criar `marcas/<slug>/marca.json` (`"padrao_padrao": null`).
+
+### Marcas já existem (pré-configuradas)
+Apresentar de forma clara o que já tem e o que falta em cada uma:
+
+> Encontrei **N** marcas pré-configuradas:
+> 1. **adel-bark** — nome definido, cor definida, sem logo
+> 2. **mariana** — nome e cor a definir
+>
+> Vamos completar uma por vez. Qual você quer configurar primeiro?
+
+Para cada marca, verificar e completar:
+- `nome` é null → perguntar: "Qual o nome completo da pessoa ou da marca?"
+- `marca` é null → perguntar: "Como a marca se apresenta? (ex.: 'Nome — Nicho')"
+- `logo` é null → perguntar: "Tem logo? Se tiver, manda a versão clara e escura (PNG sem fundo). Se não tiver, o vídeo sai sem logo — pode adicionar depois."
+- `glossario` é null → perguntar: "Tem termos técnicos do nicho que o nome pode ser escrito errado? (ex.: nomes de procedimentos, marcas, nomes próprios). Se não tiver agora, pode adicionar depois."
+- `lut` é null → avisar: "A cor do vídeo será decidida no primeiro vídeo que editar — vou mostrar uma comparação pra você escolher."
+
+Completar cada campo no `marca.json`. Não apagar campos que já estão preenchidos.
+
+### Cor do cenário
+Decidida no primeiro vídeo de cada marca, com comparação lado a lado. Imagem normal (com contraste) → sugerir `padroes/amanda/cor/meus-editados.cube`; imagem lavada (cinza, sem contraste: perfis log/flat) → sugerir `padroes/amanda/cor/lavado.cube`. A escolhida é copiada pra `marcas/<slug>/cor/`. Outra cor: gerar com vídeos editados da pessoa (`motor/grading.py`).
+
+### Mais de uma marca
+Quando houver mais de uma marca, ao iniciar cada edição o Claude sempre pergunta **de qual marca é o vídeo**. Não existe marca "principal" — cada vídeo é de uma marca.
 
 ## 6. Vídeos de referência e editados que estejam no Mac
 

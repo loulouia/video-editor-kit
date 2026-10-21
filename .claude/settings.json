@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": ".claude/mods/video-editor-painel"
+  },
   "hooks": {
     "SessionStart": [
       {

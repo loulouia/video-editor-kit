@@ -1,0 +1,6 @@
+{
+  "name": "video-editor-painel",
+  "version": "0.1.0",
+  "description": "Painel lateral do editor de video com status e acoes",
+  "types": "./types/index.d.ts"
+}
