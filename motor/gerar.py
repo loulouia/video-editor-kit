@@ -335,7 +335,7 @@ body {{ margin: 0; background: #000; }}
 /* PLAYBOOK 3.1 — efeito negativo: as letras invertem as cores do vídeo atrás delas */
 .kw-neg .kw-block {{ mix-blend-mode: difference; text-shadow: none; }}
 .cx {{ position: absolute; overflow: hidden; }}
-.cx-in {{ position: absolute; inset: 0; display: flex; font-family: "Cartao", serif; overflow: hidden; }}
+.cx-in {{ position: absolute; inset: 0; display: flex; {'font-family: "Cartao", serif; ' if FC else ''}overflow: hidden; }}
 .cx-grao {{ position: absolute; inset: 0; }}
 .logo {{ position: absolute; top: {LG["topo"]}; right: {LG["direita"]}; width: {LG["largura"]}; height: auto; }}
 </style>
