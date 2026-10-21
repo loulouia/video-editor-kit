@@ -5,22 +5,20 @@ description: Verifica se tem vídeo novo na pasta brutos do Drive e lista para o
 
 # Verificar material novo
 
-1. Rodar `rclone lsf "gdrive:Edição de vídeos/brutos/" --format pst` para listar os brutos no Drive (nome, tamanho, data).
-2. Ler `registro.json` e comparar: identificar quais brutos do Drive **já estão registrados** e quais são **novos**.
-3. Mostrar para o usuário de forma clara:
-   - **Novos** (ainda não registrados): nome e tamanho.
-   - **Já registrados** (com a etapa atual): nome, etapa, padrão.
-4. Atualizar `_driveCheck` em `registro.json` com `{"checked":"HH:MM","message":"...","newCount":N}`.
-5. Avisos:
-   - Nome que parece b-roll em `brutos/` (sem fala, muito curto, nome tipo "broll") → perguntar se é bruto ou inserção.
-   - Vídeo registrado que sumiu de `brutos/` → avisar.
-6. Se houver vídeos novos, perguntar: **"Qual você quer editar?"** e listar os novos com número para facilitar.
-7. Quando o usuário escolher, seguir para `/video-editor-editar <nome>`.
+1. Rodar `~/.video-skill/bin/python -I motor/registro.py --json` (com `~/.local/bin` no PATH, se o rclone estiver lá). É a mesma conferência do `/video-editor-videos` e do início de sessão — não listar o Drive por conta própria. Ela já devolve, por bruto: nome, tamanho, etapa (`novo`, `plano`, `storyboard`, `montagem`, `preview`, `entregue`), padrão, se o nome parece b-roll (`suspeito_broll`) e os vídeos registrados que sumiram do Drive (`sumidos_do_drive`); reconhece vídeo renomeado pelo ID do Drive.
+2. Mostrar para o usuário de forma clara:
+   - **Novos** (`etapa: novo`): nome e tamanho.
+   - **Em andamento / entregues**: nome, etapa, padrão.
+3. Avisos:
+   - `suspeito_broll` → perguntar se é bruto ou inserção (nunca decidir sozinho).
+   - `sumidos_do_drive` → avisar que o vídeo não está mais em `brutos/` (sem ele, não dá pra reabrir a edição).
+4. Se houver vídeos novos, perguntar: **"Qual você quer editar?"** e listar os novos com número para facilitar.
+5. Quando o usuário escolher, seguir para `/video-editor-editar <nome>`.
 
-Se o setup estiver incompleto, indicar `/video-editor-configurar`.
+Se o setup estiver incompleto (o comando falha por falta de configuração), indicar `/video-editor-configurar`.
 
 ## Importante
 
-- Usar **rclone direto** (não o conector do Google Drive — é mais rápido).
+- Usar o `motor/registro.py` (rclone por baixo), não o conector do Google Drive — é mais rápido e é a mesma lógica dos outros comandos.
 - Não perguntar confirmações desnecessárias; ir direto ao ponto.
 - Se só tem 1 vídeo novo, já sugerir: "Quer editar esse?"
