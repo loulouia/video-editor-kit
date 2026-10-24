@@ -72,6 +72,10 @@ Regras:
 
 ## Distribuição para clientes
 
+### Instalação pelo Claude Code (recomendado)
+O cliente abre o Claude Code e cola no chat: "Baixe o editor de vídeo pra mim: https://github.com/loulouia/video-editor-kit.git". O Claude clona o repositório dentro de `~/Desktop/ClaudeCode/video-editor.nosync` (criando a pasta `ClaudeCode` se não existir), abre a pasta como projeto ativo do Claude Code (pra que os comandos `/video-editor-*` apareçam) e orienta o cliente a mudar as permissões pra Auto e rodar `/video-editor-configurar`.
+
+### Conteúdo do pacote
 Pacote `video-editor.nosync` com: `motor/`, `.claude/` (comandos e hook), `CLAUDE.md`, `LEIA-ME.md`, `padroes/` (amanda + topo-livre, com fontes e licenças). **Não vai:** `marcas/amanda/` (logo, glossário, editados), `projetos/`, `config/`, `registro.json`, `.git/`. Marca do cliente: logo e glossário definidos por ele no `/video-editor-configurar`; a cor sugerida depende de **como a câmera grava**: imagem normal (com contraste) → a mesma da Amanda (`padroes/amanda/cor/meus-editados.cube`); **imagem lavada** (cinza, sem contraste: perfis log/flat, comum em câmeras Sony/cinema) → `padroes/amanda/cor/lavado.cube` (contraste, pele quente, cor rica; aprovada no vídeo do Adel Bark, 2026-10-21). A LUT da Amanda num vídeo lavado deixa ainda mais apagado. Sempre mostrar a comparação e deixar a pessoa escolher; a escolhida é copiada pra `marcas/<cliente>/cor/`. O vídeo de teste (`taste-washing-5`) é só da autora do motor.
 
 ## Primeiro uso / padrão novo

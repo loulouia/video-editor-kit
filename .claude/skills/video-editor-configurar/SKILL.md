@@ -7,12 +7,25 @@ description: Primeiro uso do editor de vídeo (video-editor) — instala e confe
 
 Siga em ordem. Fale em linguagem simples (a pessoa pode não ser técnica). Cada etapa já feita é só conferida e pulada. Regras gerais: `CLAUDE.md`.
 
-## 0. Nome da pasta (iCloud)
+## 0. Local e nome da pasta
 
+### Pasta-mãe `ClaudeCode`
+O projeto deve ficar dentro de `~/Desktop/ClaudeCode/`. Conferir:
+- `~/Desktop/ClaudeCode/` já existe? → seguir.
+- não existe? → criar `mkdir -p ~/Desktop/ClaudeCode` (sem perguntar — é só uma pasta organizadora).
+
+Se o projeto foi clonado ou descompactado em outro lugar (ex.: `~/Desktop/video-editor.nosync`), mover pra dentro de `~/Desktop/ClaudeCode/` e avisar: "Movi a pasta pra ~/Desktop/ClaudeCode/video-editor.nosync pra ficar organizado."
+
+### Nome `.nosync` (iCloud)
 A pasta deve se chamar `video-editor.nosync` (já é distribuída assim). Conferir:
 - nome atual da raiz do projeto termina em `.nosync`? → seguir;
 - não termina **e** está num lugar sincronizado pelo iCloud (caminho dentro de `~/Desktop` ou `~/Documents` quando existir `~/Library/Mobile Documents/com~apple~CloudDocs/Desktop`, ou dentro de `~/Library/Mobile Documents`) → explicar em uma frase ("o iCloud pode tirar arquivos do seu Mac quando o disco enche; com `.nosync` no nome a pasta fica sempre no Mac") e **pedir OK** pra renomear no mesmo lugar. Antes: checar espaço e baixar os arquivos que estejam só na nuvem (`find . -flags +dataless`); depois: conferir que nenhum ficou na nuvem. Avisar que a pessoa passa a abrir a pasta com o nome novo.
 - não está num lugar sincronizado → não mexer.
+
+### Abrir o projeto no Claude Code
+Depois de garantir que a pasta está em `~/Desktop/ClaudeCode/video-editor.nosync`, o projeto precisa estar **aberto como pasta do Claude Code** pra que os comandos `/video-editor-*` funcionem. Conferir:
+- o diretório de trabalho atual do Claude Code já é esta pasta? → seguir.
+- não é? → trocar o diretório de trabalho pra `~/Desktop/ClaudeCode/video-editor.nosync` (usar a ferramenta de trocar diretório do Claude Code). Explicar: "Preciso abrir a pasta do editor como projeto ativo pra que os comandos funcionem."
 
 ## 1. Ferramentas no Mac
 
