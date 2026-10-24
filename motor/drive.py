@@ -9,6 +9,8 @@ Uso (CLI):
   python motor/drive.py listar brutos                → JSON com nome, tamanho, data, id
   python motor/drive.py baixar <caminho> <destino>   → copia do Drive pro Mac
   python motor/drive.py enviar <arquivo> <caminho>   → copia do Mac pro Drive e CONFERE (tamanho + MD5)
+  python motor/drive.py copiar-biblioteca            → copia a biblioteca inicial (efeitos, músicas, transições)
+                                                       da pasta compartilhada pra o Drive do cliente
 """
 import hashlib, json, os, shutil, subprocess, sys
 
@@ -109,6 +111,40 @@ def enviar(arquivo, rel):
     return not remoto["md5"] or remoto["md5"] == md5(arquivo)
 
 
+def copiar_biblioteca():
+    """Copia a biblioteca inicial (efeitos, músicas, transições) de uma pasta compartilhada no Drive para o Drive do cliente.
+    Usa --drive-root-folder-id pra acessar a pasta compartilhada pelo ID, independente de ela estar em 'Meu Drive' ou 'Compartilhados comigo'."""
+    a = ambiente()
+    if not a or "biblioteca" not in a:
+        return {"ok": False, "erro": "sem configuração de biblioteca em ambiente.json"}
+    bib = a["biblioteca"]
+    pasta_id = bib.get("pasta_id")
+    destinos = bib.get("destinos", {})
+    if not pasta_id or not destinos:
+        return {"ok": False, "erro": "biblioteca mal configurada"}
+
+    remote = a.get("remote", "gdrive:").rstrip(":")
+    origem_remote = f"{remote},root_folder_id={pasta_id}:"
+    resultado = {}
+    total_arquivos = 0
+    for sub, destino_rel in destinos.items():
+        origem = f"{origem_remote}{sub}"
+        destino = caminho(destino_rel)
+        try:
+            r = rc("copy", origem, destino, check=False, timeout=900)
+        except subprocess.TimeoutExpired:
+            resultado[sub] = {"ok": False, "erro": "timeout — arquivos muito grandes; tente de novo"}
+            continue
+        if r.returncode and "directory not found" not in r.stderr:
+            resultado[sub] = {"ok": False, "erro": r.stderr.strip()}
+        else:
+            arquivos = listar(destino_rel)
+            resultado[sub] = {"ok": True, "arquivos": len(arquivos)}
+            total_arquivos += len(arquivos)
+    resultado["total"] = total_arquivos
+    return resultado
+
+
 def remover_backups_antigos(manter=5):
     """Único caso em que algo é apagado no Drive: backups antigos que o próprio motor criou em _backup/."""
     zips = sorted(f["nome"] for f in listar("_backup") if f["nome"].startswith("video-editor-") and f["nome"].endswith(".zip"))
@@ -128,5 +164,7 @@ if __name__ == "__main__":
         print(baixar(sys.argv[2], sys.argv[3]))
     elif cmd == "enviar":
         ok = enviar(sys.argv[2], sys.argv[3]); print("conferido" if ok else "FALHOU"); sys.exit(0 if ok else 1)
+    elif cmd == "copiar-biblioteca":
+        print(json.dumps(copiar_biblioteca(), ensure_ascii=False, indent=1))
     else:
         sys.exit(__doc__)

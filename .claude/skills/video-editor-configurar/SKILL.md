@@ -50,7 +50,7 @@ Conferir e, se faltar, instalar (avisar o tamanho antes de downloads grandes; ch
 1. Explicar em duas frases: primeiro a pessoa cria uma **chave própria** no Google (grátis, ~10 min, eu guio passo a passo), depois autoriza o acesso ao Drive **uma vez**. Eu nunca vejo a senha nem a chave. O acesso é ao Drive inteiro porque os vídeos que ela sobe pelo navegador/celular precisam ser lidos.
 2. Seguir **`chave-google.md`** (nesta pasta), um passo por mensagem: projeto → Drive API → tela de autorização → chave → terminal com `chave-google.sh` (cria a conexão `gdrive` já com a chave e abre o Google pra autorizar).
 3. Conferir: `rclone lsd gdrive:` lista as pastas do Meu Drive **sem** o NOTICE de `client_id`. (Se já houver uma conexão `gdrive` com a chave compartilhada, o mesmo script troca a chave.)
-4. Gravar `config/ambiente.json`: `{"remote": "gdrive:", "raiz": "Edição de vídeos", "configurado": false}`
+4. Gravar `config/ambiente.json`: `{"remote": "gdrive:", "raiz": "Edição de vídeos", "configurado": false, "biblioteca": {"pasta_id": "1C_tqHO2k-w02zYEYLw3pZ4pTt6tHSqN_", "destinos": {"efeitos sonoros": "_audio/efeitos", "musicas": "_audio/musicas", "transicoes": "_transicoes"}}}`
 
 ## 4. Pastas no Drive (só com OK)
 
@@ -71,6 +71,18 @@ Meu Drive/Edição de vídeos/
 Explicar em uma frase que `_audio/` e `_transicoes/` são uma biblioteca da pessoa, pra qualquer vídeo, e que só entra o que ela tem direito de usar.
 
 `python motor/drive.py status` mostra o que já existe; `python motor/drive.py criar-estrutura` cria só o que falta (nunca apaga nem renomeia nada). Se a pasta já existir, usar a existente.
+
+## 4.1. Biblioteca inicial (efeitos, músicas, transições)
+
+Se `config/ambiente.json` tiver o campo `"biblioteca"` (com `pasta_id` e `destinos`), listar os arquivos disponíveis com `rclone lsjson -R --files-only "gdrive,root_folder_id=<pasta_id>:"` pra saber quantos são e o tamanho total, e oferecer a cópia informando os números:
+
+> Tenho uma biblioteca inicial com **N** efeitos sonoros, **N** músicas e **N** transições (total ~X MB) pra você. Quer que eu copie pro seu Drive? São arquivos livres pra usar nos vídeos.
+
+- Se sim: `python motor/drive.py copiar-biblioteca`. Mostrar quantos arquivos foram copiados em cada categoria.
+- Se não: seguir sem copiar. A pessoa pode pedir depois (comando: `python motor/drive.py copiar-biblioteca`).
+- Se `"biblioteca"` não existir no `ambiente.json`: pular silenciosamente.
+
+Os arquivos vão pra `_audio/efeitos/`, `_audio/musicas/` e `_transicoes/` no Drive da pessoa — a mesma biblioteca que ela vai abastecer depois com os dela.
 
 ## 5. Marcas
 
