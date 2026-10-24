@@ -16,5 +16,6 @@ ext = os.path.splitext(p["bruto"])[1].lower() or ".mp4"
 bruto = os.path.join(pj, "cache", "bruto" + ext)
 if not os.path.exists(bruto):
     drive.baixar(p["bruto_drive"], bruto)
+drive.rc("mkdir", drive.caminho(p["insercoes_drive"]), check=False)
 ins = drive.baixar_pasta(p["insercoes_drive"], os.path.join(pj, "composicao", "assets", "img"))
 print(json.dumps({"bruto_local": bruto, "insercoes": ins}, ensure_ascii=False))
