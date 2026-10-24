@@ -4,7 +4,7 @@ Pipeline de edição de vídeos curtos (Reels/TikTok, 1080×1920) feito em códi
 
 ## Comandos do projeto e início de sessão
 
-Comandos (skills em `.claude/skills/`): `/video-editor-configurar` (primeiro uso), `/video-editor-verificar` (verificar material novo no Drive — também responde a "veja se tem vídeo novo", "subi vídeo novo", "carreguei video", "tem material novo?"), `/video-editor-videos` (status no Drive), `/video-editor-editar` (editar ou reabrir), `/video-editor-entregar` (render + entrega), `/video-editor-novo-padrao`. Pedidos em linguagem normal seguem o mesmo fluxo do comando correspondente.
+Comandos (skills em `.claude/skills/`): `/video-editor-configurar` (primeiro uso), `/video-editor-verificar` (verificar material novo no Drive — também responde a "veja se tem vídeo novo", "subi vídeo novo", "carreguei video", "tem material novo?"), `/video-editor-videos` (status no Drive), `/video-editor-editar` (editar ou reabrir), `/video-editor-entregar` (render + entrega), `/video-editor-novo-padrao`, `/video-editor-atualizar` (atualizar motor/padrões quando o hook detectar versão nova). Pedidos em linguagem normal seguem o mesmo fluxo do comando correspondente.
 
 Ao abrir o projeto, o hook `SessionStart` (`.claude/settings.json` → `motor/inicio.py`) informa se o setup está completo e quais vídeos estão novos/em andamento no Drive. Na primeira resposta, **sempre mostrar o painel visual** (`.claude/painel.html`) via `show_widget`:
 
@@ -80,6 +80,9 @@ Pacote `video-editor.nosync` com: `motor/`, `.claude/` (comandos e hook), `CLAUD
 
 ### Biblioteca inicial (efeitos, músicas, transições)
 A autora mantém uma pasta compartilhada no Drive (`Edição de vídeos/_biblioteca/`) com efeitos sonoros, músicas e transições livres pra usar. O `/video-editor-configurar` (etapa 4.1) oferece copiar pro Drive do cliente. A configuração fica em `config/ambiente.json` → `"biblioteca"`: `pasta_id` (ID da pasta compartilhada no Drive da autora) e `destinos` (mapeamento subpasta → pasta destino no Drive do cliente). Comando: `python motor/drive.py copiar-biblioteca`. Os arquivos são copiados, não linkados — a pessoa tem a cópia no próprio Drive. A autora atualiza a pasta compartilhada; clientes novos recebem a versão mais recente; clientes antigos podem rodar `copiar-biblioteca` de novo (o rclone só copia o que não existe).
+
+### Atualizações automáticas (padrões, motor, melhorias)
+O hook `SessionStart` (`motor/inicio.py`) faz `git fetch` e compara o HEAD local com `origin/main`. Se houver commits novos, avisa o Claude, que pergunta à pessoa se quer atualizar. Comando: `/video-editor-atualizar` (faz `git pull --ff-only`, com fallback pra `--rebase`; guarda alterações locais com stash se necessário). A pessoa nunca precisa lembrar de verificar — o editor avisa sozinho ao abrir. A autora empurra melhorias no motor e nos padrões pro repo (`git push`); na próxima sessão de cada cliente, o aviso aparece.
 
 ## Primeiro uso / padrão novo
 

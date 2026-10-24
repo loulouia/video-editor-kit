@@ -3,7 +3,7 @@
 Só biblioteca padrão do Python (roda antes do setup). Nunca falha a sessão: em qualquer erro, só informa.
 Saída: JSON com hookSpecificOutput.additionalContext (contexto pro Claude, não aparece como mensagem).
 """
-import json, os, shutil, sys
+import json, os, shutil, subprocess, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -42,6 +42,31 @@ def checar():
     return " ".join(linhas)
 
 
+def checar_atualizacao():
+    """Compara HEAD local com origin/main. Retorna aviso se houver commits novos."""
+    git = os.path.join(RAIZ, ".git")
+    if not os.path.isdir(git):
+        return ""
+    try:
+        subprocess.run(["git", "-C", RAIZ, "fetch", "--quiet"], capture_output=True, timeout=15)
+        local = subprocess.run(["git", "-C", RAIZ, "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5).stdout.strip()
+        remoto = subprocess.run(["git", "-C", RAIZ, "rev-parse", "origin/main"], capture_output=True, text=True, timeout=5).stdout.strip()
+        if not local or not remoto or local == remoto:
+            return ""
+        r = subprocess.run(["git", "-C", RAIZ, "log", "--oneline", f"{local}..{remoto}"], capture_output=True, text=True, timeout=10)
+        commits = [l.strip() for l in r.stdout.strip().splitlines() if l.strip()]
+        if not commits:
+            return ""
+        resumo = "; ".join(commits[:5])
+        if len(commits) > 5:
+            resumo += f" (+{len(commits) - 5} mais)"
+        return (f" ATUALIZAÇÃO DISPONÍVEL ({len(commits)} commit(s): {resumo}). "
+                "Avise a pessoa: 'Tem uma atualização do editor de vídeo disponível (padrões, melhorias no motor, etc). "
+                "Quer que eu atualize?' Se sim, rodar /video-editor-atualizar.")
+    except Exception:
+        return ""
+
+
 def aviso_icloud():
     """Pasta sem .nosync dentro de um lugar sincronizado pelo iCloud → avisar (o setup corrige com OK)."""
     home = os.path.expanduser("~")
@@ -55,7 +80,7 @@ def aviso_icloud():
 
 
 try:
-    ctx = checar() + aviso_icloud()
+    ctx = checar() + checar_atualizacao() + aviso_icloud()
 except Exception as e:
     ctx = f"[video-editor] Checagem de início falhou ({str(e)[:150]}). Seguir normalmente."
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}, ensure_ascii=False))
