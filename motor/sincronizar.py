@@ -50,12 +50,14 @@ dif = [v - W[k]["s0"] for k, v in achados.items() if v is not None]
 atraso = float(min(0.2, max(0.0, np.median(dif)))) if dif else 0.0
 
 ant, movidas = 0.0, 0
+ESCADA = 0.06    # intervalo mínimo entre o começo de duas palavras seguidas
 for k, w in enumerate(W):
     s = achados[k] if achados[k] is not None else w["s0"] + atraso
     s = min(s, max(w["s0"], w["e"] - 0.05))     # o atraso estimado não passa do fim da palavra
-    s = max(s, ant)
+    s = max(s, ant + (ESCADA if k else 0))       # palavras empurradas pro mesmo ponto entram uma depois da outra
     if not ativo[idx(s)]:                       # regra mais forte: nunca em silêncio/respiro, espera a voz
         s = proxima_voz(s)
+    s = max(s, ant + (ESCADA if k else 0))
     movidas += abs(s - w["s0"]) > 0.02
     w["s"] = round(s, 3)
     ant = w["s"]

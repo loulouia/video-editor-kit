@@ -81,7 +81,7 @@ Cada vídeo combina **um padrão + uma marca**. O mesmo vídeo pode ser editado 
 |---|---|---|
 | `amanda` | v1.0, oficial | Helvetica Now Display (licença e fonte incluídas) |
 | `topo-livre` | em criação | clientes (TikTok Sans + Instrument Serif, livres) |
-| `basico` | v1.2 | clientes (Instrument Serif Italic, livre): legenda palavra por palavra em blocos, com destaques |
+| `basico` | v1.3 | clientes (Instrument Serif Italic, livre): legenda palavra por palavra em blocos de 3 ou 2 linhas, ou simples (1 linha), com destaques |
 
 ## Criar um padrão novo
 

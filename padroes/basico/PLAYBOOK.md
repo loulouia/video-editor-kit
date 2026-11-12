@@ -1,6 +1,6 @@
 # Playbook de edição — Padrão Básico
 
-**Status:** v1.2 (2026-11-12): legenda em Instrument Serif Italic no estilo da referência da Amanda (blocos de até 3 linhas quase encostadas, palavra por palavra saindo do desfocado, destaques de 1–2 palavras), sem aceleração por padrão, glow opcional. v1.0 (2026-10-24). Criado a partir de vídeo de referência (Mariana & Adel Bark — conteúdo hospitalar/cirúrgico). Valores lidos pelo motor: `padrao.json`. Histórico: `CHANGELOG.md`.
+**Status:** v1.3 (2026-11-12): + 3 estilos de legenda escolhidos por vídeo (blocos com 3 linhas, blocos com 2 linhas, simples). v1.2 (2026-11-12): legenda em Instrument Serif Italic no estilo da referência da Amanda (blocos de até 3 linhas quase encostadas, palavra por palavra saindo do desfocado, destaques de 1–2 palavras), sem aceleração por padrão, glow opcional. v1.0 (2026-10-24). Criado a partir de vídeo de referência (Mariana & Adel Bark — conteúdo hospitalar/cirúrgico). Valores lidos pelo motor: `padrao.json`. Histórico: `CHANGELOG.md`.
 
 Tela: 1080×1920, 30 fps. Coordenadas em % da altura/largura da tela.
 
@@ -12,7 +12,8 @@ Legendas, título e qualquer elemento de texto **nunca ficam em cima do rosto** 
 |---|---|
 | Como | rosto mapeado ao longo do vídeo (`motor/rosto.py`, a partir do **recorte completo** da pessoa; o modo rápido só serve pro storyboard e erra em selfie de perto). Mede o rosto inteiro até o queixo, também em selfie de perto, sem se confundir com a mão encostada no rosto. Cada elemento fica abaixo do queixo, com folga de 2% da altura |
 | Posição padrão da legenda | ~65% da altura — só vale quando o rosto está acima dessa linha |
-| Se não couber embaixo | a legenda é dividida em menos linhas (§0.1); o card vira tela cheia. O rosto nunca é coberto |
+| Sobreposição leve (só a legenda) | se o bloco não couber entre o queixo e a margem de baixo, ele pode subir e cobrir **até 6% da altura do rosto acima do queixo** (só a pontinha do queixo). Base medida no vídeo da Mari (IMG_4802): da boca ao queixo há 12–15% da altura do rosto, então 6% fica sempre longe da boca. Decisão da Amanda: manter as 3 linhas com uma sobreposição leve antes de dividir |
+| Se nem assim couber | a legenda é dividida em menos linhas (§0.1); o card vira tela cheia. A boca e os olhos nunca são cobertos |
 | Limites da tela | a área segura do Instagram (§0.1): entre 13% e 78% da altura; texto entre 11% e 89% da largura; cards entre 4% e 89% |
 
 ## 0.1 Área segura do Instagram (margens)
@@ -29,7 +30,7 @@ Legendas, título, cards e logo **nunca** passam da área segura de um post do I
 | Regra | Valor |
 |---|---|
 | Legendas | o bloco fica dentro da área. **Texto com a mesma margem dos dois lados (11%)**, centralizado pelo desenho real das letras (o itálico pende pra direita), pra não ficar colado na borda esquerda. Linha larga demais: **primeiro o destaque daquela linha diminui** (até 1,4×); se não bastar, **a linha quebra em duas** |
-| Sem espaço entre o queixo e a margem de baixo | o rosto não cede e a margem também não: o bloco é **dividido em menos linhas** (2, depois 1), cada pedaço no tempo da sua fala, com o mesmo tamanho de letra (decisão da Amanda). Só se nem 1 linha couber, a letra encolhe (até 70%) e o motor avisa |
+| Sem espaço entre o queixo e a margem de baixo | primeiro a **sobreposição leve** do queixo (§0); se ainda faltar, o bloco é **dividido em menos linhas** (2, depois 1), cada pedaço no tempo da sua fala, com o mesmo tamanho de letra (decisão da Amanda). Só se nem 1 linha couber, a letra encolhe (até 70%) e o motor avisa |
 | Cards (imagem/vídeo em quadro) | dentro da área; se não couber entre o rosto e a margem de baixo, **vira tela cheia** automaticamente. Mídia vertical (9:16) ocupa a tela inteira; as outras (capa de livro, print, foto) ficam **no alto da área segura, inteiras, sobre fundo preto**, e a legenda vai **embaixo**, nunca por cima do texto da imagem |
 | Mídia em tela cheia | **permitida** (é fundo); só o texto por cima respeita a área |
 | Logo (se a marca usar) | canto superior direito, a 14% do topo e 12% da direita (fora do nome do perfil e da faixa dos botões) |
@@ -98,6 +99,16 @@ Referência visual: vídeo de referência enviado pela Amanda em 2026-11-12 (blo
 | Fim extra | o bloco permanece 0,3 s depois da última palavra |
 | Grafia | pelo glossário da marca (`marcas/<marca>/glossario.md`) |
 
+### 3.0a Estilo da legenda (escolhido por vídeo)
+
+| Estilo | Como é |
+|---|---|
+| **Blocos com 3 linhas** (padrão) | o descrito acima: até 3 linhas por bloco, com a palavra de destaque grande no meio, palavra por palavra |
+| **Blocos com 2 linhas** | igual, com **no máximo 2 linhas** por bloco (até 3 palavras por linha), palavra por palavra |
+| **Simples** | **1 linha por vez, até 3 palavras**, que aparece **inteira de uma vez** (saindo do desfocado) quando a primeira palavra é falada; tudo o mais igual (fonte, tamanho, desfoque, sincronia, destaques, área segura). O destaque "sozinho" ocupa a tela só com ele; nas outras vezes divide a linha. Fala muito rápida: as palavras são redistribuídas entre a linha e a vizinha pra nenhuma linha piscar na tela (menos de 0,35 s); só em último caso, quando uma palavra sumiria (menos de 0,2 s), a linha leva 4 palavras |
+
+Escolha no começo da edição (passo a passo), junto com glow e aceleração; no direto ao resultado vale **blocos com 3 linhas**. Fica em `projeto.json` → `"legenda_estilo"` (`blocos3`, `blocos2`, `simples`); dá pra trocar no preview. Valores em `padrao.json` → `legenda.variacoes`.
+
 ### 3.0 Palavras de destaque (dentro da legenda)
 
 | Regra | Valor |
@@ -106,7 +117,7 @@ Referência visual: vídeo de referência enviado pela Amanda em 2026-11-12 (blo
 | Frequência | **pelo menos um a cada 4 s** (o motor avisa se passar disso); de preferência não mais que um a cada ~2,5 s |
 | Qual palavra | a que carrega o sentido: números, nomes, o conceito do trecho, a conclusão da frase. Nunca palavra vazia ("isso", "muito", "vamos") nem de ligação |
 | Sozinho numa linha | **alterna**: um destaque ocupa uma linha só dele (a linha grande do bloco), o seguinte divide a linha com outras palavras, e assim por diante. Quando ficar sozinho deixaria um pedaço solto, ele divide a linha dessa vez e o próximo fica sozinho. Destaque de 2 palavras nunca é separado |
-| Como é feito | `motor/legendas.py` propõe blocos e destaques automaticamente; o Claude **revisa no plano** (troca destaques fracos por palavras de mais sentido e ajusta quebras estranhas) antes de gravar. No `edicao.json`, cada legenda leva `{"linhas", "destaques", "sozinha"}` |
+| Como é feito | `motor/legendas.py` propõe blocos e destaques automaticamente; o Claude **revisa no plano**, escolhe os destaques de sentido e roda `legendas.py --destaques ...`, que monta as linhas em volta deles. No `edicao.json`, cada legenda leva `{"linhas", "destaques", "sozinha"}` |
 
 ### 3.1 Palavras-chave em destaque (opcional)
 
@@ -149,7 +160,9 @@ Desligados por padrão. Se o cliente pedir:
 
 | Recurso | Estado |
 |---|---|
-| Legendas palavra por palavra (Instrument Serif Italic, até 3 linhas × 3 palavras, linhas quase encostadas) | **Ligado** |
+| Legendas palavra por palavra (Instrument Serif Italic, até 3 linhas × 3 palavras, linhas quase encostadas) | **Ligado** (estilo blocos com 3 linhas) |
+| Estilo blocos com 2 linhas | Opcional, por vídeo |
+| Estilo de legenda simples (1 linha inteira por vez, até 3 palavras) | Opcional, por vídeo |
 | Palavras de destaque na legenda (1–2 palavras, 1 a cada 4 s, alternando sozinha) | **Ligado** |
 | Aceleração | Opcional (padrão: sem aceleração) |
 | Glow na legenda | Opcional |

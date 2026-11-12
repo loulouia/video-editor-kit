@@ -100,6 +100,8 @@ for n, leg in enumerate(E["legendas"]):
         elif x > s:
             e = min(e, x)
     if e - s < 0.2:
+        if CAP.get("palavra_por_palavra"):
+            print(f"⚠️  legenda {txt!r} ({s:.2f} s) ficaria só {max(0, e - s):.2f} s na tela e foi descartada — conferir a sincronia")
         continue
     caps.append((r3(s), r3(e), txt, overlaps(s, e, [(a, b) for a, b, _ in cards]), i, j, meta))
 
@@ -169,6 +171,9 @@ def largura_px(palavras):
             w += CAP.get("espaco_palavras", 0.25) * tam
     return w + 0.1 * palavras[-1][1]
 
+LIG_PP = {"pra", "para", "de", "do", "da", "dos", "das", "que", "e", "o", "a", "os", "as", "um", "uma", "no", "na", "nos",
+          "nas", "com", "em", "por", "se", "ao", "aos", "à", "às", "pelo", "pela", "num", "numa", "mas", "ou", "nem"}
+
 def ajustar_largura(cap):
     """Linha mais larga que a área do texto: primeiro o destaque daquela linha diminui (até `escala_min`);
     se não bastar, a linha quebra em duas (PLAYBOOK basico §0.1)."""
@@ -191,14 +196,18 @@ def ajustar_largura(cap):
                 e = round(e - 0.02, 2)
             if larg(e) <= maxw:
                 novas.append(ln); escalas.append(e); continue
-        if len(ln) > 1:          # quebra em duas, o mais equilibrado possível
-            corte = min(range(1, len(ln)), key=lambda c: abs(larg.__call__(esc_pad) / 2 -
+        # cortes possíveis: nunca no meio de um destaque de 2 palavras, nem deixando só palavra de ligação num lado
+        lig = lambda ks: all(tok(k).strip(",.?!").lower() in LIG_PP for k in ks)
+        cortes = [c for c in range(1, len(ln))
+                  if not (ln[c - 1] in dest and ln[c] in dest and ln[c] == ln[c - 1] + 1) and not lig(ln[:c]) and not lig(ln[c:])]
+        if cortes:               # quebra em duas, o mais equilibrado possível
+            corte = min(cortes, key=lambda c: abs(larg.__call__(esc_pad) / 2 -
                         largura_px([(tok(k), base * (esc_pad if k in dest else 1)) for k in ln[:c]])))
             pend[:0] = [ln[:corte], ln[corte:]]; continue
-        e = esc_pad              # uma palavra só, larga demais: diminui o quanto precisar (o navegador ainda confere)
+        e = esc_pad              # não dá pra quebrar (ex.: "nos ESTADOS UNIDOS"): o destaque diminui o quanto precisar
         while e > 1 and larg(e) > maxw:
             e = round(e - 0.02, 2)
-        novas.append(ln); escalas.append(e if ln[0] in dest else None)
+        novas.append(ln); escalas.append(e if dest & set(ln) else None)
     if novas == linhas_pp(i, j, meta) and not any(escalas):
         return cap
     m = dict(meta or {}); m["linhas"] = novas; m["escalas"] = escalas
@@ -214,9 +223,21 @@ def altura_pp(i, j, meta):
         + 0.25 * tams[-1]
     return h / 1920
 
+SOBRE = TELA.get("sobreposicao_rosto", 0)   # quanto a legenda pode cobrir do rosto acima do queixo (fração da altura do rosto)
+
+def topo_legenda(a, b, h, padrao_top):
+    """Topo da legenda: abaixo do queixo (+ folga); se não couber até a margem de baixo, pode subir e cobrir de leve a
+    pontinha do queixo — no máximo `sobreposicao_rosto` da altura do rosto, longe da boca (PLAYBOOK basico §0)."""
+    ftop, chin = face_span(a, b)
+    top = max(padrao_top, chin + GAP)
+    if top + h > SAFE_BOTTOM and SOBRE:
+        top = max(chin - SOBRE * (chin - ftop), SAFE_BOTTOM - h)
+    return round(top, 4)
+
 def cabe(a, b, h):
-    """O bloco de altura h cabe entre o queixo (+ folga) e a margem de baixo em todo o intervalo [a, b]?"""
-    return face_span(a, b)[1] + GAP + h <= SAFE_BOTTOM
+    """O bloco de altura h cabe entre o queixo (com a sobreposição leve permitida) e a margem de baixo em [a, b]?"""
+    ftop, chin = face_span(a, b)
+    return chin - SOBRE * (chin - ftop) + h <= SAFE_BOTTOM
 
 def dividir(cap):
     """Bloco que não cabe abaixo do rosto → blocos menores (2 linhas, depois 1), cada um no tempo da sua fala.
@@ -413,7 +434,10 @@ def cap_pp(n, a, txt, i, j, meta):
     for nl, ln in enumerate(linhas):
         e = (meta or {}).get("escalas") and meta["escalas"][nl]
         st = f' style="font-size:{e}em"' if e else ""
-        ws = [f'<span class="cw{" cw-d" if k in dest else ""}"{st if k in dest else ""} data-t="{r3(max(a, W[k]["s"]))}">{esc(toks[k - i])}</span>'
+        # "linha_inteira": a linha toda entra de uma vez quando a primeira palavra é falada (estilo simples);
+        # sem ela, cada palavra entra no seu tempo
+        ws = [f'<span class="cw{" cw-d" if k in dest else ""}"{st if k in dest else ""} '
+              f'data-t="{r3(a if CAP.get("linha_inteira") else max(a, W[k]["s"]))}">{esc(toks[k - i])}</span>'
               for k in ln]
         rows.append(f'<div class="cap-l">{"".join(ws)}</div>')     # espaço entre palavras: margem no tamanho de cada palavra
     return "".join(rows), altura_pp(i, j, meta)
@@ -429,7 +453,8 @@ for n, (a, b, txt, up, low, i, j, meta) in enumerate(caps):
     if PP is not None and any(x <= a and b <= y for x, y in TC):
         top = max(CAP["posicao"] - hc / 2, TC_BASE + GAP)          # abaixo da mídia, nunca por cima dela
     else:
-        top = ht if ht is not None else place(a, b, hc, (CAP["posicao_fundo_mesclado"] if low else CAP["posicao"]) - hc / 2)
+        alvo = (CAP["posicao_fundo_mesclado"] if low else CAP["posicao"]) - hc / 2
+        top = ht if ht is not None else (topo_legenda(a, b, hc, alvo) if PP is not None else place(a, b, hc, alvo))
     extra = ""
     if PP is not None:
         if top + hc > SAFE_BOTTOM:     # nem dividido cabe entre o queixo e a margem de baixo: o rosto e a margem não cedem, a letra encolhe

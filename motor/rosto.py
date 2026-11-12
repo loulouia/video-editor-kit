@@ -26,6 +26,8 @@ ap.add_argument("video"); ap.add_argument("recorte"); ap.add_argument("saida")
 ap.add_argument("--fps", type=float, default=4); ap.add_argument("--debug")
 A = ap.parse_args()
 W, H = 270, 480
+FATOR = float(os.environ.get("ROSTO_FATOR", 1.85))   # altura testa→queixo / largura do rosto (selfie de perto)
+PONTE = float(os.environ.get("ROSTO_PONTE", 0.03))   # buraco de olho/sobrancelha que a faixa do rosto atravessa (fração da largura)
 
 def frames(args, pix, ch):
     raw = subprocess.run(["ffmpeg", "-loglevel", "error"] + args + ["-vf", f"fps={A.fps},scale={W}:{H}" + (",format=rgba,alphaextract" if pix == "gray" else ""),
@@ -63,11 +65,32 @@ for i in range(n):
             queixo = y + h
             if faixa > 0.24:
                 # faixa cresceu (selfie de perto): o queixo sai da proporção do rosto, não do fim da pele (pescoço e mão)
-                larg = (lbl[y:y + h] == j).sum(1)
-                # largura do rosto entre a testa e os olhos (15–35% da pele; mão e pescoço ficam abaixo disso).
-                # Altura testa→queixo ≈ 1,85 × essa largura (calibrado em selfie, IMG_4802; a mão encostada não estica)
-                lf = float(np.median(larg[int(h * 0.15):max(int(h * 0.15) + 1, int(h * 0.35))]))
-                queixo = y + min(h, int(1.85 * lf))
+                # largura do rosto entre a testa e os olhos (15–35% da pele), medida só no trecho contínuo de pele que
+                # passa pelo centro da testa — mão, braço ou pincel encostados ao lado não contam (antes, com a mão
+                # perto do olho, o rosto parecia largo e o queixo ia 18% da tela pra baixo). Altura testa→queixo ≈
+                # FATOR × essa largura (calibrado em selfie, IMG_4802)
+                comp = (lbl[y:y + h] == j)
+                # olhos e sobrancelhas não são pele: fecha esses buracos pra faixa do rosto não parecer estreita
+                pontes = cv2.morphologyEx(comp.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((1, max(3, int(W * PONTE))), np.uint8)) > 0
+                topo_cols = np.nonzero(comp[:max(2, h // 10)].any(0))[0]
+                cx = int(np.median(topo_cols)) if len(topo_cols) else w // 2 + x
+                cx = cx - x if len(topo_cols) == 0 else cx
+                runs = []
+                for r in range(int(h * 0.15), max(int(h * 0.15) + 1, int(h * 0.35))):
+                    lin = pontes[r]
+                    c = cx if lin[cx] else (np.nonzero(lin)[0][np.argmin(np.abs(np.nonzero(lin)[0] - cx))] if lin.any() else None)
+                    if c is None:
+                        continue
+                    a_ = c
+                    while a_ > 0 and lin[a_ - 1]: a_ -= 1
+                    b_ = c
+                    while b_ < len(lin) - 1 and lin[b_ + 1]: b_ += 1
+                    runs.append(b_ - a_ + 1)
+                larg = comp.sum(1)
+                lf_antiga = float(np.median(larg[int(h * 0.15):max(int(h * 0.15) + 1, int(h * 0.35))]))
+                # a menor das duas: sem mão perto são iguais (nada muda); com mão encostada, a mão não conta
+                lf = min(lf_antiga, float(np.median(runs))) if runs else lf_antiga
+                queixo = y + min(h, int(FATOR * lf))
             # o topo do rosto começa no topo da cabeça (testa coberta pelo cabelo/franja também conta)
             box = [x / W, top / H, (x + w) / W, queixo / H]
     box = box or last

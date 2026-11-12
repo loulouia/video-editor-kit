@@ -8,7 +8,9 @@ Padrão com "palavras_por_linha" (ex.: basico): monta linhas explícitas (até `
 Cada legenda vira [texto, i, j, {"linhas": [[índices]...], "destaques": [índices], "sozinha": [índices]}].
 O Claude revisa os destaques no plano (trocar por palavras mais importantes do sentido) antes de gravar.
 
-Uso: python motor/legendas.py projetos/<video> [--de <indice> --ate <indice>] [--gravar]
+Uso: python motor/legendas.py projetos/<video> [--de <indice> --ate <indice>] [--destaques 15,16;43,44] [--gravar]
+     --destaques: os destaques escolhidos na revisão (grupos de 1–2 índices de palavras, separados por ";");
+                  as linhas são montadas em volta deles (padrões com "palavras_por_linha")
      Lê transcricao/aroll.words.json e imprime as legendas; com --gravar, escreve em edicao.json → "legendas"
      (formato [texto, índice_da_primeira_palavra, índice_da_última]). Revisar a grafia pelo glossário da marca
      antes de gravar: o texto vem do Whisper.
@@ -37,6 +39,9 @@ def fmt(ws):
     return t.upper() if L.get("maiusculas", True) else t[:1].lower() + t[1:] if t[:2] != t[:2].upper() else t
 
 PPL = L.get("palavras_por_linha")
+# legenda em blocos/linhas (palavra por palavra): lista de ligação mais completa (não muda a divisão dos outros padrões)
+LIGACAO_PP = LIGACAO | {"ao", "aos", "à", "às", "pelo", "pela", "pelos", "pelas", "num", "numa", "mas", "ou", "nem",
+                        "nesse", "nessa", "neste", "nesta", "seu", "sua", "meu", "minha", "te", "me", "lhe"}
 DEST = L.get("destaque") or {}
 
 
@@ -58,7 +63,7 @@ FRACAS = {"vamos", "vai", "vou", "tinha", "tem", "ter", "isso", "isto", "esse", 
 def forca(k):
     """Quanto a palavra serve de destaque: números, nomes próprios, depois palavras longas; vazias nunca."""
     t = limpa(k)
-    if not t or t in LIGACAO or t in FRACAS:
+    if not t or t in LIGACAO_PP or t in FRACAS:
         return 0
     if any(c.isdigit() for c in t):
         return 100
@@ -101,7 +106,11 @@ PREFIXO = {"não", "sem", "de", "da", "do", "das", "dos", "um", "uma", "mais", "
 
 
 def grupos_destaque(a, b):
-    """Cada destaque: a palavra forte e, se o padrão permitir 2 palavras, a anterior quando forma expressão com ela."""
+    """Cada destaque: a palavra forte e, se o padrão permitir 2 palavras, a anterior quando forma expressão com ela.
+    Com --destaques, usa os grupos escolhidos na revisão."""
+    if "--destaques" in sys.argv:
+        txt_g = sys.argv[sys.argv.index("--destaques") + 1]
+        return [[int(x) for x in g.split(",")] for g in txt_g.split(";") if g.strip()]
     grupos, usados = [], set()
     for k in escolher_destaques(a, b):
         g = [k]
@@ -148,7 +157,7 @@ def por_linhas(a, b):
             # linha atual só com palavras de ligação ("uma") → o destaque divide a linha com elas desta vez
             # ou linha terminando em ligação ("uma perda de") → também divide; a vez de ficar sozinha passa pro próximo
             # ou a legenda já tem uma linha e a atual está pela metade (sobraria um pedaço solto) → também divide
-            bloqueia = bool(linha) and (all(limpa(x) in LIGACAO for x in linha) or limpa(linha[-1]) in LIGACAO
+            bloqueia = bool(linha) and (all(limpa(x) in LIGACAO_PP for x in linha) or limpa(linha[-1]) in LIGACAO_PP
                                         or len(linhas) >= LMAX - 1)
             if vez_sozinha and not bloqueia:
                 soz.add(k)
@@ -166,11 +175,14 @@ def por_linhas(a, b):
             k = inicio[k][-1]
         else:
             unid = list(inicio.get(k, [k]))       # destaque de 2 palavras junto: nunca separa as duas
-            if linha and (len(linha) + len(unid) > PPL or len(txt(linha + unid)) > MAXL):
+            # largura passou mas a linha atual é só ligação ("em", "nos"): não deixa a palavrinha sozinha — segue
+            # na linha e o gerar.py diminui o destaque pra caber (regra da linha larga)
+            so_lig = bool(linha) and all(limpa(x) in LIGACAO_PP for x in linha)
+            if linha and (len(linha) + len(unid) > PPL or (len(txt(linha + unid)) > MAXL and not so_lig)):
                 carrega = []
-                while len(linha) > 1 and limpa(linha[-1]) in LIGACAO:   # ligação nunca no fim da linha
+                while len(linha) > 1 and limpa(linha[-1]) in LIGACAO_PP:   # ligação nunca no fim da linha
                     carrega.insert(0, linha.pop())
-                if all(limpa(x) in LIGACAO for x in linha) or len(carrega) >= PPL:   # sobraria só ligação: desiste
+                if all(limpa(x) in LIGACAO_PP for x in linha) or len(carrega) >= PPL:   # sobraria só ligação: desiste
                     linha += carrega
                     carrega = []
                 fecha_linha()
@@ -193,10 +205,65 @@ def por_linhas(a, b):
         elif not linha and len(linhas) >= LMAX:
             fecha_legenda()
     fecha_legenda()
+    # legenda de 1 linha (estilo "simples"): fala rápida deixaria uma linha piscando na tela; redistribui as palavras
+    # entre ela e a próxima (até `palavras_por_linha` cada), escolhendo o corte que deixa as duas mais tempo na tela
+    TMIN = L.get("tempo_min_linha_s", 0.35)
+    if LMAX == 1:
+        soz_todas = {x for k in soz for x in inicio[k]}
+        def dur(n):
+            ini = W[caps[n][0][0]]["s"]
+            fim = W[caps[n + 1][0][0]]["s"] if n + 1 < len(caps) else W[caps[n][-1][-1]]["e"] + 0.3
+            return fim - ini
+        def redistribuir(x, y, rigido, limite=PPL):
+            """Junta as linhas x e y (seguidas) e corta de novo onde as duas ficam mais tempo na tela."""
+            pool = caps[x][0] + caps[y][0]
+            fim2 = W[caps[y + 1][0][0]]["s"] if y + 1 < len(caps) else W[pool[-1]]["e"] + 0.3
+            melhor = None
+            frase = not any(W[k]["w"].strip()[-1:] in ".?!" for k in pool[:-1])
+            if len(pool) <= limite and (limite == PPL or len(txt(pool)) <= MAXL) and (frase or not rigido):   # junta
+                melhor = (fim2 - W[pool[0]]["s"], pool, None)
+            for c in range(1, len(pool)):
+                p1, p2 = pool[:c], pool[c:]
+                if len(p1) > PPL or len(p2) > PPL or any(g[0] in p1 and g[-1] in p2 for g in grupos):
+                    continue
+                if rigido and limpa(p1[-1]) in LIGACAO_PP and len(p1) > 1:
+                    continue
+                if rigido and any(W[k]["w"].strip()[-1:] in ".?!" for k in p1[:-1] + p2[:-1]):
+                    continue                      # não junta o fim de uma frase com o começo da outra
+                nota = min(W[p2[0]]["s"] - W[p1[0]]["s"], fim2 - W[p2[0]]["s"])
+                if melhor is None or nota > melhor[0]:
+                    melhor = (nota, p1, p2)
+            return melhor
+        n = 0
+        while n < len(caps):
+            if dur(n) < TMIN:
+                pares = [(n, n + 1)] if n + 1 < len(caps) else []
+                pares += [(n - 1, n)] if n > 0 else []
+                # legível vem antes de "não terminar em ligação"; último recurso: uma linha de PPL+1 palavras
+                # (fala rapidíssima, ex. "aqui é o lugar" em 0,3 s) — melhor que a palavra sumir da legenda
+                for rigido, limite in ((True, PPL), (False, PPL), (False, PPL + 1)):
+                    if limite > PPL and dur(n) >= 0.2:   # exceção só quando a palavra sumiria da legenda
+                        break
+                    feito = False
+                    for x, y in pares:
+                        if set(caps[x][0] + caps[y][0]) & soz_todas:
+                            continue
+                        m = redistribuir(x, y, rigido, limite)
+                        if m and m[0] > dur(n) and m[0] >= 0.2:
+                            if m[2] is None:
+                                caps[x] = [m[1]]; del caps[y]
+                            else:
+                                caps[x], caps[y] = [m[1]], [m[2]]
+                            feito = True
+                            break
+                    if feito:
+                        break
+            n += 1
+
     # legenda nunca termina em palavra de ligação: passa pra próxima
     for n in range(len(caps) - 1):
         ult = caps[n][-1]
-        if len(ult) > 1 and limpa(ult[-1]) in LIGACAO and ult[0] not in soz:
+        if len(ult) > 1 and limpa(ult[-1]) in LIGACAO_PP and ult[0] not in soz:
             k = ult.pop()
             prim = caps[n + 1][0]
             if len(prim) < PPL and prim[0] not in soz:

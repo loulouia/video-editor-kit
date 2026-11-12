@@ -17,6 +17,13 @@ class Projeto:
         # VE_PADRAO_FIXO: padrao.json guardado na entrega (reabrir "igual à versão entregue")
         fixo = os.environ.get("VE_PADRAO_FIXO")
         self.S = json.load(open(fixo or os.path.join(self.padrao_dir, "padrao.json"), encoding="utf-8"))
+        # Variação de legenda escolhida pro vídeo (projeto.json → "legenda_estilo", ex. "simples"); sem escolha, a do
+        # padrão ("estilo_padrao"). A variação só troca os valores que ela define (ex.: linhas_max = 1).
+        leg = self.S.get("legenda", {})
+        estilo = self.p.get("legenda_estilo") or leg.get("estilo_padrao")
+        estilo = leg.get("estilos_apelidos", {}).get(estilo, estilo)        # nome antigo → atual (ex.: "blocos" → "blocos3")
+        if estilo and estilo in leg.get("variacoes", {}):
+            leg.update(leg["variacoes"][estilo])
         self.M = json.load(open(os.path.join(self.marca_dir, "marca.json"), encoding="utf-8"))
 
     def path(self, *p):

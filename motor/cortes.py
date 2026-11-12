@@ -21,13 +21,15 @@ FIM = P.p.get("fim", dur)
 
 words = json.load(open(P.path("transcricao/bruto.words.json")))
 cuts = sorted((c["de"], c["ate"]) for c in json.load(open(P.path("cortes.json"))))
+cuts = [(a, min(b, FIM)) for a, b in cuts if a < FIM]     # cortes depois do fim do vídeo não contam
 
 keep, t = [], 0.0
 for a, b in cuts:
     if a > t:
         keep.append((round(t, 3), round(a, 3)))
     t = max(t, b)
-keep.append((round(t, 3), round(FIM, 3)))
+if FIM - t > 0.05:                                       # sobra depois do último corte (nunca um trecho vazio)
+    keep.append((round(t, 3), round(FIM, 3)))
 
 def to_final(x):
     """Tempo do bruto → tempo final (depois dos cortes e da aceleração)."""

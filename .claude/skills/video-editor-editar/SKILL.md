@@ -26,8 +26,9 @@ Depois de definir o padrão e a marca, **sempre perguntar ao usuário** qual mod
 Alguns padrões deixam opções para o usuário escolher em cada vídeo (`padrao.json` → `"recursos"` com valor `"opcional"`):
 
 - **Aceleração** (`"aceleracao": "opcional"`, ex.: `basico`): o padrão é **não acelerar** (`aceleracao.padrao`, 1,0×). No passo a passo, perguntar junto com a cor: "Quer acelerar a fala? (sem aceleração / acelerar um pouco)". Se sim, escolher o fator em `aceleracao.opcional` (mín.–máx.) que mais aproxima `alvo_palavras_s`. Gravar em `projeto.json` → `"aceleracao"`.
+- **Estilo da legenda** (`"estilo_legenda": "opcional"`, ex.: `basico`): o padrão tem variações em `legenda.variacoes`. No passo a passo, perguntar: "Qual legenda você prefere? 1. **Blocos com 3 linhas** (a palavra de destaque grande no meio, palavra por palavra) 2. **Blocos com 2 linhas** (igual, com no máximo 2 linhas) 3. **Simples** (1 linha só, até 3 palavras, que aparece inteira de uma vez)". Gravar em `projeto.json` → `"legenda_estilo"` (`"blocos3"`, `"blocos2"` ou `"simples"`). Sem escolha (ou no direto ao resultado), vale `legenda.estilo_padrao` (`blocos3` no `basico`). O usuário pode trocar no preview: mudar `legenda_estilo` e rodar de novo `legendas.py --gravar` (revisar destaques) + `gerar.py`.
 - **Glow na legenda** (`"glow": "opcional"`): perguntar "Quer um leve brilho branco nas legendas?". Se sim, `projeto.json` → `"glow": true` (muda só o `gerar.py`).
-- No **direto ao resultado**: não acelera e não usa glow. O usuário pode pedir no preview.
+- No **direto ao resultado**: não acelera, não usa glow e usa o estilo de legenda padrão. O usuário pode pedir no preview.
 
 Padrões sem essas opções em `"recursos"` seguem a regra do PLAYBOOK (ex.: `amanda` acelera 1,10–1,15×).
 
@@ -44,7 +45,7 @@ No lugar de `refinar_cortes.py` + `energia.py`: `motor/cortar_pausas.py projetos
 
 ## Legendas com destaques (padrões com `legenda.palavras_por_linha`, ex.: `basico`)
 
-Antes, depois de transcrever o A-roll, rodar `motor/sincronizar.py projetos/<slug>`: o Whisper marca o começo das palavras adiantado (~0,13 s) e, palavra por palavra, a legenda apareceria antes da fala. `motor/legendas.py projetos/<slug>` propõe as linhas e as palavras de destaque. Antes de gravar (`--gravar`), **revisar**: trocar destaques fracos pela palavra que carrega o sentido do trecho (número, nome, conceito, conclusão), manter pelo menos um a cada 4 s, e corrigir quebras estranhas (pedaço solto, frase cortada no meio de expressão), editando `linhas`/`destaques`/`sozinha` no `edicao.json`. No passo a passo, mostrar a lista no plano. O `gerar.py` avisa se ficar mais de 4 s sem destaque.
+Antes, depois de transcrever o A-roll, rodar `motor/sincronizar.py projetos/<slug>`: o Whisper marca o começo das palavras adiantado (~0,13 s) e, palavra por palavra, a legenda apareceria antes da fala. `motor/legendas.py projetos/<slug>` propõe as linhas e as palavras de destaque. Antes de gravar, **revisar os destaques**: escolher as palavras que carregam o sentido do trecho (número, nome, conceito, conclusão; expressão de 2 palavras quando fizer sentido, ex. "11 segundos", "Estados Unidos"), pelo menos um a cada 4 s, e rodar `motor/legendas.py projetos/<slug> --destaques 15,16;40,41;... --gravar` (grupos de índices de `aroll.words.json`): as linhas são montadas em volta deles, em qualquer estilo. Quebras estranhas que sobrarem → ajustar `linhas` no `edicao.json`. No passo a passo, mostrar a lista no plano. O `gerar.py` avisa se ficar mais de 4 s sem destaque.
 
 ## Vídeo novo — Fluxo normal (passo a passo)
 
