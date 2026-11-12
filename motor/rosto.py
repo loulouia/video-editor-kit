@@ -43,16 +43,33 @@ for i in range(n):
     if len(rows):
         top = rows[0]
         lab = cv2.cvtColor(rgb[i].astype(np.float32) / 255, cv2.COLOR_RGB2LAB)
-        band = np.zeros_like(person); band[top: min(H, top + int(H * 0.24))] = True
-        skin = (person & band & (lab[..., 0] > 42) & (lab[..., 1] > 6) & (lab[..., 2] > 5)).astype(np.uint8)
-        skin = cv2.morphologyEx(skin, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-        k, lbl, st, _ = cv2.connectedComponentsWithStats(skin)
-        if k > 1:
+        pele = person & (lab[..., 0] > 42) & (lab[..., 1] > 6) & (lab[..., 2] > 5)
+        faixa = 0.24      # faixa da cabeça (enquadramento normal: o rosto inteiro cabe em 24% da tela)
+        while True:
+            band = np.zeros_like(person); fim = min(H, top + int(H * faixa)); band[top:fim] = True
+            skin = (pele & band).astype(np.uint8)
+            skin = cv2.morphologyEx(skin, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+            k, lbl, st, _ = cv2.connectedComponentsWithStats(skin)
+            if k <= 1:
+                break
             j = 1 + np.argmax(st[1:, cv2.CC_STAT_AREA])
             x, y, w, h, area = st[j]
-            if area > W * H * 0.003:
-                # o topo do rosto começa no topo da cabeça (testa coberta pelo cabelo/franja também conta)
-                box = [x / W, top / H, (x + w) / W, (y + h) / H]
+            # rosto grande (selfie de perto): a pele encosta no fim da faixa → a faixa cresce até achar o queixo
+            if y + h >= fim - 2 and faixa < 0.6 and fim < H:
+                faixa += 0.06
+                continue
+            break
+        if k > 1 and area > W * H * 0.003:
+            queixo = y + h
+            if faixa > 0.24:
+                # faixa cresceu (selfie de perto): o queixo sai da proporção do rosto, não do fim da pele (pescoço e mão)
+                larg = (lbl[y:y + h] == j).sum(1)
+                # largura do rosto entre a testa e os olhos (15–35% da pele; mão e pescoço ficam abaixo disso).
+                # Altura testa→queixo ≈ 1,85 × essa largura (calibrado em selfie, IMG_4802; a mão encostada não estica)
+                lf = float(np.median(larg[int(h * 0.15):max(int(h * 0.15) + 1, int(h * 0.35))]))
+                queixo = y + min(h, int(1.85 * lf))
+            # o topo do rosto começa no topo da cabeça (testa coberta pelo cabelo/franja também conta)
+            box = [x / W, top / H, (x + w) / W, queixo / H]
     box = box or last
     if box:
         out.append([round(i / A.fps, 2)] + [round(v, 4) for v in box]); last = box

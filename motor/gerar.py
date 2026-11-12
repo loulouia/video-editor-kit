@@ -53,6 +53,15 @@ FACE = json.load(open(_rf))["rostos"]     # rosto_rapido.json = modo storyboard 
 SHIFT = json.load(open(P.path("cache/camadas.json"))) if os.path.exists(P.path("cache/camadas.json")) else {"janelas": [], "deslocamentos_px": []}
 ZS, ZO = ZOOM["escala"], float(ZOOM["origem"].split()[1].rstrip("%")) / 100
 SAFE_TOP, SAFE_BOTTOM, GAP = TELA["seguro_topo"], TELA["seguro_base"], TELA["folga_rosto"]
+# Área segura lateral do Instagram (padrões que definem: legendas e cards nunca entram na faixa dos botões)
+SAFE_L, SAFE_R = TELA.get("seguro_esquerda"), TELA.get("seguro_direita")
+HSAFE = SAFE_L is not None and SAFE_R is not None
+SAFE_W = (1 - SAFE_L - SAFE_R) if HSAFE else 1
+
+def lados(w):
+    """left/width (CSS) pra um elemento de largura w (fração) centralizado na área segura lateral."""
+    w = min(w, SAFE_W)
+    return f"left:{(SAFE_L + (SAFE_W - w) / 2)*100:.2f}%;width:{w*100:.2f}%;"
 
 def face_span(a, b):
     """Topo e queixo do rosto (fração da tela) no pior caso dentro de [a, b], já com deslocamento e zoom."""
@@ -78,7 +87,9 @@ def place(a, b, height, default_top, below_only=False):
 
 # ---------- legendas: começam na 1ª palavra, terminam na próxima legenda / bloqueio ----------
 caps = []
-for n, (txt, i, j) in enumerate(E["legendas"]):
+for n, leg in enumerate(E["legendas"]):
+    txt, i, j = leg[:3]
+    meta = leg[3] if len(leg) > 3 else None   # linhas e destaques (padrões com legenda palavra por palavra)
     s = W[i]["s"]
     e = W[j]["e"] + CAP["fim_extra_s"]
     if n + 1 < len(E["legendas"]):
@@ -90,10 +101,10 @@ for n, (txt, i, j) in enumerate(E["legendas"]):
             e = min(e, x)
     if e - s < 0.2:
         continue
-    caps.append((r3(s), r3(e), txt, overlaps(s, e, [(a, b) for a, b, _ in cards])))
+    caps.append((r3(s), r3(e), txt, overlaps(s, e, [(a, b) for a, b, _ in cards]), i, j, meta))
 
 MAXC = CAP.get("caracteres_por_linha", 30) * CAP.get("linhas_max", 2)
-for _, _, txt, _ in caps:
+for _, _, txt, *_ in caps:
     if len(txt) > MAXC:
         print(f"⚠️  legenda com {len(txt)} caracteres (máx. {MAXC}): {txt!r} — divida com motor/legendas.py")
     if len(txt.split()) > CAP.get("palavras_max", 99):
@@ -101,7 +112,7 @@ for _, _, txt, _ in caps:
 
 # Trechos de fundo mesclado: a pessoa está mais baixa na tela → legendas e palavras-chave descem (PLAYBOOK 4.5)
 topo_win = [(t["de"], t["ate"]) for t in E["topo_mesclado"]]
-caps = [(a, b, txt, up, overlaps(a, b, topo_win)) for a, b, txt, up in caps]
+caps = [(a, b, txt, up, overlaps(a, b, topo_win), i, j, meta) for a, b, txt, up, i, j, meta in caps]
 
 # ---------- HTML ----------
 out, tl = [], []
@@ -121,31 +132,175 @@ def card_h(c):
         return min(CARD["altura_noticia_max"], CARD["largura"] * 1080 * im.shape[0] / im.shape[1] / 1920)
     return CARD["altura_pequeno"] if c["tipo"] == "card-pequeno" else CARD["altura"]
 
+PP, DS = CAP.get("palavra_por_palavra"), CAP.get("destaque") or {}
+PP = PP if isinstance(PP, dict) else ({} if PP else None)
+PPL = CAP.get("palavras_por_linha", 3)
+GLOW = CAP.get("glow") if P.p.get("glow") else None      # recurso opcional, escolhido por vídeo (projeto.json)
+XR = CAP.get("altura_x", 0.5)                             # altura do "x" / tamanho da fonte (estimativa da altura do bloco)
+
+def linhas_pp(i, j, meta):
+    return (meta or {}).get("linhas") or [list(range(k, min(k + PPL, j + 1))) for k in range(i, j + 1, PPL)]
+
+def escala_linha(meta, n):
+    """Escala do destaque na linha n (a padrão, ou menor quando a linha precisou caber na largura)."""
+    e = (meta or {}).get("escalas")
+    return e[n] if e and e[n] else DS.get("escala", 1)
+
+# Área do texto: a área segura do Instagram; com "area_simetrica", a mesma margem dos dois lados (a maior delas),
+# pra legenda ficar centralizada e longe das duas bordas (PLAYBOOK basico §0.1)
+if HSAFE and CAP.get("area_simetrica"):
+    TXT_L = max(SAFE_L, SAFE_R); TXT_W = 1 - 2 * TXT_L
+elif HSAFE:
+    TXT_L, TXT_W = SAFE_L, SAFE_W
+else:
+    TXT_W = float(str(CAP.get("largura", "90%")).rstrip("%")) / 100; TXT_L = (1 - TXT_W) / 2
+
+if PP is not None:
+    from PIL import ImageFont
+    _FONTE = ImageFont.truetype(P.padrao(S["fonte"]["arquivo"]), 1000)
+    _TRACK = float(str(CAP.get("espacamento", "0")).replace("em", "") or 0)
+
+def largura_px(palavras):
+    """Largura aproximada de uma linha [(palavra, tamanho_px)], com espaçamento, espaço entre palavras e a sobra do itálico."""
+    w = 0.0
+    for n, (t, tam) in enumerate(palavras):
+        w += _FONTE.getlength(t) / 1000 * tam + _TRACK * tam * max(0, len(t) - 1)
+        if n:
+            w += CAP.get("espaco_palavras", 0.25) * tam
+    return w + 0.1 * palavras[-1][1]
+
+def ajustar_largura(cap):
+    """Linha mais larga que a área do texto: primeiro o destaque daquela linha diminui (até `escala_min`);
+    se não bastar, a linha quebra em duas (PLAYBOOK basico §0.1)."""
+    a, b, txt, up, low, i, j, meta = cap
+    toks = txt.split()
+    tok = (lambda k: toks[k - i]) if len(toks) == j - i + 1 else (lambda k: W[k]["w"].strip())
+    dest = set((meta or {}).get("destaques", []))
+    maxw, base, emin = TXT_W * 1080, CAP["tamanho_px"], DS.get("escala_min", 1.4)
+    novas, escalas = [], []
+    pend = [list(ln) for ln in linhas_pp(i, j, meta)]
+    while pend:
+        ln = pend.pop(0)
+        esc_pad = DS.get("escala", 1)
+        larg = lambda e: largura_px([(tok(k), base * (e if k in dest else 1)) for k in ln])
+        if larg(esc_pad) <= maxw:
+            novas.append(ln); escalas.append(None); continue
+        if dest & set(ln):
+            e = esc_pad
+            while e > emin and larg(e) > maxw:
+                e = round(e - 0.02, 2)
+            if larg(e) <= maxw:
+                novas.append(ln); escalas.append(e); continue
+        if len(ln) > 1:          # quebra em duas, o mais equilibrado possível
+            corte = min(range(1, len(ln)), key=lambda c: abs(larg.__call__(esc_pad) / 2 -
+                        largura_px([(tok(k), base * (esc_pad if k in dest else 1)) for k in ln[:c]])))
+            pend[:0] = [ln[:corte], ln[corte:]]; continue
+        e = esc_pad              # uma palavra só, larga demais: diminui o quanto precisar (o navegador ainda confere)
+        while e > 1 and larg(e) > maxw:
+            e = round(e - 0.02, 2)
+        novas.append(ln); escalas.append(e if ln[0] in dest else None)
+    if novas == linhas_pp(i, j, meta) and not any(escalas):
+        return cap
+    m = dict(meta or {}); m["linhas"] = novas; m["escalas"] = escalas
+    return (a, b, txt, up, low, i, j, m)
+
+def altura_pp(i, j, meta):
+    """Altura do bloco palavra por palavra (fração da tela), conservadora: letras altas sobem ~0,72 do tamanho,
+    perninhas descem ~0,22 (o navegador mede o exato e nunca passa disso)."""
+    dest = set((meta or {}).get("destaques", []))
+    tams = [CAP["tamanho_px"] * (escala_linha(meta, n) if dest & set(ln) else 1) for n, ln in enumerate(linhas_pp(i, j, meta))]
+    folga = CAP.get("folga_linhas", 0.65) * CAP["tamanho_px"] * XR
+    h = 0.72 * tams[0] + sum(max(folga + XR * tams[n], 0.22 * tams[n - 1] + 0.72 * tams[n] + 3) for n in range(1, len(tams))) \
+        + 0.25 * tams[-1]
+    return h / 1920
+
+def cabe(a, b, h):
+    """O bloco de altura h cabe entre o queixo (+ folga) e a margem de baixo em todo o intervalo [a, b]?"""
+    return face_span(a, b)[1] + GAP + h <= SAFE_BOTTOM
+
+def dividir(cap):
+    """Bloco que não cabe abaixo do rosto → blocos menores (2 linhas, depois 1), cada um no tempo da sua fala.
+    A letra mantém o tamanho (PLAYBOOK basico §0.1)."""
+    a, b, txt, up, low, i, j, meta = cap
+    ls = linhas_pp(i, j, meta)
+    LMAX = CAP.get("linhas_max", 3)
+    if len(ls) == 1 or (len(ls) <= LMAX and cabe(a, b, altura_pp(i, j, meta))):
+        return [cap]
+    escs = (meta or {}).get("escalas") or [None] * len(ls)
+    toks = txt.split()
+    tok = (lambda k: toks[k - i]) if len(toks) == j - i + 1 else (lambda k: W[k]["w"].strip())
+    dest, soz = set((meta or {}).get("destaques", [])), set((meta or {}).get("sozinha", []))
+    for por in (LMAX, 2, 1):
+        grupos = [ls[n:n + por] for n in range(0, len(ls), por)]
+        egrupos = [escs[n:n + por] for n in range(0, len(ls), por)]
+        subs = []
+        for g, grupo in enumerate(grupos):
+            ks = [k for ln in grupo for k in ln]
+            ini = a if g == 0 else max(a, W[ks[0]]["s"])
+            fim = b if g == len(grupos) - 1 else max(ini + 0.2, W[grupos[g + 1][0][0]]["s"])
+            m = {"linhas": grupo, "destaques": [k for k in ks if k in dest], "sozinha": [k for k in ks if k in soz],
+                 "escalas": egrupos[g]}
+            subs.append((r3(ini), r3(fim), " ".join(tok(k) for k in ks), up, low, ks[0], ks[-1], m))
+        if all(cabe(x, y, altura_pp(ii, jj, mm)) for x, y, _, _, _, ii, jj, mm in subs) or por == 1:
+            return subs
+
+if PP is not None:
+    caps = [ajustar_largura(c) for c in caps]
+    antes = len(caps)
+    caps = [sub for cap in caps for sub in dividir(cap)]
+    if len(caps) > antes:
+        print(f"ℹ️  {len(caps) - antes} bloco(s) de legenda divididos em menos linhas (não cabiam entre o queixo e a margem de baixo)")
+
+TC_BASE = S["cards"].get("tela_cheia_base", 0.55)   # mídia não vertical em tela cheia vai até aqui; a legenda fica abaixo
+TC = []   # mídias que viraram tela cheia (não cabiam como card): sem rosto na tela, a legenda vai pra posição normal
 card_pos = []   # (a, b, cabeçalho_top, card_top, card_h)
 for a, b, c in cards:
+    if c["tipo"] == "tela-cheia":
+        TC.append((a, b)); card_pos.append((a, b, None, 0, 1)); continue
     head = TITLE_H if T and overlaps(a, b, [(T["de"], T["ate"])]) else CAP_H
+    if PP is not None and head == CAP_H:     # legenda em bloco grande: reserva o espaço do maior bloco que aparece junto
+        head = max([altura_pp(i, j, meta) for x, y, _, _, _, i, j, meta in caps if x < b and y > a] or [CAP_H])
     ch = card_h(c)
     region = place(a, b, head + GAP + ch, CARD["posicao"])
     ct = region + head + GAP
     if ct + ch > SAFE_BOTTOM:                 # não cabe inteiro: o card encolhe, nunca sobe no rosto
         ch = max(CARD["altura_min"], SAFE_BOTTOM - ct)
+        if PP is not None and ct + ch > SAFE_BOTTOM and S["recursos"].get("tela_cheia_se_nao_couber"):
+            print(f"ℹ️  card {c['arquivo']} ({a:.1f}–{b:.1f} s) não cabe entre o rosto e a margem de baixo: vira tela cheia")
+            c["tipo"] = "tela-cheia"; TC.append((a, b)); card_pos.append((a, b, None, 0, 1)); continue
+        if PP is not None and ct + ch > SAFE_BOTTOM:
+            print(f"⚠️  card {c['arquivo']} ({a:.1f}–{b:.1f} s) não cabe entre o rosto e a margem de baixo do Instagram: "
+                  "sugerir tela cheia, outro momento ou card menor")
     card_pos.append((a, b, region, ct, ch))
 
 def header_top(a, b):
     for x, y, ht, *_ in card_pos:
-        if a < y and b > x:
+        if a < y and b > x and ht is not None:
             return ht
     return None
 
 CE = CARD["entrada"]
 for n, ((a, b, c), (_, _, _, ct, ch)) in enumerate(zip(cards, card_pos)):
     cid = f"card{n}"
+    if c["tipo"] == "tela-cheia":
+        # mídia vertical (9:16) ocupa a tela inteira; as outras (capa, print, foto) ficam no alto da área segura,
+        # sobre fundo preto, e a legenda vai embaixo dela — nunca por cima do texto da imagem (PLAYBOOK basico §0.1)
+        im = cv2.imread(os.path.join(P.assets, c["arquivo"]))
+        vertical = abs(im.shape[1] / im.shape[0] - 1080 / 1920) < 0.03
+        caixa = "" if vertical else (f'style="left:{TXT_L*100:.2f}%;width:{TXT_W*100:.2f}%;top:{SAFE_TOP*100:.2f}%;'
+                                     f'height:{(TC_BASE - SAFE_TOP)*100:.2f}%;"')
+        add(f'<div id="{cid}" class="clip" data-start="{r3(a)}" data-duration="{r3(b-a)}" data-track-index="4">'
+            f'<div class="tela-cheia"><img {caixa or "class=\"tc-cheia\""} src="assets/{c["arquivo"]}" alt=""></div></div>')
+        continue
     if c["tipo"] == "noticia":   # encolhe mantendo a proporção do print (nunca corta a manchete)
         im = cv2.imread(os.path.join(P.assets, c["arquivo"]))
         wpx = min(CARD["largura"] * 1080, ch * 1920 * im.shape[1] / im.shape[0])
         size = f"width:{wpx / 1080 * 100:.2f}%"
     else:
         size = f"height:{ch*100:.2f}%"
+    if HSAFE:     # mídia em card: nunca passa das margens laterais da área segura
+        wfr = (wpx / 1080) if c["tipo"] == "noticia" else CARD["largura_pequeno" if c["tipo"] == "card-pequeno" else "largura"]
+        size += ";" + lados(wfr)
     add(f'<div id="{cid}" class="clip card-slot" data-start="{r3(a)}" data-duration="{r3(b-a)}" data-track-index="4">'
         f'<div class="card {c["tipo"]}" style="top:{ct*100:.2f}%;{size}"><img src="assets/{c["arquivo"]}" alt=""></div></div>')
     prev_end = cards[n - 1][1] if n else -1
@@ -183,7 +338,7 @@ elif T:
     tt = tt if tt is not None else place(T["de"], T["ate"], TITLE_H, TIT["posicao"])
     sub = f'<div class="t-sub">{esc(T["subtitulo"])}</div>' if T.get("subtitulo") else ""
     add(f'<div id="titulo" class="clip titulo" data-start="{T["de"]}" data-duration="{r3(T["ate"]-T["de"])}" data-track-index="5">'
-        f'<div class="t-block" style="top:{tt*100:.2f}%">{lines}{sub}</div></div>')
+        f'<div class="t-block" style="top:{tt*100:.2f}%{";" + lados(0.9) if HSAFE else ""}">{lines}{sub}</div></div>')
 
 # ---------- caixa do topo (PLAYBOOK topo-livre §2) ----------
 CX = S.get("caixa_topo")
@@ -241,11 +396,58 @@ def cap_html(txt):
     # palavra de ligação presa à seguinte (espaço inseparável): nunca fica sozinha no fim de uma linha
     return re.sub(LIG, lambda m: m.group(1) + "&nbsp;", h) if CAP.get("prender_ligacao") else h
 
-for n, (a, b, txt, up, low) in enumerate(caps):
+# Legenda palavra por palavra (padrão com "palavra_por_palavra"): blocos de linhas explícitas; cada palavra entra
+# quando é falada (saindo do desfocado) e as anteriores ficam; destaques maiores. As linhas ficam quase encostadas:
+# a distância entre a base de uma linha e o topo do "x" da seguinte é `folga_linhas` × altura do "x" do texto normal,
+# medida pelo contorno real das letras no navegador (capLayout). PLAYBOOK basico §3.
+
+def cap_pp(n, a, txt, i, j, meta):
+    """HTML das linhas da legenda e altura aproximada do bloco (fração da tela; a posição exata é feita no navegador)."""
+    toks = txt.split()
+    if len(toks) != j - i + 1:
+        print(f"⚠️  legenda {txt!r}: {len(toks)} palavras no texto e {j - i + 1} na transcrição — usando a transcrição")
+        toks = [W[k]["w"].strip() for k in range(i, j + 1)]
+    linhas = linhas_pp(i, j, meta)
+    dest = set((meta or {}).get("destaques", []))
+    rows = []
+    for nl, ln in enumerate(linhas):
+        e = (meta or {}).get("escalas") and meta["escalas"][nl]
+        st = f' style="font-size:{e}em"' if e else ""
+        ws = [f'<span class="cw{" cw-d" if k in dest else ""}"{st if k in dest else ""} data-t="{r3(max(a, W[k]["s"]))}">{esc(toks[k - i])}</span>'
+              for k in ln]
+        rows.append(f'<div class="cap-l">{"".join(ws)}</div>')     # espaço entre palavras: margem no tamanho de cada palavra
+    return "".join(rows), altura_pp(i, j, meta)
+
+dest_t = []
+for n, (a, b, txt, up, low, i, j, meta) in enumerate(caps):
     ht = header_top(a, b)
-    top = ht if ht is not None else place(a, b, CAP_H, (CAP["posicao_fundo_mesclado"] if low else CAP["posicao"]) - CAP_H / 2)
+    if PP is not None:
+        inner, hc = cap_pp(n, a, txt, i, j, meta)
+        dest_t += [W[k]["s"] for k in (meta or {}).get("destaques", [])]
+    else:
+        inner, hc = cap_html(txt), CAP_H
+    if PP is not None and any(x <= a and b <= y for x, y in TC):
+        top = max(CAP["posicao"] - hc / 2, TC_BASE + GAP)          # abaixo da mídia, nunca por cima dela
+    else:
+        top = ht if ht is not None else place(a, b, hc, (CAP["posicao_fundo_mesclado"] if low else CAP["posicao"]) - hc / 2)
+    extra = ""
+    if PP is not None:
+        if top + hc > SAFE_BOTTOM:     # nem dividido cabe entre o queixo e a margem de baixo: o rosto e a margem não cedem, a letra encolhe
+            k = max(0.7, (SAFE_BOTTOM - top) / hc)
+            if k == 0.7:
+                print(f"⚠️  legenda {txt!r} ({a:.1f} s) não cabe entre o queixo e a margem de baixo nem encolhida a 70%")
+            extra += f"font-size:{CAP['tamanho_px'] * k:.1f}px;"
+            hc *= k
+        extra += f"left:{TXT_L*100:.2f}%;width:{TXT_W*100:.2f}%;"
     add(f'<div id="cap{n}" class="clip cap" data-start="{a}" data-duration="{r3(b-a)}" data-track-index="6">'
-        f'<div class="cap-txt" style="top:{(top + CAP_H / 2)*100:.2f}%">{cap_html(txt)}</div></div>')
+        f'<div class="cap-txt{" cap-pp" if PP is not None else ""}" style="top:{(top + hc / 2)*100:.2f}%{";" + extra if extra else ""}">{inner}</div></div>')
+    if PP is not None:
+        tl.append(f'capWords("#cap{n}", {b});')
+if PP is not None and DS:
+    marcos = [caps[0][0]] + sorted(dest_t) + [caps[-1][1]] if caps else []
+    for x, y in zip(marcos, marcos[1:]):
+        if y - x > DS.get("intervalo_max_s", 4) + 0.5:
+            print(f"⚠️  {y - x:.1f} s sem palavra de destaque ({x:.1f}–{y:.1f} s); o padrão pede uma a cada {DS['intervalo_max_s']:g} s")
 
 KS = KW["saida"]
 for n, (a, b, k) in enumerate(kws):
@@ -293,6 +495,89 @@ for t in (E["topo_mesclado"] if USA_LOGO else []):
             tl.append(f'tl.set("#logo", {{opacity: 0}}, {r3(a)}); tl.set("#logo-claro", {{opacity: {LG["opacidade_clara"]}}}, {r3(a)});'
                       f' tl.set("#logo", {{opacity: {L["opacidade"]}}}, {r3(b)}); tl.set("#logo-claro", {{opacity: 0}}, {r3(b)});')
 
+# CSS/JS da legenda palavra por palavra: só entram na página quando o padrão usa (os outros padrões não mudam)
+CSS_PP = JS_PP = ""
+if PP is not None:
+    ent, sai = PP.get("entrada", {}), PP.get("saida")
+    CSS_PP = (f"\n.cap-pp {{ width: {CAP.get('largura', '90%')}; }}"
+              f"\n.cap-l {{ position: absolute; left: 50%; transform: translateX(-50%); width: max-content; white-space: nowrap; line-height: normal; }}"
+              f"\n.cw {{ display: inline-block; }}\n.cw + .cw {{ margin-left: {CAP.get('espaco_palavras', 0.25)}em; }}"
+              f"\n.cw-d {{ font-size: {DS.get('escala', 1)}em; }}")
+    saida_js = (f"  if (fim !== undefined) tl.to(sel + \" .cw\", {{ opacity: 0, filter: \"blur({sai.get('desfoque_px', 8)}px)\", "
+                f"duration: {sai.get('duracao', 0.2)}, ease: \"power1.in\" }}, fim - {sai.get('duracao', 0.2)});\n") if sai else ""
+    JS_PP = ("const cvT = document.createElement(\"canvas\"), cxT = cvT.getContext(\"2d\", { willReadFrequently: true });\n"
+             "function perfil(l) {\n"
+             "  // desenho real da linha: em cada coluna, quanto a tinta sobe acima e desce abaixo da linha de base\n"
+             "  const spans = [...l.querySelectorAll(\".cw\")];\n"
+             "  const fsMax = Math.max(...spans.map((s) => parseFloat(getComputedStyle(s).fontSize)));\n"
+             "  const w = l.offsetWidth, pad = Math.ceil(fsMax * 0.4), H = Math.ceil(fsMax * 2.2), base = Math.ceil(fsMax * 1.4);\n"
+             "  cvT.width = w + 2 * pad; cvT.height = H; cxT.clearRect(0, 0, cvT.width, H);\n"
+             "  spans.forEach((s) => { const cs = getComputedStyle(s); cxT.font = `" + str(FW) + " ${cs.fontSize} Padrao`;\n"
+             "    cxT.letterSpacing = cs.letterSpacing; cxT.fillText(s.textContent, pad + s.offsetLeft, base); });\n"
+             "  const d = cxT.getImageData(0, 0, cvT.width, H).data, up = {}, down = {};\n"
+             "  let left = Infinity, right = -Infinity, upMax = 0, downMax = 0;\n"
+             "  for (let x = 0; x < cvT.width; x++) {\n"
+             "    let t = -1, b = -1;\n"
+             "    for (let y = 0; y < H; y++) if (d[(y * cvT.width + x) * 4 + 3] > 60) { if (t < 0) t = y; b = y; }\n"
+             "    if (t >= 0) { const c = x - pad; up[c] = base - t; down[c] = b - base; left = Math.min(left, c); right = Math.max(right, c);\n"
+             "      upMax = Math.max(upMax, base - t); downMax = Math.max(downMax, b - base); }\n"
+             "  }\n"
+             "  return { w, up, down, left, right, upMax, downMax };\n"
+             "}\n"
+             "function capLayout(sel) {\n"
+             "  // linhas quase encostadas: cada linha desce até a tinta quase tocar a de cima, coluna por coluna\n"
+             "  // (as palavras pequenas encaixam no vão das letras baixas; só acento, pingo do i e haste do t seguram)\n"
+             "  const box = document.querySelector(sel + \" .cap-pp\");\n"
+             "  if (!box) return;\n"
+             "  const lines = [...box.querySelectorAll(\".cap-l\")], boxW = box.clientWidth;\n"
+             "  let P = lines.map(perfil);\n"
+             "  lines.forEach((l, i) => { const iw = P[i].right - P[i].left + 1; if (iw > boxW) { l.style.fontSize = (boxW / iw) + \"em\"; P[i] = perfil(l); } });\n"
+             "  // centraliza pela tinta (o itálico pende pra direita), nunca passando das margens\n"
+             "  const lx = P.map((p) => { const x0 = (boxW - p.w) / 2, dx = boxW / 2 - (x0 + (p.left + p.right) / 2); return { x0: x0 + dx, dx }; });\n"
+             "  lines.forEach((l, i) => (l.style.transform = `translateX(-50%) translateX(${lx[i].dx}px)`));\n"
+             "  const met = (s) => { const fs = parseFloat(getComputedStyle(s).fontSize); ctx.font = `" + str(FW) + " ${fs}px Padrao`;\n"
+             "    const m = ctx.measureText(\"x\"); return { asc: m.fontBoundingBoxAscent, xh: m.actualBoundingBoxAscent }; };\n"
+             f"  const folga = {CAP.get('folga_linhas', 0.65)} * met(box).xh;\n"
+             f"  const minimo = {CAP.get('folga_minima', 0.06)} * parseFloat(getComputedStyle(box).fontSize), viz = Math.round(minimo);\n"
+             "  let prev = null;\n"
+             "  lines.forEach((l, i) => {\n"
+             "    let asc = 0, xh = 0;\n"
+             "    l.querySelectorAll(\".cw\").forEach((s) => { const k = met(s); asc = Math.max(asc, k.asc); xh = Math.max(xh, k.xh); });\n"
+             "    let base;\n"
+             "    if (prev === null) base = P[i].upMax;\n"
+             "    else {\n"
+             "      let precisa = 0;\n"
+             "      for (const c in P[i].up) {\n"
+             "        const X = lx[i].x0 + Number(c);\n"
+             "        for (let d = -viz; d <= viz; d++) { const dn = P[i - 1].down[Math.round(X + d - lx[i - 1].x0)];\n"
+             "          if (dn !== undefined) precisa = Math.max(precisa, dn + minimo + P[i].up[c]); }\n"
+             "      }\n"
+             "      base = prev + Math.max(folga + xh, precisa);\n"
+             "    }\n"
+             "    l.style.top = (base - asc) + \"px\";\n"
+             "    prev = base;\n"
+             "  });\n"
+             "  const h = prev + Math.max(0, P[P.length - 1].downMax) + 2;\n"
+             "  box.style.height = h + \"px\";\n"
+             f"  const lim = {SAFE_BOTTOM} * 1920, limTop = {SAFE_TOP} * 1920, c = box.offsetTop;\n"
+             "  if (c + h / 2 > lim || c - h / 2 < limTop) {\n"
+             "    const k = Math.min(lim - (c - h / 2), (c + h / 2) - limTop) / h;   // área segura do Instagram\n"
+             "    if (k < 1 && !box.dataset.enc) { box.dataset.enc = 1; box.style.fontSize = (parseFloat(getComputedStyle(box).fontSize) * Math.max(0.7, k)) + \"px\"; lines.forEach((l) => (l.style.fontSize = \"\")); return capLayout(sel); }\n"
+             "  }\n"
+             "}\n"
+             "function capWords(sel, fim) {\n"
+             "  // cada palavra aparece no instante em que é falada, saindo do desfocado; as anteriores ficam\n"
+             "  capLayout(sel);\n"
+             "  document.querySelectorAll(sel + \" .cw\").forEach((w) => {\n"
+             f"    tl.fromTo(w, {{ opacity: 0, filter: \"blur({ent.get('desfoque_px', 0)}px)\" }}, {{ opacity: 1, filter: \"blur(0px)\", duration: {ent.get('duracao', 0.12)}, ease: \"power2.out\" }}, parseFloat(w.dataset.t));\n"
+             "  });\n" + saida_js + "}\n")
+if TC:
+    CSS_PP += ("\n.tela-cheia { position: absolute; inset: 0; background: #000; }"
+               "\n.tela-cheia img { position: absolute; object-fit: contain; }"
+               "\n.tela-cheia img.tc-cheia { inset: 0; width: 100%; height: 100%; object-fit: " + S["cards"].get("tela_cheia_ajuste", "cover") + "; }")
+if GLOW:
+    CSS_PP += f"\n.cap-txt {{ text-shadow: {GLOW}, {CAP['sombra']}; }}"
+
 KE = KW["entrada"]
 page = f"""<!doctype html>
 <html lang="pt-BR">
@@ -326,7 +611,7 @@ body {{ margin: 0; background: #000; }}
 .cap {{ display: flex; justify-content: center; }}
 .cap-txt {{ position: absolute; transform: translateY(-50%); width: {CAP["largura"]}; text-align: center; font-size: {CAP["tamanho_px"]}px;
   font-weight: {CAP.get("peso", FW)}; line-height: {CAP["entrelinha"]}; letter-spacing: {CAP["espacamento"]}; text-shadow: {CAP["sombra"]};
-  {"text-wrap: balance;" if CAP.get("equilibrar_linhas") else ""} }}
+  {"text-wrap: balance;" if CAP.get("equilibrar_linhas") else ""} }}{CSS_PP}
 /* PLAYBOOK 3.1 — palavras-chave */
 .kw {{ display: flex; justify-content: center; }}
 .kw-block {{ position: absolute; display: flex; flex-direction: column; align-items: center; text-shadow: {KW["sombra"]}; }}
@@ -461,7 +746,7 @@ function tighten(block, mainSize) {{
     row.style.marginBottom = bottom + "px";
   }});
 }}
-function kwWords(sel) {{
+{JS_PP}function kwWords(sel) {{
   document.querySelectorAll(sel + " .w").forEach((w) => {{
     tl.fromTo(w, {{ opacity: 0, y: {KE["sobe_px"]}, filter: "blur({KE["desfoque_px"]}px)" }},
       {{ opacity: 1, y: 0, filter: "blur(0px)", duration: {KE["duracao"]}, ease: "power2.out" }}, parseFloat(w.dataset.t));

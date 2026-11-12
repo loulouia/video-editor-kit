@@ -21,13 +21,38 @@ Depois de definir o padrão e a marca, **sempre perguntar ao usuário** qual mod
 - Se o usuário escolher **Passo a passo** → fluxo normal com aprovações.
 - Na dúvida ou sem resposta clara → usar **Direto ao resultado** como padrão.
 
+## Opções do padrão (aceleração, glow)
+
+Alguns padrões deixam opções para o usuário escolher em cada vídeo (`padrao.json` → `"recursos"` com valor `"opcional"`):
+
+- **Aceleração** (`"aceleracao": "opcional"`, ex.: `basico`): o padrão é **não acelerar** (`aceleracao.padrao`, 1,0×). No passo a passo, perguntar junto com a cor: "Quer acelerar a fala? (sem aceleração / acelerar um pouco)". Se sim, escolher o fator em `aceleracao.opcional` (mín.–máx.) que mais aproxima `alvo_palavras_s`. Gravar em `projeto.json` → `"aceleracao"`.
+- **Glow na legenda** (`"glow": "opcional"`): perguntar "Quer um leve brilho branco nas legendas?". Se sim, `projeto.json` → `"glow": true` (muda só o `gerar.py`).
+- No **direto ao resultado**: não acelera e não usa glow. O usuário pode pedir no preview.
+
+Padrões sem essas opções em `"recursos"` seguem a regra do PLAYBOOK (ex.: `amanda` acelera 1,10–1,15×).
+
+## Cortes de pausas e respiros (padrões com `cortes.tom_min`, ex.: `basico`)
+
+No lugar de `refinar_cortes.py` + `energia.py`: `motor/cortar_pausas.py projetos/<slug> <bruto>` corta toda pausa **e respiro** com 0,2 s ou mais (detector de fala pelo tom das cordas vocais, `motor/voz.py`; respiro é chiado sem tom). Depois de `cortes.py`, **conferir**: `transcrever.py ... aroll_conferencia` e comparar a lista de palavras com `bruto.words.json` (nenhuma palavra pode sumir; diferença de grafia/vogal é variação do Whisper, mas palavra faltando ou fim de palavra comido → transcrever o trecho isolado com e sem o corte e, se mudar, marcar o trecho em `projeto.json` → `cortes_config.manter`).
+
+## Rosto e montagem (padrões com `legenda.palavra_por_palavra`, ex.: `basico`)
+
+- **Recorte completo antes de montar**: `remove-background` + `rosto.py` com o recorte (o `--rapido` é só pro storyboard; em selfie de perto ele erra o queixo e a legenda pode cobrir a boca).
+- **Zoom**: alternar aberto/fechado a cada corte (pausa ou respiro), em `edicao.json` → `zoom.trechos` (fronteiras dos trechos de `timeline.json` → `keep`).
+- O `gerar.py` aplica sozinho a área segura do Instagram, divide blocos que não cabem abaixo do queixo e transforma em tela cheia o card que não cabe; ler os avisos (ℹ️/⚠️) e conferir nos snapshots os trechos avisados.
+- Render com pouco disco: se `hyperframes render` falhar por espaço, usar `--workers 1` (não grava os quadros no disco).
+
+## Legendas com destaques (padrões com `legenda.palavras_por_linha`, ex.: `basico`)
+
+Antes, depois de transcrever o A-roll, rodar `motor/sincronizar.py projetos/<slug>`: o Whisper marca o começo das palavras adiantado (~0,13 s) e, palavra por palavra, a legenda apareceria antes da fala. `motor/legendas.py projetos/<slug>` propõe as linhas e as palavras de destaque. Antes de gravar (`--gravar`), **revisar**: trocar destaques fracos pela palavra que carrega o sentido do trecho (número, nome, conceito, conclusão), manter pelo menos um a cada 4 s, e corrigir quebras estranhas (pedaço solto, frase cortada no meio de expressão), editando `linhas`/`destaques`/`sozinha` no `edicao.json`. No passo a passo, mostrar a lista no plano. O `gerar.py` avisa se ficar mais de 4 s sem destaque.
+
 ## Vídeo novo — Fluxo normal (passo a passo)
 
 1. **Padrão:** se `marca.json` tiver `padrao_padrao`, usar e avisar; senão **perguntar** (listar `padroes/`). **Marca:** se houver só uma, usar; se houver mais de uma, **perguntar qual** (listar `marcas/`), nunca escolher a primeira da lista.
 2. `motor/registro.py iniciar "<bruto>" <padrão> <marca>` → cria `projetos/<slug>/`.
 3. `motor/preparar.py projetos/<slug>` → baixa o bruto (cópia temporária) e as inserções de `insercoes/<nome-do-bruto>/`.
 4. Conferir se é mesmo um bruto: tem fala? Se não tiver fala ou for muito curto → perguntar antes de seguir.
-5. **Cor:** mostrar comparação (original × cor da marca × referência) e perguntar. Gravar em `projeto.json`.
+5. **Cor:** mostrar comparação (original × cor da marca × referência) e perguntar. Gravar em `projeto.json`. Se o padrão tiver opções (aceleração, glow), perguntar aqui também (ver "Opções do padrão").
 6. Transcrever, propor cortes, **validar pela energia** (`energia.py`), escolher aceleração → `cortes.py` → A-roll.
 7. **Plano** (tabela de inserções com fala exata, entra/sai, duração, tipo, origem; pergunta do gancho; recursos opcionais só se pedidos). Imagens que eu buscar: depois de escolhidas, **enviar pra `insercoes/<nome-do-bruto>/` no Drive** (`drive.py enviar`) e copiar pra `composicao/assets/img/`.
 8. **Storyboard:** `motor/storyboard.py` → mandar `storyboard/storyboard.jpg`. Corrigir pelo número do quadro. `registro.py etapa <slug> storyboard`.
@@ -41,7 +66,7 @@ Executa todas as etapas do fluxo normal **sem pedir confirmação**, usando as m
 1. Padrão e marca: já definidos antes do bypass.
 2. `registro.py iniciar` + `preparar.py` → baixa tudo.
 3. Cor: rodar `motor/medir_cor.py <bruto>`. **Lavado** → `padroes/amanda/cor/lavado.cube` (`grading` = esse caminho); **normal** → cor da marca; marca sem cor → original. Nunca aplicar a cor da marca num bruto lavado (deixa ainda mais apagado).
-4. Transcrever, cortar, validar energia, aceleração → `cortes.py` → A-roll.
+4. Transcrever, cortar, validar energia, aceleração (padrão com aceleração opcional → sem aceleração) → `cortes.py` → A-roll.
 5. Plano: montar automaticamente seguindo as regras do PLAYBOOK do padrão. Gancho: só o título de abertura (sem inserção). Inserções: as imagens de `insercoes/<nome-do-bruto>/` entram como card na base, no trecho da fala a que se referem (ou no tempo do prefixo do nome, ex. `0m12-`). Recursos opcionais: só os que o padrão liga por padrão.
 6. Storyboard: gerar mas **não mostrar** (fica salvo pra consulta posterior).
 7. Recorte, `rosto.py`, `compor_camadas.py`, `gerar.py`, snapshots → abrir o **preview**.

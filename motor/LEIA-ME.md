@@ -28,10 +28,12 @@ B=$PJ/cache/bruto.<ext>        # baixado do Drive por preparar.py
 |---|---|---|---|
 | 1 | Transcrever o bruto (com o glossário da marca) | `$PY motor/transcrever.py $PJ $B bruto` | `transcricao/bruto.words.json` |
 | 2 | Propor cortes de pausa/respiração | `$PY motor/refinar_cortes.py $PJ $B` | `cortes.json` (+ início falso à mão) |
+| 2b | **Cortar pausas e respiros** (padrões com `cortes.tom_min`, ex.: `basico`; substitui os passos 2 e 3) | `$PY motor/cortar_pausas.py $PJ $B` | `cortes.json` pelo detector de fala (`motor/voz.py`, pelo tom: respiro não conta como fala); depois de gerar o A-roll, retranscrever e comparar palavra por palavra com o bruto: nenhuma pode sumir |
 | 3 | **Validar cortes pela energia do áudio** | `$PY motor/energia.py $PJ $B` (`--perfil de ate`; `--sugerir --gravar` propõe cortes nas pausas reais) | relatório OK/⚠️ |
 | 4 | Gerar LUT de cor (só se a marca ainda não tiver) | `$PY motor/grading.py --bruto $B --ref ... --saida marcas/<m>/cor/x.cube --comparar x.jpg` | `.cube` + comparação |
 | 5 | A-roll: cortes + aceleração + cor | `$PY motor/cortes.py $PJ $B` | `composicao/assets/aroll.mp4` |
 | 6 | Conferir o A-roll | `$PY motor/transcrever.py $PJ $PJ/composicao/assets/aroll.mp4 aroll` | `transcricao/aroll.words.json` |
+| 6a | **Sincronia das palavras** (padrões com legenda palavra por palavra, ex.: `basico`) | `$PY motor/sincronizar.py $PJ` | acerta `aroll.words.json` pela voz real (o Whisper adianta ~0,13 s) |
 | 6b | **Storyboard (aprovação antes de montar)** | `$PY motor/storyboard.py $PJ` | `storyboard/storyboard.jpg` |
 | 7 | Recorte da pessoa | `npx hyperframes remove-background $PJ/composicao/assets/aroll.mp4 -o $PJ/cache/subject.webm` | `cache/subject.webm` |
 | 8 | Mapa do rosto (completo; o storyboard usa `--rapido`) | `$PY motor/rosto.py $PJ/composicao/assets/aroll.mp4 $PJ/cache/subject.webm $PJ/cache/rosto.json` | `cache/rosto.json` |

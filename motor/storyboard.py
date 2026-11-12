@@ -44,7 +44,7 @@ def avisos_em(a, b):
 
 def fala(a, b):
     # texto revisado das legendas (o do Whisper pode ter palavras erradas); sem legenda, cai na transcrição
-    caps = [t for t, i, j in E.get("legendas", []) if W[i]["s"] < b and W[j]["e"] > a]
+    caps = [leg[0] for leg in E.get("legendas", []) if W[leg[1]]["s"] < b and W[leg[2]]["e"] > a]
     return " / ".join(caps) if caps else " ".join(w["w"] for w in W if w["s"] < b and w["e"] > a)
 
 origens = {}
