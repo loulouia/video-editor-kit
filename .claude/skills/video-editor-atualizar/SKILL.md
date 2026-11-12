@@ -39,8 +39,23 @@ autora: ajustes no motor são feitos por ela e chegam pra todos pela atualizaç�
    Os comandos novos ou alterados passam a valer na próxima vez que o Claude Code for aberto: avisar
    "Feche e abra o Claude Code de novo pra garantir que tudo novo apareça."
 
-4. Se der `ERRO`: mostrar a frase do erro em linguagem simples, dizer que nada foi perdido (o script desfaz
-   sozinho) e sugerir avisar a autora do editor. Nunca tentar consertar apagando ou movendo pastas na mão.
+4. Se der erro, seguir a tabela abaixo. Sempre em linguagem simples, dizendo que os vídeos, a marca e o Drive
+   estão a salvo. **Nunca** consertar apagando, movendo ou renomeando pastas na mão, e nunca baixar o zip do
+   editor pelo navegador pra copiar por cima.
+
+## Se der erro
+
+| O que aparece | O que fazer |
+|---|---|
+| `python3: command not found`, janela pedindo pra instalar "ferramentas de linha de comando", ou o `python3` não responde | Rodar o mesmo comando com `~/.video-skill/bin/python` no lugar de `python3`. Se também não existir: o setup do editor está incompleto → `/video-editor-configurar`. |
+| `ERRO: não consegui baixar do GitHub` | Internet ou GitHub fora do ar. Nada foi trocado. Dizer: "Não consegui baixar agora. Vamos tentar de novo daqui a alguns minutos." Tentar de novo uma vez; se repetir, deixar pra depois (o aviso volta na próxima vez que abrir). |
+| `ERRO: o download veio incompleto` | Tentar de novo uma vez. |
+| `ERRO: ... não parece a pasta do editor` | O Claude Code está aberto em outra pasta. Procurar a pasta do editor (a que tem `motor/` e `padroes/`, normalmente `~/Desktop/ClaudeCode/video-editor.nosync`) e rodar o comando de dentro dela. |
+| `ERRO: uma atualização anterior foi interrompida` | Rodar `python3 motor/atualizar.py desfazer` e depois `python3 motor/atualizar.py aplicar` de novo. |
+| A pasta `motor/` ou o arquivo `motor/atualizar.py` sumiu (atualização interrompida no pior momento) | Baixar o atualizador de novo: `curl -fsSL https://raw.githubusercontent.com/loulouia/video-editor-kit/main/motor/atualizar.py -o motor/atualizar.py` (criar a pasta `motor` antes, se não existir) e rodar `python3 motor/atualizar.py desfazer`. A cópia de segurança fica em `config/`, que a atualização nunca toca. |
+| `ERRO: esta pasta usa git` | Instalação via git: usar a seção "Pasta com `.git`" abaixo. |
+| `ERRO inesperado` | Nada foi perdido (o script desfaz o que tinha trocado). Pedir pra pessoa mandar a mensagem de erro pra autora do editor. Não tentar outra coisa. |
+| A atualização terminou, mas depois o editor passou a dar erro ao editar | Rodar `python3 motor/atualizar.py desfazer` (volta pra versão anterior) e pedir pra pessoa avisar a autora do editor, com a mensagem do erro. |
 
 ## Pasta com `.git` (instalação da autora)
 
