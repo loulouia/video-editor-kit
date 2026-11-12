@@ -6,12 +6,13 @@ Pipeline de edição de vídeos curtos (Reels/TikTok, 1080×1920) feito em códi
 
 Comandos (skills em `.claude/skills/`): `/video-editor-configurar` (primeiro uso), `/video-editor-verificar` (verificar material novo no Drive — também responde a "veja se tem vídeo novo", "subi vídeo novo", "carreguei video", "tem material novo?"), `/video-editor-videos` (status no Drive), `/video-editor-editar` (editar ou reabrir), `/video-editor-entregar` (render + entrega), `/video-editor-novo-padrao`, `/video-editor-atualizar` (atualizar motor/padrões quando o hook detectar versão nova). Pedidos em linguagem normal seguem o mesmo fluxo do comando correspondente.
 
-Ao abrir o projeto, o hook `SessionStart` (`.claude/settings.json` → `motor/inicio.py`) informa se o setup está completo e quais vídeos estão novos/em andamento no Drive. Na primeira resposta, **sempre mostrar o painel visual** (`.claude/painel.html`) via `show_widget`:
+Ao abrir o projeto, o hook `SessionStart` (`.claude/settings.json` → `motor/inicio.py`) informa se o setup está completo e quais vídeos estão novos/em andamento no Drive. Na primeira resposta, **sempre mostrar o painel visual** (`.claude/painel.html`) no browser pane:
 
 1. Ler `.claude/painel.html`.
 2. Montar o JSON com os dados da sessão (marca, setup, vídeos, padrões) a partir do contexto do hook.
 3. Substituir `{{DATA}}` no HTML pelo JSON.
-4. Mostrar o resultado com `show_widget` (title: `painel_editor_video`).
+4. Gravar o HTML populado num arquivo temporário (scratchpad do Claude Code).
+5. Abrir no browser pane com `navigate` (`file://`). **Nunca** usar `show_widget` — o painel é no browser pane.
 
 Formato do JSON que substitui `{{DATA}}`:
 ```json
@@ -20,12 +21,12 @@ Formato do JSON que substitui `{{DATA}}`:
   "setup": true,
   "padroes": ["amanda", "topo-livre"],
   "videos": [
-    {"bruto": "nome.mp4", "etapa": "novo", "tamanho_mb": 150, "padrao": null},
-    {"bruto": "outro.mov", "etapa": "preview", "tamanho_mb": 200, "padrao": "amanda"}
+    {"bruto": "nome.mp4", "etapa": "novo", "tamanho_mb": 150, "padrao": null, "slug": null, "saida": null},
+    {"bruto": "outro.mov", "etapa": "preview", "tamanho_mb": 200, "padrao": "amanda", "slug": "outro", "saida": null}
   ]
 }
 ```
-Etapas possíveis: `novo`, `plano`, `storyboard`, `montagem`, `preview`, `entregue`. `marca`: se houver **uma só** marca em `marcas/`, o nome dela; se **não houver**, `null`; se houver **mais de uma**, **perguntar ao usuário qual é a dele** (listar as marcas) antes de mostrar o painel — nunca escolher a primeira da lista. `setup` vem do `configurado` em `config/ambiente.json`. `padroes` são as pastas em `padroes/`. `videos` vem do contexto do hook (registro + Drive); se o hook não retornar vídeos, usar `[]`.
+Etapas possíveis: `novo`, `plano`, `storyboard`, `montagem`, `preview`, `entregue`. `slug`: o nome do projeto em `projetos/` (`null` se `novo`). `saida`: o nome do arquivo em `editados/` (só para `entregue`). `marca`: se houver **uma só** marca em `marcas/`, o nome dela; se **não houver**, `null`; se houver **mais de uma**, **perguntar ao usuário qual é a dele** (listar as marcas) antes de mostrar o painel — nunca escolher a primeira da lista. `setup` vem do `configurado` em `config/ambiente.json`. `padroes` são as pastas em `padroes/`. `videos` vem do contexto do hook (registro + Drive); se o hook não retornar vídeos, usar `[]`.
 
 Depois do painel, acrescentar **uma frase curta** (não um parágrafo) dizendo o que há de novo, como antes. Setup incompleto → indicar `/video-editor-configurar` e não editar.
 
@@ -82,7 +83,12 @@ Pacote `video-editor.nosync` com: `motor/`, `.claude/` (comandos e hook), `CLAUD
 A autora mantém uma pasta compartilhada no Drive (`Edição de vídeos/_biblioteca/`) com efeitos sonoros, músicas e transições livres pra usar. O `/video-editor-configurar` (etapa 4.1) oferece copiar pro Drive do cliente. A configuração fica em `config/ambiente.json` → `"biblioteca"`: `pasta_id` (ID da pasta compartilhada no Drive da autora) e `destinos` (mapeamento subpasta → pasta destino no Drive do cliente). Comando: `python motor/drive.py copiar-biblioteca`. Os arquivos são copiados, não linkados — a pessoa tem a cópia no próprio Drive. A autora atualiza a pasta compartilhada; clientes novos recebem a versão mais recente; clientes antigos podem rodar `copiar-biblioteca` de novo (o rclone só copia o que não existe).
 
 ### Atualizações automáticas (padrões, motor, melhorias)
-O hook `SessionStart` (`motor/inicio.py`) faz `git fetch` e compara o HEAD local com `origin/main`. Se houver commits novos, avisa o Claude, que pergunta à pessoa se quer atualizar. Comando: `/video-editor-atualizar` (faz `git pull --ff-only`, com fallback pra `--rebase`; guarda alterações locais com stash se necessário). A pessoa nunca precisa lembrar de verificar — o editor avisa sozinho ao abrir. A autora empurra melhorias no motor e nos padrões pro repo (`git push`); na próxima sessão de cada cliente, o aviso aparece.
+Os clientes instalam pelo zip (o programa git não funciona no Mac sem as ferramentas da Apple), então a atualização **não usa git**: `motor/atualizar.py` consulta a versão no site do GitHub e baixa o zip pela web (curl). O hook `SessionStart` (`motor/inicio.py`) compara a versão instalada (`config/versao.json`) com a última do GitHub; se for diferente, o Claude pergunta se quer atualizar e, com o sim, roda `/video-editor-atualizar`.
+- **Troca:** `motor/`, cada padrão que vem na versão nova (`padroes/<nome>/`), `.claude/` (comandos, hook, painel), `CLAUDE.md`, `LEIA-ME.md`. **Nunca toca:** `marcas/`, `config/`, `projetos/`, `registro.json`, `.claude/settings.local.json`, padrões criados pela pessoa.
+- **Sobrescreve** ajustes locais no motor e nos padrões da autora (decisão da autora: ajuste no motor é feito por ela e chega pra todos). Antes, guarda cópia em `config/backups-atualizacao/` (3 mais recentes). Falha no meio → desfaz tudo.
+- Toda publicação na `main` vira atualização pros clientes (não há número de versão manual): só publicar o que estiver pronto.
+- Pasta com `.git` (a da autora): o script se recusa; lá é `git pull`.
+- Clientes que instalaram antes do atualizador precisam, uma única vez, colar no Claude Code a frase que baixa `motor/atualizar.py` e roda `aplicar`.
 
 ## Primeiro uso / padrão novo
 

@@ -24,6 +24,9 @@ __pycache__/
 config/
 registro.json
 projetos/
+# Temporários do motor/atualizar.py
+.atualizacao-novo/
+.atualizacao-antigo/
 
 # Marca pessoal (a distribuição vai sem ela)
 marcas/amanda/

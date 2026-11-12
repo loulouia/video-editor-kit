@@ -67,6 +67,25 @@ def checar_atualizacao():
         return ""
 
 
+def checar_atualizacao_sem_git():
+    """Instalação pelo zip (sem .git): compara a versão instalada com a do GitHub pela web (motor/atualizar.py)."""
+    if os.path.isdir(os.path.join(RAIZ, ".git")):
+        return ""
+    try:
+        import atualizar
+        info = atualizar.checar(tempo=6)
+    except Exception:
+        return ""
+    if not info.get("disponivel"):
+        return ""
+    lista = info.get("mudancas") or []
+    resumo = ("; ".join(lista[:5]) + (f" (+{len(lista) - 5} mais)" if len(lista) > 5 else "")) if lista else ""
+    return (" ATUALIZAÇÃO DISPONÍVEL" + (f" (mudanças: {resumo})" if resumo else "") + ". "
+            "Na primeira resposta, antes de qualquer outra coisa, pergunte em linguagem simples: "
+            "'Tem uma atualização do editor de vídeo. Quer que eu atualize agora? Seus vídeos, sua marca e a "
+            "conexão com o Drive não mudam.' Se a pessoa disser sim, rodar /video-editor-atualizar.")
+
+
 def aviso_icloud():
     """Pasta sem .nosync dentro de um lugar sincronizado pelo iCloud → avisar (o setup corrige com OK)."""
     home = os.path.expanduser("~")
@@ -80,7 +99,7 @@ def aviso_icloud():
 
 
 try:
-    ctx = checar() + checar_atualizacao() + aviso_icloud()
+    ctx = checar() + checar_atualizacao() + checar_atualizacao_sem_git() + aviso_icloud()
 except Exception as e:
     ctx = f"[video-editor] Checagem de início falhou ({str(e)[:150]}). Seguir normalmente."
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}, ensure_ascii=False))
