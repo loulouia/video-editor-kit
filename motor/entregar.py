@@ -17,6 +17,16 @@ pj = os.path.abspath(sys.argv[1]); slug = os.path.basename(pj)
 p = json.load(open(os.path.join(pj, "projeto.json"), encoding="utf-8"))
 comp = os.path.join(pj, "composicao")
 
+# 0. espaço no Mac: o render guarda cada quadro como imagem enquanto trabalha (~1 MB por quadro, 30 por segundo).
+#    Sem espaço ele falha no meio; então confere antes e, se faltar, para com um aviso simples (nada é apagado).
+dur = json.load(open(os.path.join(pj, "edicao.json"), encoding="utf-8")).get("duracao", 60)
+precisa_gb = dur * 30 * 1.05 / 1024 + 0.8
+livre_gb = shutil.disk_usage(pj).free / 1024 ** 3
+if livre_gb < precisa_gb:
+    print(f"POUCO ESPAÇO: o Mac tem {livre_gb:.1f} GB livres e, pra gerar este vídeo ({dur:.0f} s), precisa de pelo menos "
+          f"{precisa_gb:.1f} GB. Libere espaço (Lixeira, Downloads, vídeos antigos) e peça a entrega de novo. Nada foi apagado.")
+    sys.exit(2)
+
 # 1. render
 os.makedirs(os.path.join(pj, "cache"), exist_ok=True)
 local = os.path.join(pj, "cache", "entrega.mp4")

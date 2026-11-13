@@ -9,7 +9,7 @@ argument-hint: "[nome do vídeo]"
 Vídeo: $ARGUMENTS (se vazio, usar o que está em preview; se houver mais de um, perguntar).
 
 1. Só entregar com **aprovação explícita** do preview nesta conversa.
-2. Rodar `~/.video-skill/bin/python -I motor/entregar.py projetos/<slug>`. Ele:
+2. Rodar `~/.video-skill/bin/python -I motor/entregar.py projetos/<slug>`. Se ele parar com **POUCO ESPAÇO**, avisar a pessoa em linguagem simples, com os números da mensagem: "Seu Mac está com X GB livres e, pra gerar o vídeo, preciso de pelo menos Y GB. Libera um espaço (Lixeira, Downloads, vídeos antigos) e me avisa que eu entrego." Nada foi apagado; não tentar liberar espaço sozinho. Com espaço, ele:
    - renderiza (MP4 1080×1920);
    - envia pra `editados/<nome-do-bruto>-<padrão>.mp4` (se já existir: `-v2`, `-v3`… nunca sobrescreve);
    - **confere** tamanho + MD5 no Drive — se falhar, para e não apaga nada;

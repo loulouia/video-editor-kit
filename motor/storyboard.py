@@ -4,8 +4,13 @@ Cada quadro é a composição real do motor (gerar.py) naquele instante — víd
 mais caixa/cartões/título/legendas/palavras-chave nas posições do padrão — com, embaixo: tempo, fala exata,
 tipo da inserção, origem da imagem e ALERTAS de regra (rosto coberto, limites de caracteres, caixa vazia...).
 
+O storyboard tem que BATER com o preview (é pra ver como vai ficar de fato, não uma estimativa):
+- usa o recorte completo da pessoa e o mapa do rosto completo (cache/subject.webm + cache/rosto.json); se faltarem,
+  faz agora (o mapa rápido erra o queixo em selfie de perto e a legenda iria pra outro lugar no preview);
+- em padrões com legenda palavra por palavra, mostra CADA bloco de legenda completo (todas as palavras já na tela),
+  no instante em que aparece inteiro no vídeo final.
+
 Pré-requisitos: composicao/assets/aroll.mp4 (motor/cortes.py), transcricao/aroll.words.json, edicao.json.
-O recorte completo NÃO é necessário: sem cache/rosto.json, usa o mapa rápido (rosto.py --rapido).
 
 Uso: python motor/storyboard.py projetos/<video>   → projetos/<video>/storyboard/storyboard.jpg
 """
@@ -21,12 +26,19 @@ OUT = P.path("storyboard"); shutil.rmtree(OUT, ignore_errors=True); os.makedirs(
 PY = [sys.executable, "-I"]
 esc = html.escape
 
-# 1. mapa do rosto (rápido, se o completo ainda não existe)
-if not os.path.exists(P.path("cache/rosto.json")) and not os.path.exists(P.path("cache/rosto_rapido.json")):
-    os.makedirs(P.path("cache"), exist_ok=True)
-    print("mapa rápido do rosto…")
-    subprocess.run(PY + [os.path.join(AQUI, "rosto.py"), os.path.join(P.assets, "aroll.mp4"), "--rapido",
-                         P.path("cache/rosto_rapido.json")], check=True, capture_output=True)
+# 1. recorte completo + mapa do rosto completo (o mesmo que o preview usa)
+os.makedirs(P.path("cache"), exist_ok=True)
+if not os.path.exists(P.path("cache/subject.webm")):
+    print("recorte completo da pessoa (alguns minutos; é o mesmo do preview)…")
+    subprocess.run(["npx", "--yes", "hyperframes@0.8.150", "remove-background", os.path.join(P.assets, "aroll.mp4"),
+                    "-o", P.path("cache/subject.webm"), "--quality", "fast"], check=True, capture_output=True)
+if not os.path.exists(P.path("cache/rosto.json")) or \
+        os.path.getmtime(P.path("cache/rosto.json")) < os.path.getmtime(P.path("cache/subject.webm")):
+    print("mapa do rosto…")
+    subprocess.run(PY + [os.path.join(AQUI, "rosto.py"), os.path.join(P.assets, "aroll.mp4"), P.path("cache/subject.webm"),
+                         P.path("cache/rosto.json")], check=True, capture_output=True)
+if os.path.exists(P.path("cache/rosto_rapido.json")):
+    os.remove(P.path("cache/rosto_rapido.json"))      # nunca deixar o mapa rápido ser usado no lugar do completo
 
 # 2. composição real + avisos do gerador
 g = subprocess.run(PY + [os.path.join(AQUI, "gerar.py"), P.dir], capture_output=True, text=True)
@@ -80,12 +92,32 @@ for k in E.get("palavras_chave", []):
     a, b = W[min(ids)]["s"], W[max(ids)]["e"] + k.get("segura", 0)
     mom.append((a, b, "Palavra-chave" + (" · negativo" if k.get("efeito") == "negativo" else ""),
                 " / ".join(p[0] for p in k["partes"]), ""))
-if not mom:   # vídeo só com legendas: um quadro a cada ~4 s
+# legenda palavra por palavra: um quadro por bloco, com o bloco completo (como fica no vídeo final, já dividido)
+LEG = S.get("legenda", {})
+PALAVRA = LEG.get("palavra_por_palavra")
+tempos_fixos = {}
+if PALAVRA:
+    sai = (PALAVRA.get("saida") or {}).get("duracao", 0.2) if isinstance(PALAVRA, dict) else 0.2
+    ent = (PALAVRA.get("entrada") or {}).get("duracao", 0.25) if isinstance(PALAVRA, dict) else 0.25
+    h = open(P.path("composicao/index.html"), encoding="utf-8").read()
+    for m in re.finditer(r'<div id="cap\d+" class="clip cap" data-start="([\d.]+)" data-duration="([\d.]+)".*?\n', h):
+        a, b = float(m.group(1)), float(m.group(1)) + float(m.group(2))
+        if a >= E["duracao"] - 0.1:       # bloco que começa depois do fim do vídeo não entra no vídeo
+            continue
+        b = min(b, E["duracao"])
+        ts = [float(x) for x in re.findall(r'data-t="([\d.]+)"', m.group(0))]
+        t = min(b - sai - 0.03, max(ts or [a]) + ent + 0.03)       # todas as palavras já nítidas, antes de sair
+        texto = " ".join(re.findall(r'>([^<>]+)</span>', m.group(0)))
+        mom.append((a, b, "Legenda", texto, ""))
+        tempos_fixos[len(mom) - 1] = round(max(a + 0.05, t), 2)
+elif not mom:   # vídeo só com legendas: um quadro a cada ~4 s
     d = E["duracao"]; mom = [(x, min(d, x + 4), "Legenda", "", "") for x in range(0, int(d), 4)]
-mom.sort()
+ordem = sorted(range(len(mom)), key=lambda k: mom[k][0])
+tempos_fixos = {ordem.index(k): v for k, v in tempos_fixos.items()}
+mom = [mom[k] for k in ordem]
 
 # 4. quadros reais da composição
-tempos = [round(min(b - 0.05, a + max(0.35, (b - a) * 0.4)), 2) for a, b, *_ in mom]
+tempos = [tempos_fixos.get(n, round(min(b - 0.05, a + max(0.35, (b - a) * 0.4)), 2)) for n, (a, b, *_) in enumerate(mom)]
 subprocess.run(["npx", "--yes", "hyperframes@0.8.150", "snapshot", "--at", ",".join(map(str, tempos)), "--no-end",
                 "--describe", "false", "-o", os.path.join(OUT, "q"), "--timeout", "20000"],
                cwd=P.path("composicao"), capture_output=True, check=True)

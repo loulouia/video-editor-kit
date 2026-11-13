@@ -33,3 +33,5 @@ marcas/amanda/
 
 # Tipos gerados pelo engine do mod
 .claude/mods/*/.claude-plugin/types/
+# Marcador da pasta de trabalho da autora (o atualizador por zip se recusa a rodar nela)
+.autora

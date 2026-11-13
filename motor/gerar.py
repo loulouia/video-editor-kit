@@ -49,7 +49,17 @@ def overlaps(a, b, spans):
 
 # ---------- rosto: nada pode cobrir o rosto (PLAYBOOK §0) ----------
 _rf = P.path("cache/rosto.json") if os.path.exists(P.path("cache/rosto.json")) else P.path("cache/rosto_rapido.json")
-FACE = json.load(open(_rf))["rostos"]     # rosto_rapido.json = modo storyboard (antes do recorte completo)
+if not _rf.endswith("rosto.json"):
+    print("⚠️  usando o mapa RÁPIDO do rosto (impreciso em selfie de perto): rode o recorte completo + rosto.py antes do preview")
+FACE = json.load(open(_rf))["rostos"]
+
+# Legendas montadas sobre outro texto (transcrição corrigida depois de legendas.py): os índices apontariam pras palavras
+# erradas. Para e pede pra montar de novo (PLAYBOOK: corrigiu o texto → legendas.py de novo).
+import hashlib
+_assin = hashlib.sha1("\n".join(w["w"] for w in W).encode("utf-8")).hexdigest()[:12]
+if E.get("legendas_texto") and E["legendas_texto"] != _assin:
+    sys.exit("ERRO: o texto da transcrição mudou depois que as legendas foram montadas. Rode de novo "
+             "motor/legendas.py projetos/<slug> --gravar (com os mesmos --destaques da revisão) e depois o gerar.py.")
 SHIFT = json.load(open(P.path("cache/camadas.json"))) if os.path.exists(P.path("cache/camadas.json")) else {"janelas": [], "deslocamentos_px": []}
 ZS, ZO = ZOOM["escala"], float(ZOOM["origem"].split()[1].rstrip("%")) / 100
 SAFE_TOP, SAFE_BOTTOM, GAP = TELA["seguro_topo"], TELA["seguro_base"], TELA["folga_rosto"]
@@ -441,6 +451,23 @@ def cap_pp(n, a, txt, i, j, meta):
               for k in ln]
         rows.append(f'<div class="cap-l">{"".join(ws)}</div>')     # espaço entre palavras: margem no tamanho de cada palavra
     return "".join(rows), altura_pp(i, j, meta)
+
+# Última palavra de cada bloco: fica pelo menos `ultima_palavra_min_s` nítida antes do bloco sair. Fala rápida
+# ("por um tempo. E ela mudou") faria a última palavra piscar 0,1 s; o bloco seguinte espera esses décimos
+# (a legenda pode atrasar um pouco, nunca adiantar a fala).
+if PP is not None and caps:
+    MINU = CAP.get("ultima_palavra_min_s", 0.4)
+    caps = [list(c) for c in caps]
+    for n, c in enumerate(caps):
+        a, b, txt, up, low, i, j, meta = c
+        ult = a if CAP.get("linha_inteira") else max(a, W[j]["s"])
+        if b < ult + MINU:
+            c[1] = r3(ult + MINU)
+            if n + 1 < len(caps) and caps[n + 1][0] < c[1]:
+                prox = caps[n + 1]
+                prox[0] = c[1]
+                prox[1] = max(prox[1], r3(prox[0] + 0.2))
+    caps = [tuple(c) for c in caps]
 
 dest_t = []
 for n, (a, b, txt, up, low, i, j, meta) in enumerate(caps):

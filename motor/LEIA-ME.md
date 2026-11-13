@@ -34,9 +34,9 @@ B=$PJ/cache/bruto.<ext>        # baixado do Drive por preparar.py
 | 5 | A-roll: cortes + aceleração + cor | `$PY motor/cortes.py $PJ $B` | `composicao/assets/aroll.mp4` |
 | 6 | Conferir o A-roll | `$PY motor/transcrever.py $PJ $PJ/composicao/assets/aroll.mp4 aroll` | `transcricao/aroll.words.json` |
 | 6a | **Sincronia das palavras** (padrões com legenda palavra por palavra, ex.: `basico`) | `$PY motor/sincronizar.py $PJ` | acerta `aroll.words.json` pela voz real (o Whisper adianta ~0,13 s) |
-| 6b | **Storyboard (aprovação antes de montar)** | `$PY motor/storyboard.py $PJ` | `storyboard/storyboard.jpg` |
 | 7 | Recorte da pessoa | `npx hyperframes remove-background $PJ/composicao/assets/aroll.mp4 -o $PJ/cache/subject.webm` | `cache/subject.webm` |
-| 8 | Mapa do rosto (completo; o storyboard usa `--rapido`) | `$PY motor/rosto.py $PJ/composicao/assets/aroll.mp4 $PJ/cache/subject.webm $PJ/cache/rosto.json` | `cache/rosto.json` |
+| 8 | Mapa do rosto (completo) | `$PY motor/rosto.py $PJ/composicao/assets/aroll.mp4 $PJ/cache/subject.webm $PJ/cache/rosto.json` | `cache/rosto.json` |
+| 8b | **Storyboard (aprovação antes de montar)** — com o recorte e o rosto completos (faz sozinho se faltar), pra bater com o preview | `$PY motor/storyboard.py $PJ` | `storyboard/storyboard.jpg` |
 | 9 | Camadas (fundo mesclado, texto atrás) | `$PY motor/compor_camadas.py $PJ` | `composicao/assets/aroll_comp.mp4` |
 | 10 | Composição (legendas, palavras-chave, cards, título, logo) | `$PY motor/gerar.py $PJ` | `composicao/index.html` |
 | 11 | Validar e conferir | `npx hyperframes check` e `npx hyperframes snapshot --at ...` em `composicao/` | — |

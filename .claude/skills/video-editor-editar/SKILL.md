@@ -36,9 +36,13 @@ Padrões sem essas opções em `"recursos"` seguem a regra do PLAYBOOK (ex.: `am
 
 No lugar de `refinar_cortes.py` + `energia.py`: `motor/cortar_pausas.py projetos/<slug> <bruto>` corta toda pausa **e respiro** com 0,2 s ou mais (detector de fala pelo tom das cordas vocais, `motor/voz.py`; respiro é chiado sem tom). Depois de `cortes.py`, **conferir**: `transcrever.py ... aroll_conferencia` e comparar a lista de palavras com `bruto.words.json` (nenhuma palavra pode sumir; diferença de grafia/vogal é variação do Whisper, mas palavra faltando ou fim de palavra comido → transcrever o trecho isolado com e sem o corte e, se mudar, marcar o trecho em `projeto.json` → `cortes_config.manter`).
 
+**Fim do vídeo escolhido pela pessoa** (ex.: "termina em 'escreve aqui'", tirar uma despedida): gravar em `projeto.json` → `"fim": <segundo do bruto>` **e** `"fim_escolhido": true`; o `cortar_pausas.py` nunca troca esse fim.
+
+**Transcrição:** se o `transcrever.py` avisar "palavras puladas" (arquivo `transcricao/<nome>.alertas.txt`), retranscrever o trecho isolado e inserir as palavras com tempo antes de seguir.
+
 ## Rosto e montagem (padrões com `legenda.palavra_por_palavra`, ex.: `basico`)
 
-- **Recorte completo antes de montar**: `remove-background` + `rosto.py` com o recorte (o `--rapido` é só pro storyboard; em selfie de perto ele erra o queixo e a legenda pode cobrir a boca).
+- **Recorte completo antes do storyboard**: `remove-background` + `rosto.py` com o recorte. O `storyboard.py` faz isso sozinho se faltar — o storyboard tem que bater com o preview (o mapa rápido erra o queixo em selfie de perto).
 - **Zoom**: alternar aberto/fechado a cada corte (pausa ou respiro), em `edicao.json` → `zoom.trechos` (fronteiras dos trechos de `timeline.json` → `keep`).
 - O `gerar.py` aplica sozinho a área segura do Instagram, divide blocos que não cabem abaixo do queixo e transforma em tela cheia o card que não cabe; ler os avisos (ℹ️/⚠️) e conferir nos snapshots os trechos avisados.
 - Render com pouco disco: se `hyperframes render` falhar por espaço, usar `--workers 1` (não grava os quadros no disco).
@@ -56,8 +60,8 @@ Antes, depois de transcrever o A-roll, rodar `motor/sincronizar.py projetos/<slu
 5. **Cor:** mostrar comparação (original × cor da marca × referência) e perguntar. Gravar em `projeto.json`. Se o padrão tiver opções (aceleração, glow), perguntar aqui também (ver "Opções do padrão").
 6. Transcrever, propor cortes, **validar pela energia** (`energia.py`), escolher aceleração → `cortes.py` → A-roll.
 7. **Plano** (tabela de inserções com fala exata, entra/sai, duração, tipo, origem; pergunta do gancho; recursos opcionais só se pedidos). Imagens que eu buscar: depois de escolhidas, **enviar pra `insercoes/<nome-do-bruto>/` no Drive** (`drive.py enviar`) e copiar pra `composicao/assets/img/`.
-8. **Storyboard:** `motor/storyboard.py` → mandar `storyboard/storyboard.jpg`. Corrigir pelo número do quadro. `registro.py etapa <slug> storyboard`.
-9. Aprovado → recorte (`remove-background`), `rosto.py`, `compor_camadas.py`, `gerar.py`, `hyperframes check` + snapshots → abrir o **preview** (HyperFrames, navegador do app). `registro.py etapa <slug> preview`.
+8. **Recorte completo** (`remove-background`) + `rosto.py` + `compor_camadas.py`, depois **storyboard:** `motor/storyboard.py` → mandar `storyboard/storyboard.jpg` (é a composição real: o que aparece nele é o que vai pro vídeo). Corrigir pelo número do quadro. `registro.py etapa <slug> storyboard`.
+9. Aprovado → `gerar.py`, `hyperframes check` + snapshots → abrir o **preview** (HyperFrames, navegador do app). `registro.py etapa <slug> preview`.
 10. Ajustes no preview até a aprovação. Pra entregar: `/video-editor-entregar`.
 
 ## Vídeo novo — Modo bypass (direto ao resultado)
@@ -69,8 +73,8 @@ Executa todas as etapas do fluxo normal **sem pedir confirmação**, usando as m
 3. Cor: rodar `motor/medir_cor.py <bruto>`. **Lavado** → `padroes/amanda/cor/lavado.cube` (`grading` = esse caminho); **normal** → cor da marca; marca sem cor → original. Nunca aplicar a cor da marca num bruto lavado (deixa ainda mais apagado).
 4. Transcrever, cortar, validar energia, aceleração (padrão com aceleração opcional → sem aceleração) → `cortes.py` → A-roll.
 5. Plano: montar automaticamente seguindo as regras do PLAYBOOK do padrão. Gancho: só o título de abertura (sem inserção). Inserções: as imagens de `insercoes/<nome-do-bruto>/` entram como card na base, no trecho da fala a que se referem (ou no tempo do prefixo do nome, ex. `0m12-`). Recursos opcionais: só os que o padrão liga por padrão.
-6. Storyboard: gerar mas **não mostrar** (fica salvo pra consulta posterior).
-7. Recorte, `rosto.py`, `compor_camadas.py`, `gerar.py`, snapshots → abrir o **preview**.
+6. Recorte completo, `rosto.py`, `compor_camadas.py`; storyboard: gerar mas **não mostrar** (fica salvo pra consulta posterior).
+7. `gerar.py`, snapshots → abrir o **preview**.
 8. `registro.py etapa <slug> preview`.
 9. Mostrar o preview e dizer: **"Pronto! Assista ao vídeo e me diga o que quer ajustar."**
 

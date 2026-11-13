@@ -25,11 +25,43 @@ prompt = f"Vídeo de {P.M['nome']}." + (" Termos: " + ", ".join(terms) + "." if 
 
 r = mlx_whisper.transcribe(audio, path_or_hf_repo="mlx-community/whisper-large-v3-turbo",
                            language="pt", word_timestamps=True, initial_prompt=prompt)
-words = [{"w": w["word"].strip(), "s": round(w["start"], 2), "e": round(w["end"], 2)}
-         for seg in r["segments"] for w in seg["words"]]
-# o Whisper às vezes "alucina" números/vírgulas no último instante do áudio: descarta tokens sem letras
-words = [w for w in words if re.search(r"[A-Za-zÀ-ÿ0-9]{2,}|^[A-Za-zÀ-ÿ]$", w["w"]) and w["e"] > w["s"] - 0.01]
+fim_audio = max((seg["end"] for seg in r["segments"]), default=0)
+
+def vale(w, ultimo):
+    """Descarta só lixo: token sem letra/número, ou número "alucinado" com duração zero no último instante do áudio.
+    Números de um dígito de verdade ("1,", "6") ficam (antes eram descartados e a contagem "1, 2, 3..." sumia)."""
+    t = w["word"].strip()
+    if not re.search(r"[A-Za-zÀ-ÿ0-9]", t):
+        return False
+    if ultimo and re.fullmatch(r"[0-9][,.;:!?]*", t) and w["end"] - w["start"] < 0.02 and w["end"] >= fim_audio - 0.1:
+        return False
+    return True
+
+words, alertas = [], []
+for seg in r["segments"]:
+    sw = seg.get("words", [])
+    ok = [w for k, w in enumerate(sw) if vale(w, k == len(sw) - 1)]
+    words += [{"w": w["word"].strip(), "s": round(w["start"], 2), "e": round(w["end"], 2)} for w in ok]
+    # conferência: a frase do trecho tem palavras que não vieram na lista palavra por palavra? (o Whisper às vezes
+    # pula palavras no modo palavra por palavra, ex. uma contagem rápida) → avisa com o trecho
+    norm = lambda x: re.sub(r"[^\wÀ-ÿ]", "", x.lower())
+    frase = [norm(t) for t in seg["text"].split() if norm(t)]
+    lista = [norm(w["word"]) for w in ok if norm(w["word"])]
+    if len(frase) > len(lista):
+        faltam = list(frase)
+        for t in lista:
+            if t in faltam: faltam.remove(t)
+        alertas.append(f"{seg['start']:.2f}–{seg['end']:.2f} s: faltam {len(frase) - len(lista)} palavra(s) na lista "
+                       f"({' '.join(faltam[:12])}) — frase: \"{seg['text'].strip()}\"")
 os.makedirs(P.path("transcricao"), exist_ok=True)
+alerta_arq = P.path(f"transcricao/{nome}.alertas.txt")
+if alertas:
+    open(alerta_arq, "w", encoding="utf-8").write("\n".join(alertas) + "\n")
+    for a in alertas:
+        print("⚠️  palavras puladas na transcrição:", a)
+    print(f"   → retranscrever esses trechos isolados e inserir as palavras com tempo em transcricao/{nome}.words.json")
+elif os.path.exists(alerta_arq):
+    os.remove(alerta_arq)
 json.dump(words, open(P.path(f"transcricao/{nome}.words.json"), "w"), ensure_ascii=False)
 with open(P.path(f"transcricao/{nome}.txt"), "w") as f:
     for seg in r["segments"]:

@@ -106,7 +106,8 @@
   },
   "estilos_apelidos": {
    "blocos": "blocos3"
-  }
+  },
+  "ultima_palavra_min_s": 0.4
  },
  "palavras_chave": {
   "posicao": 0.5,

@@ -42,18 +42,26 @@ def checar():
     return " ".join(linhas)
 
 
+GIT_AUTORA = "/opt/homebrew/bin/git"   # o /usr/bin/git abre a janela de instalação da Apple em Mac sem as ferramentas
+
+
+def da_autora():
+    """Pasta de trabalho da autora: arquivo-marcador `.autora` (ignorado pelo git) ou git + a marca dela."""
+    return os.path.exists(os.path.join(RAIZ, ".autora")) or \
+        (os.path.isdir(os.path.join(RAIZ, ".git")) and os.path.isdir(os.path.join(RAIZ, "marcas", "amanda")))
+
+
 def checar_atualizacao():
-    """Compara HEAD local com origin/main. Retorna aviso se houver commits novos."""
-    git = os.path.join(RAIZ, ".git")
-    if not os.path.isdir(git):
+    """Pasta da autora: compara HEAD local com origin/main (com o git do Homebrew). Retorna aviso se houver commits novos."""
+    if not da_autora() or not os.path.exists(GIT_AUTORA):
         return ""
     try:
-        subprocess.run(["git", "-C", RAIZ, "fetch", "--quiet"], capture_output=True, timeout=15)
-        local = subprocess.run(["git", "-C", RAIZ, "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5).stdout.strip()
-        remoto = subprocess.run(["git", "-C", RAIZ, "rev-parse", "origin/main"], capture_output=True, text=True, timeout=5).stdout.strip()
+        subprocess.run([GIT_AUTORA, "-C", RAIZ, "fetch", "--quiet"], capture_output=True, timeout=15)
+        local = subprocess.run([GIT_AUTORA, "-C", RAIZ, "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5).stdout.strip()
+        remoto = subprocess.run([GIT_AUTORA, "-C", RAIZ, "rev-parse", "origin/main"], capture_output=True, text=True, timeout=5).stdout.strip()
         if not local or not remoto or local == remoto:
             return ""
-        r = subprocess.run(["git", "-C", RAIZ, "log", "--oneline", f"{local}..{remoto}"], capture_output=True, text=True, timeout=10)
+        r = subprocess.run([GIT_AUTORA, "-C", RAIZ, "log", "--oneline", f"{local}..{remoto}"], capture_output=True, text=True, timeout=10)
         commits = [l.strip() for l in r.stdout.strip().splitlines() if l.strip()]
         if not commits:
             return ""
@@ -68,8 +76,9 @@ def checar_atualizacao():
 
 
 def checar_atualizacao_sem_git():
-    """Instalação pelo zip (sem .git): compara a versão instalada com a do GitHub pela web (motor/atualizar.py)."""
-    if os.path.isdir(os.path.join(RAIZ, ".git")):
+    """Clientes (instalação pelo zip — ou por git, que no Mac deles nem funciona): compara a versão instalada com a do
+    GitHub pela web (motor/atualizar.py). Só a pasta da autora usa o git."""
+    if da_autora():
         return ""
     try:
         import atualizar
@@ -80,10 +89,21 @@ def checar_atualizacao_sem_git():
         return ""
     lista = info.get("mudancas") or []
     resumo = ("; ".join(lista[:5]) + (f" (+{len(lista) - 5} mais)" if len(lista) > 5 else "")) if lista else ""
+    # vídeos no meio da edição: a atualização pode mudar o visual deles (padrão novo) — avisar antes
+    andamento = []
+    try:
+        reg = json.load(open(os.path.join(RAIZ, "registro.json"), encoding="utf-8"))
+        andamento = [f"{v['bruto']} ({v['etapa']})" for v in reg.get("videos", []) if v.get("etapa") not in ("novo", "entregue")]
+    except Exception:
+        pass
+    aviso_andamento = (f" ATENÇÃO: há vídeo(s) em andamento: {', '.join(andamento[:5])}. Na pergunta, acrescentar: "
+                       "'Você tem vídeo em edição. Se atualizar agora, ele pode mudar de aparência quando eu montar de "
+                       "novo (o padrão pode ter mudado). Prefere terminar e entregar antes, ou atualizar agora?'"
+                       ) if andamento else ""
     return (" ATUALIZAÇÃO DISPONÍVEL" + (f" (mudanças: {resumo})" if resumo else "") + ". "
             "Na primeira resposta, antes de qualquer outra coisa, pergunte em linguagem simples: "
             "'Tem uma atualização do editor de vídeo. Quer que eu atualize agora? Seus vídeos, sua marca e a "
-            "conexão com o Drive não mudam.' Se a pessoa disser sim, rodar /video-editor-atualizar.")
+            "conexão com o Drive não mudam.' Se a pessoa disser sim, rodar /video-editor-atualizar." + aviso_andamento)
 
 
 def aviso_icloud():

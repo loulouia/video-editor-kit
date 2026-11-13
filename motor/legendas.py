@@ -326,6 +326,8 @@ for t, i, j, *meta in out:
         print(f"{W[i]['s']:6.2f}  [{len(t):2d}] {t}")
 if "--gravar" in sys.argv:
     e = P.edicao(); e["legendas"] = out
+    import hashlib     # "impressão digital" do texto: o gerar.py recusa legendas montadas sobre outro texto
+    e["legendas_texto"] = hashlib.sha1("\n".join(w["w"] for w in W).encode("utf-8")).hexdigest()[:12]
     json.dump(e, open(P.path("edicao.json"), "w"), ensure_ascii=False, indent=1)
     print(f"{len(out)} legendas gravadas (máx. {MAXC} caracteres, {L.get('linhas_max', 2)} linha(s), {PMAX} palavras)"
           + (f", {sum(len(x[3]['destaques']) for x in out)} destaques" if PPL else ""))

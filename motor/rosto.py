@@ -19,7 +19,7 @@ if "--rapido" in sys.argv:                 # modo storyboard: recorte só de 2 q
     tmp = tempfile.mkdtemp(); clip, matte = os.path.join(tmp, "q.mp4"), os.path.join(tmp, "q.webm")
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-an", "-vf", "fps=2,scale=540:960",
                     "-c:v", "libx264", "-crf", "18", clip], check=True)
-    subprocess.run(["npx", "-y", "hyperframes@latest", "remove-background", clip, "-o", matte], capture_output=True, check=True)
+    subprocess.run(["npx", "-y", "hyperframes@0.8.150", "remove-background", clip, "-o", matte], capture_output=True, check=True)
     sys.argv = [sys.argv[0], clip, matte, saida, "--fps", "2"]
 ap = argparse.ArgumentParser()
 ap.add_argument("video"); ap.add_argument("recorte"); ap.add_argument("saida")

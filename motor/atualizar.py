@@ -173,10 +173,17 @@ def remover(p):
         os.remove(p)
 
 
+def pasta_da_autora(raiz=RAIZ):
+    """A pasta de trabalho da autora: tem o arquivo-marcador `.autora` (ignorado pelo git, nunca vai pros clientes) ou o
+    repositório git com a marca dela. Só ela atualiza com git; todo cliente atualiza por aqui, mesmo que tenha instalado
+    com git (git no Mac exige as ferramentas da Apple)."""
+    return os.path.exists(os.path.join(raiz, ".autora")) or \
+        (os.path.isdir(os.path.join(raiz, ".git")) and os.path.isdir(os.path.join(raiz, "marcas", "amanda")))
+
+
 def checar_pasta():
-    if os.path.isdir(os.path.join(RAIZ, ".git")):
-        raise Erro("esta pasta usa git (instalação da autora ou via git). Nela, atualizar é com git pull, "
-                   "não com este script")
+    if pasta_da_autora():
+        raise Erro("esta é a pasta de trabalho da autora (git). Nela, atualizar é com git pull, não com este script")
     if not (os.path.isdir(os.path.join(RAIZ, "motor")) and os.path.isfile(os.path.join(RAIZ, "CLAUDE.md"))):
         raise Erro(f"{RAIZ} não parece a pasta do editor de vídeo (falta motor/ ou CLAUDE.md). "
                    "Rode de dentro da pasta do editor (a que tem as pastas motor e padroes)")

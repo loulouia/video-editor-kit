@@ -73,11 +73,18 @@ Regras:
 
 ## Distribuição para clientes
 
-### Instalação pelo Claude Code (recomendado)
-O cliente abre o Claude Code e cola no chat: "Baixe o editor de vídeo pra mim: https://github.com/loulouia/video-editor-kit.git". O Claude clona o repositório dentro de `~/Desktop/ClaudeCode/video-editor.nosync` (criando a pasta `ClaudeCode` se não existir), abre a pasta como projeto ativo do Claude Code (pra que os comandos `/video-editor-*` apareçam) e orienta o cliente a mudar as permissões pra Auto e rodar `/video-editor-configurar`.
+### Instalação pelo Claude Code (recomendado) — pelo zip, nunca com git
+O git no Mac exige as ferramentas da Apple (falhou nos Macs dos clientes), então a instalação é **pelo zip**, o mesmo caminho da atualização. O cliente cola no Claude Code a frase do guia, que faz:
+```
+mkdir -p ~/Desktop/ClaudeCode/video-editor.nosync && cd ~/Desktop/ClaudeCode/video-editor.nosync
+curl -fsSL https://codeload.github.com/loulouia/video-editor-kit/zip/refs/heads/main -o /tmp/editor.zip
+tar -xf /tmp/editor.zip --strip-components 1 && rm /tmp/editor.zip
+python3 motor/atualizar.py aplicar        # registra a versão instalada (config/versao.json)
+```
+Depois o Claude abre a pasta como projeto ativo do Claude Code (pra que os comandos `/video-editor-*` apareçam) e orienta o cliente a mudar as permissões pra Auto e rodar `/video-editor-configurar`. Se alguém instalou com git mesmo assim, atualiza pelo zip igual (o atualizador só recusa a pasta da autora).
 
 ### Conteúdo do pacote
-Pacote `video-editor.nosync` com: `motor/`, `.claude/` (comandos e hook), `CLAUDE.md`, `LEIA-ME.md`, `padroes/` (amanda + topo-livre, com fontes e licenças). **Não vai:** `marcas/amanda/` (logo, glossário, editados), `projetos/`, `config/`, `registro.json`, `.git/`. Marca do cliente: logo e glossário definidos por ele no `/video-editor-configurar`; a cor sugerida depende de **como a câmera grava**: imagem normal (com contraste) → a mesma da Amanda (`padroes/amanda/cor/meus-editados.cube`); **imagem lavada** (cinza, sem contraste: perfis log/flat, comum em câmeras Sony/cinema) → `padroes/amanda/cor/lavado.cube` (contraste, pele quente, cor rica; aprovada no vídeo do Adel Bark, 2026-10-21). A LUT da Amanda num vídeo lavado deixa ainda mais apagado. Sempre mostrar a comparação e deixar a pessoa escolher; a escolhida é copiada pra `marcas/<cliente>/cor/`. O vídeo de teste (`taste-washing-5`) é só da autora do motor.
+Pacote `video-editor.nosync` (o zip do GitHub) com: `motor/`, `.claude/` (comandos e hook), `CLAUDE.md`, `LEIA-ME.md`, `padroes/` (amanda + topo-livre + basico, com fontes), e também `marcas/adel-bark/` e `marcas/mariana/` (estão no repositório). **Não vai:** `marcas/amanda/` (logo, glossário, editados), `projetos/`, `config/`, `registro.json`, `.git/`, `.autora`. Marca do cliente: logo e glossário definidos por ele no `/video-editor-configurar`; a cor sugerida depende de **como a câmera grava**: imagem normal (com contraste) → a mesma da Amanda (`padroes/amanda/cor/meus-editados.cube`); **imagem lavada** (cinza, sem contraste: perfis log/flat, comum em câmeras Sony/cinema) → `padroes/amanda/cor/lavado.cube` (contraste, pele quente, cor rica; aprovada no vídeo do Adel Bark, 2026-10-21). A LUT da Amanda num vídeo lavado deixa ainda mais apagado. Sempre mostrar a comparação e deixar a pessoa escolher; a escolhida é copiada pra `marcas/<cliente>/cor/`. O vídeo de teste (`taste-washing-5`) é só da autora do motor.
 
 ### Biblioteca inicial (efeitos, músicas, transições)
 A autora mantém uma pasta compartilhada no Drive (`Edição de vídeos/_biblioteca/`) com efeitos sonoros, músicas e transições livres pra usar. O `/video-editor-configurar` (etapa 4.1) oferece copiar pro Drive do cliente. A configuração fica em `config/ambiente.json` → `"biblioteca"`: `pasta_id` (ID da pasta compartilhada no Drive da autora) e `destinos` (mapeamento subpasta → pasta destino no Drive do cliente). Comando: `python motor/drive.py copiar-biblioteca`. Os arquivos são copiados, não linkados — a pessoa tem a cópia no próprio Drive. A autora atualiza a pasta compartilhada; clientes novos recebem a versão mais recente; clientes antigos podem rodar `copiar-biblioteca` de novo (o rclone só copia o que não existe).
@@ -87,7 +94,7 @@ Os clientes instalam pelo zip (o programa git não funciona no Mac sem as ferram
 - **Troca:** `motor/`, cada padrão que vem na versão nova (`padroes/<nome>/`), `.claude/` (comandos, hook, painel), `CLAUDE.md`, `LEIA-ME.md`. **Nunca toca:** `marcas/`, `config/`, `projetos/`, `registro.json`, `.claude/settings.local.json`, padrões criados pela pessoa.
 - **Sobrescreve** ajustes locais no motor e nos padrões da autora (decisão da autora: ajuste no motor é feito por ela e chega pra todos). Antes, guarda cópia em `config/backups-atualizacao/` (3 mais recentes). Falha no meio → desfaz tudo. `python3 motor/atualizar.py desfazer` volta pra versão anterior (também resolve atualização interrompida). Erros e o que fazer: tabela no `/video-editor-atualizar`.
 - Toda publicação na `main` vira atualização pros clientes (não há número de versão manual): só publicar o que estiver pronto.
-- Pasta com `.git` (a da autora): o script se recusa; lá é `git pull`.
+- Pasta da autora (arquivo-marcador `.autora`, ignorado pelo git): o script se recusa; lá é `git pull` com `/opt/homebrew/bin/git`, e o aviso de início também usa esse git (nunca o `/usr/bin/git`, que abre a janela de instalação da Apple). Qualquer outra pasta — inclusive cliente que instalou com git — atualiza pelo zip.
 - Clientes que instalaram antes do atualizador precisam, uma única vez, colar no Claude Code a frase que baixa `motor/atualizar.py` e roda `aplicar`.
 
 ## Primeiro uso / padrão novo
@@ -109,7 +116,7 @@ Entregável: tabela comparativa com valores numéricos; a usuária decide a colu
 
 ## Nada cobre o rosto (PLAYBOOK §0, vale pra todo padrão)
 
-Nunca posicionar título, cards, legendas ou palavras-chave em posições fixas. Rodar `motor/rosto.py` depois do recorte; o `motor/gerar.py` usa esse mapa (com zoom e deslocamento do fundo mesclado) pra colocar cada elemento abaixo do queixo; se não couber, o card encolhe; o rosto nunca cede. Conferir nos snapshots antes do preview.
+Nunca posicionar título, cards, legendas ou palavras-chave em posições fixas. Rodar `motor/rosto.py` depois do recorte completo (nunca o mapa rápido pra montar); o `motor/gerar.py` usa esse mapa (com zoom e deslocamento do fundo mesclado) pra colocar cada elemento abaixo do queixo; se não couber, o card encolhe; o rosto nunca cede. **Exceção do `basico`** (`tela.sobreposicao_rosto`): a legenda pode cobrir de leve a pontinha do queixo (até 6% da altura do rosto, longe da boca) antes de dividir o bloco. Conferir nos snapshots antes do preview.
 
 ## Cor e iluminação (PLAYBOOK 1.1)
 
@@ -139,8 +146,8 @@ Essa escolha também vale para **reedição de vídeos já entregues** (da pasta
 As etapas abaixo são executadas em ambos os modos. No passo a passo, cada etapa pede aprovação. No bypass, todas rodam sem parar.
 
 1. **Plano.** Transcrever e montar o plano: cortes com timecodes, aceleração, duração final, legendas, zooms, inserções (tabela PLAYBOOK 4.0), efeitos, regras do padrão aplicadas, grading.
-2. **Storyboard.** Com o A-roll pronto (`motor/cortes.py`) e o `edicao.json` do plano, rodar `motor/storyboard.py projetos/<slug>` (~2 min). Um quadro por momento com a composição real.
-3. **Preview.** Recorte, `rosto.py`, `compor_camadas.py`, `gerar.py`, `hyperframes check` + snapshots → abrir o preview (HyperFrames, navegador do app).
+2. **Storyboard.** Com o A-roll pronto (`motor/cortes.py`), o **recorte completo** + `rosto.py` + `compor_camadas.py` e o `edicao.json` do plano, rodar `motor/storyboard.py projetos/<slug>` (faz o recorte se faltar). Um quadro por momento com a composição real — tem que bater com o preview (em legenda palavra por palavra, cada bloco aparece completo).
+3. **Preview.** `gerar.py`, `hyperframes check` + snapshots → abrir o preview (HyperFrames, navegador do app).
 4. **Ajustes.** O usuário assiste e pede ajustes pelo painel ou chat. Isso vale nos dois modos — o bypass acaba aqui, e a partir do preview o controle é do usuário.
 5. **Entrega só com aprovação explícita:** `/video-editor-entregar` (`motor/entregar.py`). Conferir quadros do MP4 final.
 6. **Registrar o aprendizado** no padrão (PLAYBOOK + padrao.json + CHANGELOG) ou na marca (glossário).
@@ -154,7 +161,9 @@ As etapas abaixo são executadas em ambos os modos. No passo a passo, cada etapa
 ## Lições técnicas
 
 - **iCloud:** a Área de Trabalho sincroniza com o iCloud; ler o mesmo vídeo em dois processos dá "Operation timed out". Por isso os brutos vêm do Drive pra `projetos/<slug>/cache/` (cópia local de trabalho).
-- **Cortes:** os tempos globais do Whisper derivam até ~1 s. Rodar `motor/refinar_cortes.py` (retranscreve janelas curtas) e **sempre** validar com `motor/energia.py` (bordas e interior no nível do ruído da sala; `--perfil de ate` mostra os vales).
+- **Cortes:** os tempos globais do Whisper derivam até ~1 s. Padrões com `cortes.tom_min` (ex.: `basico`): `motor/cortar_pausas.py` (pausas e respiros pelo tom da voz) + conferência retranscrevendo. Os outros: `motor/refinar_cortes.py` (retranscreve janelas curtas) e **sempre** validar com `motor/energia.py` (bordas e interior no nível do ruído da sala; `--perfil de ate` mostra os vales).
+- **Legendas x texto:** as legendas apontam pras palavras de `aroll.words.json` por posição. Corrigiu o texto (palavra trocada, inserida ou tirada) → rodar `legendas.py --gravar` de novo; o `gerar.py` recusa legendas montadas sobre outro texto.
+- **Pouco espaço na entrega:** o `entregar.py` confere o espaço antes do render (~1 MB por quadro) e, se faltar, para e pede pra pessoa liberar espaço.
 - **Conferência:** depois do A-roll, retranscrever o arquivo inteiro e comparar com o roteiro. Janelas curtas (<5 s) fazem o Whisper inventar palavras. Nas legendas, usar o texto do roteiro.
 - **Corte duvidoso:** sílabas emendadas → não adivinhar. Gerar 2–3 versões curtas do trecho (`SendUserFile`) e deixar a usuária escolher pelo ouvido.
 - **Uma cópia só da pessoa:** recorte nunca como segunda `<video>` no HyperFrames (dessincroniza no preview → "fantasma"). `motor/compor_camadas.py` embute fundo mesclado + texto atrás + recorte num vídeo único.

@@ -94,6 +94,7 @@ Referência visual: vídeo de referência enviado pela Amanda em 2026-11-12 (blo
 | Espaço entre palavras | 0,2 × o tamanho de cada palavra (entre palavras grandes, o espaço é grande também) |
 | Aparecimento | **palavra por palavra**: cada palavra aparece no instante em que é falada, **saindo do desfocado** (0,25 s), e as anteriores **continuam na tela** até completar o bloco; aí o bloco desfoca e some (0,18 s) e entra o próximo. As palavras já nascem na posição final |
 | Sincronia | a palavra aparece **junto com a voz, nunca antes**: `motor/sincronizar.py` usa o mesmo detector de fala (pelo tom). Palavra perto de um início de voz começa exatamente nele; na fala corrida, atrasa pelo erro médio medido no vídeo; e a palavra **nunca** entra num trecho sem voz (silêncio/respiro) |
+| Última palavra do bloco | fica **pelo menos 0,4 s nítida** antes do bloco sair (fala rápida fazia ela piscar 0,1 s). Se preciso, o bloco seguinte espera esses décimos: a legenda pode atrasar um pouco, nunca adiantar a fala |
 | Linha larga demais | primeiro o destaque daquela linha diminui (até 1,4×); se não bastar, a linha quebra em duas; só uma palavra sozinha larga demais encolhe (§0.1) |
 | Quebras | fim de frase troca o bloco; vírgula fecha a linha; palavra de ligação (de, que, a, o...) nunca fica no fim da linha nem do bloco |
 | Fim extra | o bloco permanece 0,3 s depois da última palavra |

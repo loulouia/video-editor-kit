@@ -3,7 +3,8 @@
 Todo trecho sem fala (silêncio, respiro, ruído) com pelo menos `pausa_min_s` vira corte, deixando `margem_antes_s`
 depois do fim da fala e `margem_depois_s` antes da fala voltar. A fala já inclui uma folguinha pras consoantes sem tom
 (`antes_s`/`depois_s`), então o fim das palavras não é comido.
-Também corta o começo (antes da primeira fala) e grava o fim em projeto.json ("fim").
+Também corta o começo (antes da primeira fala) e grava o fim em projeto.json ("fim") — a não ser que o fim tenha sido
+escolhido pela pessoa ("fim_escolhido": true, ex. pra tirar uma despedida no final): esse nunca é trocado.
 Valores no padrão: padrao.json → "cortes": {"tom_min", "volume_min_db", "antes_s", "depois_s", "pausa_min_s",
 "margem_antes_s", "margem_depois_s"}.
 Trechos marcados em projeto.json → "cortes_config": {"manter": [[de, ate, "motivo"], ...]} nunca são cortados.
@@ -37,7 +38,12 @@ for a, b in trechos_sem_voz(t, ativo, MIN):
         continue
     cortes.append({"de": round(de, 3), "ate": round(ate, 3), "motivo": "pausa/respiro"})
 json.dump(cortes, open(P.path("cortes.json"), "w"), ensure_ascii=False, indent=1)
-P.p["fim"] = round(fim_fala + 0.3, 3)
+if P.p.get("fim_escolhido") and P.p.get("fim"):
+    fim_fala = min(fim_fala, P.p["fim"])          # fim escolhido pela pessoa: fica, e os cortes param nele
+    cortes = [c for c in cortes if c["de"] < P.p["fim"]]
+    json.dump(cortes, open(P.path("cortes.json"), "w"), ensure_ascii=False, indent=1)
+else:
+    P.p["fim"] = round(fim_fala + 0.3, 3)
 json.dump(P.p, open(P.path("projeto.json"), "w"), ensure_ascii=False, indent=1)
 tirado = sum(c["ate"] - c["de"] for c in cortes)
 print(f"silêncio da sala {piso:.1f} dB | {len(cortes)} cortes, {tirado:.1f} s tirados (pausas e respiros com {MIN:g} s "
